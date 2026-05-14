@@ -4,8 +4,8 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
-#include "sensors/MPU6050_register_map.h"
 #include "sensors/IMU.h"
+#include "IMU_processing.h"
 
 static float accel_x_offset;
 static float accel_y_offset;
@@ -21,19 +21,15 @@ int main()
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
     while (1) {
-        int16_t gyro_x, gyro_y, gyro_z;
-        int16_t accel_x, accel_y, accel_z;
-        float a_x, a_y, a_z;
+        IMU_vectors_t IMU_data;
 
         while (stdio_getchar_timeout_us(100) != (int)'\r');
 
         while (IMU_IsDataReady());
 
-        IMU_GetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
-        a_x = accel_x / MPU6050_ACCEL_2_LSB_SENS;
-        a_y = accel_y / MPU6050_ACCEL_2_LSB_SENS;
-        a_z = accel_z / MPU6050_ACCEL_2_LSB_SENS;
+        IMU_data = IMU_GetData();
 
-        printf("A = {%01.03f %01.03f %01.03f}\r\n", a_x, a_y, a_z);
+        printf("A = {%01.03f %01.03f %01.03f}\r\n", 
+               IMU_data.accel.x, IMU_data.accel.y, IMU_data.accel.z);
     }
 }

@@ -8,6 +8,8 @@ project(MPU6050_demo C CXX ASM)
 
 set(SOURCES
     src/main.c
+    src/IMU_processing.h
+    src/IMU_processing.c
     src/sensors/MPU6050_register_map.h
     src/sensors/IMU.h
     src/sensors/IMU.c

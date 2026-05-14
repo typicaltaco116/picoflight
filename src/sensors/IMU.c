@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
+#include "../IMU_processing.h"
 #include "MPU6050_register_map.h"
 
 static i2c_inst_t *IMU_i2c_instance;
@@ -34,6 +35,8 @@ void IMU_InitDevice(IMU_sample_rate_e rate, IMU_gyro_scale_e g_scale, IMU_accel_
     sample_rate = rate;
     gyro_scale = g_scale;
     accel_scale = a_scale;
+
+    IMU_SetProcessingScale(g_scale, a_scale);
 
     // Reset IMU_ device
     IMU_RegisterWrite(MPU6050_PWR_MGMT_1, MPU6050_RESET_BIT);
