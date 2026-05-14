@@ -4,7 +4,7 @@ set(PICO_BOARD pico2)
 
 include($ENV{PICO_SDK_PATH}/pico_sdk_init.cmake)
 
-project(MPU6050_demo C CXX ASM)
+project(picoflight C CXX ASM)
 
 set(SOURCES
     src/main.c
@@ -20,20 +20,20 @@ set(SOURCES
 pico_sdk_init()
 
 if (TARGET tinyusb_device)
-    add_executable(MPU6050_demo ${SOURCES})
+    add_executable(${PROJECT_NAME} ${SOURCES})
 
     # pull in common dependencies
-    target_link_libraries(MPU6050_demo
+    target_link_libraries(${PROJECT_NAME}
         pico_stdlib
         hardware_i2c
     )
 
     # enable usb output, disable uart output
-    pico_enable_stdio_usb(MPU6050_demo 1)
-    pico_enable_stdio_uart(MPU6050_demo 0)
+    pico_enable_stdio_usb(${PROJECT_NAME} 1)
+    pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
     # create map/bin/hex/uf2 file etc.
-    pico_add_extra_outputs(MPU6050_demo)
+    pico_add_extra_outputs(${PROJECT_NAME})
 
 elseif(PICO_ON_DEVICE)
     message("Skipping hello_usb because TinyUSB submodule is not initialized in the SDK")
