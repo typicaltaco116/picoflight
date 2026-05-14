@@ -10,6 +10,7 @@ set(SOURCES
     src/main.c
     src/IMU_processing.h
     src/IMU_processing.c
+    src/orientation_types.h
     src/sensor_fusion.h
     src/sensor_fusion.c
     src/sensors/MPU6050_register_map.h
