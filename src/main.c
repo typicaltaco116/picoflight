@@ -15,7 +15,8 @@ int main()
 {
     stdio_init_all();
 
-    IMU_Init(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
+    IMU_InitBus(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
+    IMU_InitDevice(IMU_5HZ_RATE, IMU_GYRO_SCALE_250, IMU_ACCEL_SCALE_2);
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
@@ -26,7 +27,7 @@ int main()
 
         while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-        while (~IMU_Read(MPU6050_INT_STATUS) & MPU6050_DATA_RDY_INT_BIT);
+        while (IMU_IsDataReady());
 
         IMU_GetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
         a_x = accel_x / MPU6050_ACCEL_2_LSB_SENS;
