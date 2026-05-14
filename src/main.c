@@ -15,14 +15,7 @@ int main()
 {
     stdio_init_all();
 
-    gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(PICO_DEFAULT_I2C_SDA_PIN);
-    gpio_pull_up(PICO_DEFAULT_I2C_SCL_PIN);
-
-    i2c_init(i2c_default, 200 * 1000); // setup with 200kHz clock speed
-    
-    IMU_Init();
+    IMU_Init(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 

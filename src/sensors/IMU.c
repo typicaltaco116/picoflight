@@ -7,30 +7,19 @@
 
 #include "MPU6050_register_map.h"
 
-void IMU_RegisterWrite(uint8_t address, uint8_t data)
-{
-    uint8_t buffer[2];
-    buffer[0] = address;
-    buffer[1] = data;
-    i2c_write_blocking(i2c_default, MPU6050_I2C_ADDR, buffer, 2, false);
-}
+static i2c_inst_t *IMU_i2c_instance;
 
-uint8_t IMU_Read(uint8_t address)
+void IMU_Init(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t speed)
 {
-    uint8_t value;
-    i2c_write_blocking(i2c_default, MPU6050_I2C_ADDR, (uint8_t[]){address}, 1, true);
-    i2c_read_blocking(i2c_default, MPU6050_I2C_ADDR, &value, 1, false);
-    return value;
-}
+    IMU_i2c_instance = i2c;
 
-void IMU_BufferRead(uint8_t start_address, uint8_t *buffer, size_t length)
-{
-    i2c_write_blocking(i2c_default, MPU6050_I2C_ADDR, (uint8_t[]){start_address}, 1, true);
-    i2c_read_blocking(i2c_default, MPU6050_I2C_ADDR, buffer, length, false);
-}
+    i2c_init(IMU_i2c_instance, speed); 
 
-void IMU_Init(void)
-{
+    gpio_set_function(sda_pin, GPIO_FUNC_I2C);
+    gpio_set_function(scl_pin, GPIO_FUNC_I2C);
+    gpio_pull_up(sda_pin);
+    gpio_pull_up(scl_pin);
+
     // Reset IMU_ device
     IMU_RegisterWrite(MPU6050_PWR_MGMT_1, MPU6050_RESET_BIT);
     sleep_ms(100);
@@ -51,6 +40,28 @@ void IMU_Init(void)
 
     // Enable Data Ready Interrupt
     IMU_RegisterWrite(MPU6050_INT_ENABLE, MPU6050_DATA_RDY_INT_BIT);
+}
+
+void IMU_RegisterWrite(uint8_t address, uint8_t data)
+{
+    uint8_t buffer[2];
+    buffer[0] = address;
+    buffer[1] = data;
+    i2c_write_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, buffer, 2, false);
+}
+
+uint8_t IMU_Read(uint8_t address)
+{
+    uint8_t value;
+    i2c_write_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, (uint8_t[]){address}, 1, true);
+    i2c_read_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, &value, 1, false);
+    return value;
+}
+
+void IMU_BufferRead(uint8_t start_address, uint8_t *buffer, size_t length)
+{
+    i2c_write_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, (uint8_t[]){start_address}, 1, true);
+    i2c_read_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, buffer, length, false);
 }
 
 void IMU_GetRawData(int16_t* gyro_x, int16_t* gyro_y, int16_t* gyro_z,
