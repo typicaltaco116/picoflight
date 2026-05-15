@@ -13,9 +13,14 @@ set(SOURCES
     src/orientation_types.h
     src/sensor_fusion.h
     src/sensor_fusion.c
+
     src/sensors/MPU6050_register_map.h
     src/sensors/IMU.h
     src/sensors/IMU.c
+
+    src/RC/RC.h
+    src/RC/SBUS.h
+    src/RC/SBUS.c
 )
 
 pico_sdk_init()
