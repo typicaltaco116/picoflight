@@ -43,6 +43,8 @@ IMU_vectors_t IMU_GetData(void)
     data.accel.z = (float)accel_z / accel_scale;
 
     data = vector_add(data, error);
+
+    return data;
 }
 
 

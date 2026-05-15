@@ -7,12 +7,15 @@
 #define DEG_TO_RAD(x) (x * M_PI / 180.0f)
 #define RAD_TO_DEG(x) (x * 180.0f / M_PI)
 
-static float q0, q1, q2, q3;
+static float q0 = 1.0f;
+static float q1 = 0.0f;
+static float q2 = 0.0f;
+static float q3 = 0.0f;
 static const float B_madgwick = 0.04f;
 
 static float invSqrt(float x)
 {
-    return 1.0f / sqrt(x);
+    return 1.0f / sqrtf(x);
 }
 
 static float constrain(float value, float lower, float upper)
@@ -44,6 +47,7 @@ void ComputeMadgwick(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
     gx = DEG_TO_RAD(gx);
     gy = DEG_TO_RAD(gy);
     gz = DEG_TO_RAD(gz);
+
 
     //Rate of change of quaternion from gyroscope
     qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
@@ -79,6 +83,7 @@ void ComputeMadgwick(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
         s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
         s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
         s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
+
         recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); //normalise step magnitude
         s0 *= recipNorm;
         s1 *= recipNorm;
@@ -98,7 +103,7 @@ void ComputeMadgwick(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
     q2 += qDot3 * invSampleFreq;
     q3 += qDot4 * invSampleFreq;
 
-    //Normalise quaternion
+    //Normalize quaternion
     recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
     q0 *= recipNorm;
     q1 *= recipNorm;

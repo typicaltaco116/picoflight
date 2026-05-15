@@ -9,10 +9,6 @@
 #include "sensor_fusion.h"
 #include "orientation_types.h"
 
-static float accel_x_offset;
-static float accel_y_offset;
-static float accel_z_offset;
-
 int main() 
 {
     stdio_init_all();
@@ -26,11 +22,16 @@ int main()
         IMU_vectors_t IMU_data;
         euler_t angles;
 
-        while (IMU_IsDataReady());
-
+        while (!IMU_IsDataReady());
         IMU_data = IMU_GetData();
 
         ComputeMadgwick(&angles, IMU_data, 5.0f);
+
+        printf("Gyro = {%03.03f %03.03f %03.03f}\t",
+               IMU_data.gyro.x, IMU_data.gyro.y, IMU_data.gyro.z); 
+
+        printf("Accel = {%03.03f %03.03f %03.03f}\t",
+               IMU_data.accel.x, IMU_data.accel.y, IMU_data.accel.z); 
 
         printf("Euler Angles = {%03.03f %03.03f %03.03f}\r\n",
                angles.roll, angles.pitch, angles.yaw);
