@@ -29,6 +29,10 @@ if (TARGET tinyusb_device)
         hardware_i2c
     )
 
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE -Wall -Wextra
+    )
+
     # enable usb output, disable uart output
     pico_enable_stdio_usb(${PROJECT_NAME} 1)
     pico_enable_stdio_uart(${PROJECT_NAME} 0)
