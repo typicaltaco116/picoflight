@@ -6,9 +6,9 @@
 
 #include "RC.h"
 
-void SBUS_InitBus(uart_inst_t *uart, uint32_t rx, uint32_t tx);
+void SBUS_InitBus(uart_inst_t *uart, uint32_t rx);
 
 // Currently outputs channels normalized to [0, 1]
 bool SBUS_GetChannels(RC_t rc);
 
-bool SBUS_IsFailsafe(uint8_t *packet);
+bool SBUS_IsFailsafe(void);

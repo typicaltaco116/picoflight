@@ -7,7 +7,7 @@
 
 #include "RC.h"
 
-#define SBUS_BAUD       100000 // 100k baud for almost all SBUS devices
+#define SBUS_BAUD       100000
 #define SBUS_DATA_BITS  8
 #define SBUS_STOP_BITS  2
 #define SBUS_PARITY     UART_PARITY_EVEN
@@ -29,24 +29,24 @@
 // [24] SBUS end Byte
 
 static uart_inst_t *_uart_instance;
+static bool _failsafe = true;
 
 
-void SBUS_InitBus(uart_inst_t *uart, uint32_t rx, uint32_t tx)
+void SBUS_InitBus(uart_inst_t *uart, uint32_t rx)
 {
     _uart_instance = uart;
 
     gpio_set_function(rx, UART_FUNCSEL_NUM(_uart_instance, rx));
-    gpio_set_function(tx, UART_FUNCSEL_NUM(_uart_instance, tx));
-
-    uart_set_format(_uart_instance, SBUS_DATA_BITS, SBUS_STOP_BITS, SBUS_PARITY);
+    gpio_set_inover(rx, GPIO_OVERRIDE_INVERT);
 
     uart_init(_uart_instance, SBUS_BAUD);
+    uart_set_format(_uart_instance, SBUS_DATA_BITS, SBUS_STOP_BITS, SBUS_PARITY);
 }
 
 
 // MIGHT BE USEFUL TO MOVE THE WHILE LOOP TO THE OUTSIDE OF THIS FUNCTION SO THE 
 // CALLER HAS CONTROL OVER THE PARSING TIMEFRAME.
-static bool parse(uint8_t *buffer)
+static bool parse(uint8_t **ret_ptr)
 {
     typedef enum {
         IDLE,
@@ -55,14 +55,19 @@ static bool parse(uint8_t *buffer)
     } parser_state_machine_e;
     static parser_state_machine_e state = IDLE;
     static uint32_t packet_byte_count;
+    static uint8_t buffer[SBUS_PAYLOAD_SIZE] = {0};
     bool packet_complete = false;
 
-    while (uart_is_readable(_uart_instance)) {
+    *ret_ptr = buffer;
+
+    while (uart_is_readable(_uart_instance) && !packet_complete) {
         uint8_t data = uart_getc(_uart_instance);
 
         switch (state) {
             default:
             case IDLE:
+                packet_complete = false;
+
                 if (data == SBUS_HEADER) {
                     state = READ_CHANNEL_DATA;
                     packet_byte_count = 0;
@@ -70,10 +75,9 @@ static bool parse(uint8_t *buffer)
                 break;
 
             case READ_CHANNEL_DATA:
-                *buffer = data;
-                packet_byte_count++;
+                buffer[packet_byte_count++] = data;
 
-                if (packet_byte_count == SBUS_PAYLOAD_SIZE)
+                if (packet_byte_count >= SBUS_PAYLOAD_SIZE)
                     state = READ_FOOTER;
                 break;
 
@@ -90,19 +94,19 @@ static bool parse(uint8_t *buffer)
 }
 
 
-typedef uint8_t SBUS_raw_t[19];
+typedef uint16_t SBUS_raw_t[19];
 
 static bool GetRaw(SBUS_raw_t raw_ch)
 {
-    uint8_t packet[SBUS_PAYLOAD_SIZE] = {0};
- 
-    if (parse(packet)) {
+    uint8_t *packet;
+
+    if (parse(&packet)) {
         raw_ch[1] = (((uint16_t)packet[1] << 8) | ((uint16_t)packet[0])) & 0x07FF;
         raw_ch[2] = (((uint16_t)packet[2] << 5) | ((uint16_t)packet[1] >> 3)) & 0x07FF;
         raw_ch[3] = (((uint16_t)packet[4] << 10) | ((uint16_t)packet[3] << 2) | ((uint16_t)packet[2] >> 6)) & 0x07FF;
         raw_ch[4] = (((uint16_t)packet[5] << 7) | ((uint16_t)packet[4] >> 1)) & 0x07FF;
         raw_ch[5] = (((uint16_t)packet[6] << 4) | ((uint16_t)packet[5] >> 4)) & 0x07FF;
-        raw_ch[6] = (((uint16_t)packet[8] << 3) | ((uint16_t)packet[7] << 1) | ((uint16_t)packet[6] >> 7)) & 0x07FF;
+        raw_ch[6] = (((uint16_t)packet[8] << 9) | ((uint16_t)packet[7] << 1) | ((uint16_t)packet[6] >> 7)) & 0x07FF;
         raw_ch[7] = (((uint16_t)packet[9] << 6) | ((uint16_t)packet[8] >> 2)) & 0x07FF;
         raw_ch[8] = (((uint16_t)packet[10] << 3) | ((uint16_t)packet[9] >> 5)) & 0x07FF;
 
@@ -111,13 +115,15 @@ static bool GetRaw(SBUS_raw_t raw_ch)
         raw_ch[11] = (((uint16_t)packet[15] << 10) | ((uint16_t)packet[14] << 2) | ((uint16_t)packet[13] >> 6)) & 0x07FF;
         raw_ch[12] = (((uint16_t)packet[16] << 7) | ((uint16_t)packet[15] >> 1)) & 0x07FF;
         raw_ch[13] = (((uint16_t)packet[17] << 4) | ((uint16_t)packet[16] >> 4)) & 0x07FF;
-        raw_ch[14] = (((uint16_t)packet[19] << 3) | ((uint16_t)packet[18] << 1) | ((uint16_t)packet[17] >> 7)) & 0x07FF;
+        raw_ch[14] = (((uint16_t)packet[19] << 9) | ((uint16_t)packet[18] << 1) | ((uint16_t)packet[17] >> 7)) & 0x07FF;
         raw_ch[15] = (((uint16_t)packet[20] << 6) | ((uint16_t)packet[19] >> 2)) & 0x07FF;
         raw_ch[16] = (((uint16_t)packet[21] << 3) | ((uint16_t)packet[20] >> 5)) & 0x07FF;
 
         raw_ch[17] = (bool)(packet[22] & (0x1 << 7));
         raw_ch[18] = (bool)(packet[22] & (0x1 << 6));
-        
+
+        _failsafe = packet[22] & (0x1 << 4);
+
         return true;
     }
 
@@ -143,7 +149,7 @@ bool SBUS_GetChannels(RC_t rc)
 }
 
 
-bool SBUS_IsFailsafe(uint8_t *packet)
+bool SBUS_IsFailsafe(void)
 {
-    return packet[22] & (0x1 << 4);
+    return _failsafe;
 }
