@@ -4,8 +4,8 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
-#include "RC/RC.h"
-#include "RC/SBUS.h"
+#include "src/RC/RC.h"
+#include "src/RC/SBUS.h"
 
 #define SBUS_RX 9
 #define SBUS_UART_INST uart1

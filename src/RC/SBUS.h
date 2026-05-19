@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "hardware/uart.h"
 
-#include "RC.h"
+#include "src/RC/RC.h"
 
 void SBUS_InitBus(uart_inst_t *uart, uint32_t rx);
 

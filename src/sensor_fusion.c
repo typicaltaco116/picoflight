@@ -2,7 +2,8 @@
 
 #include <math.h>
 #include <stdbool.h>
-#include "orientation_types.h"
+
+#include "src/orientation_types.h"
 
 #define DEG_TO_RAD(x) (x * M_PI / 180.0f)
 #define RAD_TO_DEG(x) (x * 180.0f / M_PI)

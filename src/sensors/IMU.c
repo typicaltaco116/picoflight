@@ -5,8 +5,8 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
-#include "../IMU_processing.h"
-#include "MPU6050_register_map.h"
+#include "src/IMU_processing.h"
+#include "src/sensors/MPU6050_register_map.h"
 
 static i2c_inst_t *IMU_i2c_instance;
 static IMU_sample_rate_e sample_rate;

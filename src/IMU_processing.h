@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "sensors/IMU.h"
+#include "src/sensors/IMU.h"
 
 #define IMU_CALIBRATION_CYCLES 20000.0 // must be double literal
 

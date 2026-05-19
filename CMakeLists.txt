@@ -28,6 +28,8 @@ pico_sdk_init()
 if (TARGET tinyusb_device)
     add_executable(${PROJECT_NAME} ${SOURCES})
 
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
     # pull in common dependencies
     target_link_libraries(${PROJECT_NAME}
         pico_stdlib

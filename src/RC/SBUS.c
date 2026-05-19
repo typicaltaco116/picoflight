@@ -5,7 +5,7 @@
 #include "hardware/uart.h"
 #include "hardware/gpio.h"
 
-#include "RC.h"
+#include "src/RC/RC.h"
 
 #define SBUS_BAUD       100000
 #define SBUS_DATA_BITS  8
