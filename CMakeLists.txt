@@ -6,6 +6,13 @@ include($ENV{PICO_SDK_PATH}/pico_sdk_init.cmake)
 
 project(picoflight C CXX ASM)
 
+set(LINKED_LIBRARIES
+    pico_stdlib
+    hardware_i2c
+    hardware_gpio
+    hardware_pwm
+)
+
 set(SOURCES
     src/main.c
     src/IMU_processing.h
@@ -21,6 +28,9 @@ set(SOURCES
     src/RC/RC.h
     src/RC/SBUS.h
     src/RC/SBUS.c
+
+    src/actuators/servo.h
+    src/actuators/servo.c
 )
 
 pico_sdk_init()
@@ -31,10 +41,7 @@ if (TARGET tinyusb_device)
     target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     # pull in common dependencies
-    target_link_libraries(${PROJECT_NAME}
-        pico_stdlib
-        hardware_i2c
-    )
+    target_link_libraries(${PROJECT_NAME} ${LINKED_LIBRARIES})
 
     target_compile_options(${PROJECT_NAME}
         PRIVATE -Wall -Wextra
