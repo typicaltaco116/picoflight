@@ -1,6 +1,6 @@
 #pragma once
 
-#inclde "src/orientation/types.h"
+#include "src/orientation/types.h"
 
 typedef struct {
     float k_P;

@@ -1,6 +1,6 @@
 #include "PID.h"
 
-#inclde "src/orientation/types.h"
+#include "src/orientation/types.h"
 
 static float singleLoopRun(PID_gains_t gain,
                            float setpoint, float input,
@@ -40,13 +40,13 @@ void PID_ThreeAxisAngleControl(
     yaw_old = rates.yaw;
 
     // Simple Angle Control
-    singleLoopRun(roll, roll_set, angles.roll, dt, &roll_I, rates.roll);
+    *roll_cmd = singleLoopRun(roll, roll_set, angles.roll, dt, &roll_I, rates.roll);
 
     // Simple Angle Control
-    singleLoopRun(pitch, pitch_set, angles.pitch, dt, &pitch_I, rates.pitch);
+    *pitch_cmd = singleLoopRun(pitch, pitch_set, angles.pitch, dt, &pitch_I, rates.pitch);
 
     // Simple Rate Control
-    singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
+    *yaw_cmd = singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
 }
 
 
@@ -77,7 +77,7 @@ void PID_ThreeAxisRateControl(
     yaw_old = rates.yaw;
 
     // Simple Rate Controllers
-    singleLoopRun(roll, roll_set, rates.roll, dt, &roll_I, roll_dxdt);
-    singleLoopRun(pitch, pitch_set, rates.pitch, dt, &pitch_I, pitch_dxdt);
-    singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
+    *roll_cmd = singleLoopRun(roll, roll_set, rates.roll, dt, &roll_I, roll_dxdt);
+    *pitch_cmd = singleLoopRun(pitch, pitch_set, rates.pitch, dt, &pitch_I, pitch_dxdt);
+    *yaw_cmd = singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
 }
