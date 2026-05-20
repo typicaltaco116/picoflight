@@ -15,15 +15,17 @@ set(LINKED_LIBRARIES
 
 set(SOURCES
     src/main.c
-    src/IMU_processing.h
-    src/IMU_processing.c
-    src/orientation_types.h
-    src/sensor_fusion.h
-    src/sensor_fusion.c
+
+    src/orientation/types.h
+
+    src/estimation/madgwick.h
+    src/estimation/madgwick.c
 
     src/sensors/MPU6050_register_map.h
     src/sensors/IMU.h
     src/sensors/IMU.c
+    src/sensors/IMU_processing.h
+    src/sensors/IMU_processing.c
 
     src/RC/RC.h
     src/RC/SBUS.h
