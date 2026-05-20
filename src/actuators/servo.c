@@ -13,15 +13,11 @@
 #define PWM_DIVIDER 64.0f
 #define PWM_WRAP ((SYSTEM_CLK / PWM_DIVIDER) / PWM_FREQ)
 
-//#if PWM_WRAP > 65535.0f // 16 bit limit
-//#error "PWM wrap for servo not sized correctly."
-//#endif
-
 #define UPPER_BOUND_MICROSECONDS 2000.0f
 #define LOWER_BOUND_MICROSECONDS 1000.0f
 
-#define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS)
-#define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS)
+#define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS * 1E-6)
+#define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS * 1E-6)
 
 servo_t servo_Register(uint32_t pin)
 {
@@ -42,14 +38,14 @@ void servo_Init(servo_t servo)
 
 static float map_float(float x, float L1, float H1, float L2, float H2)
 {
-    return (x - L1) * (H2 - L2) / (H1 - L1) + H1;
+    return (x - L1) * (H2 - L2) / (H1 - L1) + L2;
 }
 
 void servo_Drive(servo_t servo, float x)
 {
     uint16_t level;
 
-    level = (uint16_t)map_float(x, -1, 1, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
+    level = (uint16_t)map_float(x, -1.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
 
     pwm_set_gpio_level(servo, level);
 }
