@@ -13,12 +13,15 @@ inferior to the RP2350.
 
 ## Build Instructions
 1. Create a build directory.
+
 ```mkdir build && cd build```
 
 2. Use CMake to generate platform specific cross compilation build files.
+
 ```cmake ..```
 
 3. Execute build (compilation platform specific).
+
 ```make -j4```
 
 4. Upload the compiled UF2 container to the Pico device. This can be achieved 
