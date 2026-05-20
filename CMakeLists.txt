@@ -33,6 +33,9 @@ set(SOURCES
 
     src/actuators/servo.h
     src/actuators/servo.c
+
+    src/stability/PID.h
+    src/stability/PID.c
 )
 
 pico_sdk_init()
