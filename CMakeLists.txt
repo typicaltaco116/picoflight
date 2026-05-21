@@ -11,6 +11,7 @@ set(LINKED_LIBRARIES
     hardware_i2c
     hardware_gpio
     hardware_pwm
+    hardware_flash
 )
 
 set(SOURCES
@@ -51,6 +52,8 @@ if (TARGET tinyusb_device)
     target_compile_options(${PROJECT_NAME}
         PRIVATE -Wall -Wextra
     )
+
+    pico_set_linker_script(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/picoflight.ld)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(${PROJECT_NAME} 1)
