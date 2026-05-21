@@ -11,6 +11,10 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
+    .reserved : {
+        PROVIDE(__config_reserved_flash = .);
+    } > STORAGE
+
     .flash_begin : {
         __flash_binary_start = .;
     } > FLASH
