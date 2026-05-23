@@ -1,29 +1,54 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <math.h>
+#include <stdlib.h>
 #include "pico/stdlib.h"
-#include "hardware/i2c.h"
 
-#include "src/actuators/servo.h"
+#include "src/config/params.h"
+#include <string.h>
 
-#define CHANNEL_3_SERVO_OUTPUT_PIN 2
+extern char __config_reserved_flash;
 
-int main() 
+int main(void) 
 {
     stdio_init_all();
 
-    while (stdio_getchar_timeout_us(100) != (int)'\r');
-
-    servo_t out3 = servo_Register(CHANNEL_3_SERVO_OUTPUT_PIN);
-    servo_Init(out3);
-    servo_Drive(out3, 0);
+    config_RegisterParam("Version", sizeof(int));
 
     while (1) {
-        servo_Drive(out3, -1.0f);
-        while (stdio_getchar_timeout_us(100) != (int)'\r');
-        servo_Drive(out3, 0.0f);
-        while (stdio_getchar_timeout_us(100) != (int)'\r');
-        servo_Drive(out3, 1.0f);
-        while (stdio_getchar_timeout_us(100) != (int)'\r');
+        char c = '\0';
+        while (c != '1' && c != '2')
+            c = (char)stdio_getchar_timeout_us(100);
+
+        printf("&__config_reserved_flash = %p\r\n", &__config_reserved_flash);
+
+        if (c == '1') {
+            puts("Writing parameters to flash.");
+
+            if (config_SetParam("Version", (int[]){16}) != EXIT_SUCCESS)
+                puts("Error: SetParam failed");
+
+            int *version = (int*)config_GetParam("Version");
+
+            if (!version)
+                puts("Error: Failed to retrieve parameter from config table");
+            else
+                printf("Version = %d (RAM)\r\n", *version);
+
+            config_WriteAll();
+
+        } else {
+            puts("Retrieving parameters from flash.");
+
+            config_ReadAll();
+
+            int *version = (int*)config_GetParam("Version");
+
+            if (!version)
+                puts("Error: Failed to retrieve parameter from config table");
+            else
+                printf("Version = %d (RAM)\r\n", *version);
+        }
+
+        printf("Done...\r\n");
     }
 }
