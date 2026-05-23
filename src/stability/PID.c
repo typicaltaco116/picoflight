@@ -56,6 +56,8 @@ void PID_ThreeAxisRateControl(
     float roll_set, float pitch_set, float yaw_set,
     float *roll_cmd, float *pitch_cmd, float *yaw_cmd)
 {
+    (void)angles; // surpress unused wanring for now
+    
     static float roll_I = 0.0f;
     static float pitch_I = 0.0f;
     static float yaw_I = 0.0f;
