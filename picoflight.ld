@@ -15,6 +15,10 @@ SECTIONS
         PROVIDE(__config_reserved_flash = .);
     } > STORAGE
 
+    .first_boot_section : {
+        *(.first_boot_section)
+    } > STORAGE
+
     .flash_begin : {
         __flash_binary_start = .;
     } > FLASH
