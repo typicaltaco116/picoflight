@@ -8,12 +8,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define INVALID_KEY -1
+#define INVALID_KEY (-1)
 
-#define CONFIG_RESERVED_BYTES (4 * 1024)
-
-#define RESERVED_FLASH_OFFSET (2044 * 1024)
 extern char __config_reserved_flash;
+
+#define RESERVED_FLASH_OFFSET ((uintptr_t)&__config_reserved_flash - XIP_BASE)
 
 typedef struct {
     char *key;
