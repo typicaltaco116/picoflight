@@ -13,7 +13,7 @@ static float q0 = 1.0f;
 static float q1 = 0.0f;
 static float q2 = 0.0f;
 static float q3 = 0.0f;
-static const float B_madgwick = 0.04f;
+static float B_madgwick = 0.04f;
 
 static float invSqrt(float x)
 {
