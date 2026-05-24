@@ -38,8 +38,8 @@ set(SOURCES
     src/stability/PID.h
     src/stability/PID.c
 
-    src/config/params.h
-    src/config/params.c
+    src/config/flash.h
+    src/config/flash.c
 )
 
 pico_sdk_init()

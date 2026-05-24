@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "pico/stdlib.h"
 
-#include "src/config/params.h"
+#include "src/config/flash.h"
 #include <string.h>
 
 extern char __config_reserved_flash;
