@@ -40,6 +40,11 @@ set(SOURCES
 
     src/config/flash.h
     src/config/flash.c
+    src/config/IMU.h
+    src/config/pin_mapping.h
+
+    src/core/init.h
+    src/core/init.c
 )
 
 pico_sdk_init()
