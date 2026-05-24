@@ -25,6 +25,8 @@ typedef struct {
 
 IMU_vectors_t IMU_GetData(void);
 
-void IMU_Calibrate(void); 
+void IMU_SetErrorOffset(IMU_vectors_t error_offset);
+
+IMU_vectors_t IMU_GetCalibrationError(uint32_t cycle_count); 
 
 void IMU_SetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale);

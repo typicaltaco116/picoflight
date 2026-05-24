@@ -49,23 +49,30 @@ IMU_vectors_t IMU_GetData(void)
 }
 
 
-void IMU_Calibrate(void)
+void IMU_SetErrorOffset(IMU_vectors_t error_offset)
+{
+    error = error_offset;
+}
+
+
+IMU_vectors_t IMU_GetCalibrationError(uint32_t cycle_count)
 {
     double gyro_x_sum, gyro_y_sum, gyro_z_sum;
     double accel_x_sum, accel_y_sum, accel_z_sum;
     IMU_vectors_t read_data;
+    IMU_vectors_t error_offset;
 
     gyro_x_sum = gyro_y_sum = gyro_z_sum = 0.0;
     accel_x_sum = accel_y_sum = accel_z_sum = 0.0;
 
-    error.gyro.x = 0.0;
-    error.gyro.y = 0.0;
-    error.gyro.z = 0.0;
-    error.accel.x = 0.0;
-    error.accel.y = 0.0;
-    error.accel.z = 0.0;
+    error_offset.gyro.x = 0.0;
+    error_offset.gyro.y = 0.0;
+    error_offset.gyro.z = 0.0;
+    error_offset.accel.x = 0.0;
+    error_offset.accel.y = 0.0;
+    error_offset.accel.z = 0.0;
 
-    for (uint32_t i = IMU_CALIBRATION_CYCLES; i != 0; --i) {
+    for (uint32_t i = cycle_count; i != 0; --i) {
         read_data = IMU_GetData();
 
         gyro_x_sum += read_data.gyro.x;
@@ -76,12 +83,14 @@ void IMU_Calibrate(void)
         accel_z_sum += read_data.accel.z;
     }
 
-    error.gyro.x = gyro_x_sum / IMU_CALIBRATION_CYCLES;
-    error.gyro.y = gyro_y_sum / IMU_CALIBRATION_CYCLES;
-    error.gyro.z = gyro_z_sum / IMU_CALIBRATION_CYCLES;
-    error.accel.x = accel_x_sum / IMU_CALIBRATION_CYCLES;
-    error.accel.y = accel_y_sum / IMU_CALIBRATION_CYCLES;
-    error.accel.z = accel_z_sum / IMU_CALIBRATION_CYCLES;
+    error_offset.gyro.x = gyro_x_sum / (float)cycle_count;
+    error_offset.gyro.y = gyro_y_sum / (float)cycle_count;
+    error_offset.gyro.z = gyro_z_sum / (float)cycle_count;
+    error_offset.accel.x = accel_x_sum / (float)cycle_count;
+    error_offset.accel.y = accel_y_sum / (float)cycle_count;
+    error_offset.accel.z = accel_z_sum / (float)cycle_count;
+
+    return error_offset;
 }
 
 
