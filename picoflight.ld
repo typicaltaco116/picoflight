@@ -13,10 +13,7 @@ SECTIONS
 {
     .reserved : {
         PROVIDE(__config_reserved_flash = .);
-    } > STORAGE
-
-    .first_boot_section : {
-        *(.first_boot_section)
+        KEEP(*(.reserved))
     } > STORAGE
 
     .flash_begin : {

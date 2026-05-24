@@ -12,7 +12,7 @@
 
 #define FIRST_BOOT_CHECK_VAL 0x67
 
-const uint32_t __attribute__((section(".first_boot_value"))) first_boot_check_val =
+const uint32_t __attribute__((section(".reserved"))) first_boot_check_val =
     FIRST_BOOT_CHECK_VAL;
 
 static void parameter_registrations(void)
@@ -63,6 +63,8 @@ void core_Init(void)
     parameter_registrations();
     config_ReadAll();
 
-    if (*(uint32_t*)config_GetParam("first_boot_value") == FIRST_BOOT_CHECK_VAL)
+    if (*(uint32_t*)config_GetParam("first_boot_value") == FIRST_BOOT_CHECK_VAL) {
         parameter_set_all_default();
+        config_WriteAll();
+    }
 }
