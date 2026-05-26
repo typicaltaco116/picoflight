@@ -32,8 +32,8 @@ set(SOURCES
     src/RC/SBUS.h
     src/RC/SBUS.c
 
-    src/actuators/servo.h
-    src/actuators/servo.c
+    src/actuators/PWM.h
+    src/actuators/PWM.c
 
     src/stability/PID.h
     src/stability/PID.c
