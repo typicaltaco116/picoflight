@@ -1,4 +1,4 @@
-#include "servo.h"
+#include "PWM.h"
 
 #include "hardware/pwm.h"
 #include "hardware/gpio.h"
@@ -19,24 +19,24 @@
 #define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS * 1E-6)
 #define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS * 1E-6)
 
-servo_t servo_Register(int32_t pin)
+PWM_t PWM_Register(int32_t pin)
 {
     return pin;
 }
 
-void servo_Init(servo_t servo)
+void PWM_Init(PWM_t PWM_obj)
 {
     pwm_config config;
 
-    if (servo < 0)
+    if (PWM_obj < 0)
         return;
 
     config = pwm_get_default_config();
     pwm_config_set_clkdiv_int(&config, (uint32_t)PWM_DIVIDER);
     pwm_config_set_wrap(&config, (uint16_t)PWM_WRAP);
 
-    pwm_init(PWM_GPIO_SLICE_NUM(servo), &config, true);
-    gpio_set_function(servo, GPIO_FUNC_PWM);
+    pwm_init(PWM_GPIO_SLICE_NUM(PWM_obj), &config, true);
+    gpio_set_function(PWM_obj, GPIO_FUNC_PWM);
 }
 
 static float map_float(float x, float L1, float H1, float L2, float H2)
@@ -44,14 +44,14 @@ static float map_float(float x, float L1, float H1, float L2, float H2)
     return (x - L1) * (H2 - L2) / (H1 - L1) + L2;
 }
 
-void servo_Drive(servo_t servo, float x)
+void PWM_Drive(PWM_t PWM_obj, float x)
 {
     uint16_t level;
 
-    if (servo < 0)
+    if (PWM_obj < 0)
         return;
 
     level = (uint16_t)map_float(x, -1.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
 
-    pwm_set_gpio_level(servo, level);
+    pwm_set_gpio_level(PWM_obj, level);
 }
