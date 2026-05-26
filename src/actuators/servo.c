@@ -19,7 +19,7 @@
 #define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS * 1E-6)
 #define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS * 1E-6)
 
-servo_t servo_Register(uint32_t pin)
+servo_t servo_Register(int32_t pin)
 {
     return pin;
 }
@@ -27,6 +27,9 @@ servo_t servo_Register(uint32_t pin)
 void servo_Init(servo_t servo)
 {
     pwm_config config;
+
+    if (servo < 0)
+        return;
 
     config = pwm_get_default_config();
     pwm_config_set_clkdiv_int(&config, (uint32_t)PWM_DIVIDER);
@@ -44,6 +47,9 @@ static float map_float(float x, float L1, float H1, float L2, float H2)
 void servo_Drive(servo_t servo, float x)
 {
     uint16_t level;
+
+    if (servo < 0)
+        return;
 
     level = (uint16_t)map_float(x, -1.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
 

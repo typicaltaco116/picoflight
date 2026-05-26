@@ -1,8 +1,8 @@
 #include <stdint.h>
 
-typedef uint32_t servo_t;
+typedef int32_t servo_t;
 
-servo_t servo_Register(uint32_t pin);
+servo_t servo_Register(int32_t pin);
 
 void servo_Init(servo_t servo);
 
