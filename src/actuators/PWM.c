@@ -55,3 +55,15 @@ void PWM_Drive(PWM_t PWM_obj, float x)
 
     pwm_set_gpio_level(PWM_obj, level);
 }
+
+void PWM_DriveNorm(PWM_t PWM_obj, float x_norm)
+{
+    uint16_t level;
+
+    if (PWM_obj < 0)
+        return;
+
+    level = (uint16_t)map_float(x_norm, 0.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
+
+    pwm_set_gpio_level(PWM_obj, level);
+}
