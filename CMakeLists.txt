@@ -34,6 +34,9 @@ set(SOURCES
 
     src/actuators/PWM.h
     src/actuators/PWM.c
+    src/actuators/mixer.h
+    src/actuators/mixer.c
+    src/actuators/outputs.h
 
     src/stability/PID.h
     src/stability/PID.c
