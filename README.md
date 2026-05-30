@@ -4,6 +4,7 @@ Pi Pico 2 (RP2350) Microcontroller.
 
 ## Dependencies
 - The Raspberry Pi Pico SDK [https://github.com/raspberrypi/pico-sdk](https://github.com/raspberrypi/pico-sdk)
+- pico-pio-loader [https://github.com/cadouthat/pico-pio-loader/tree/main](https://github.com/cadouthat/pico-pio-loader/tree/main)
 
 ## Supported Microcontroller Targets
 - Raspberry Pi Pico 2 (RP2350)
