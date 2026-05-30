@@ -3,7 +3,6 @@
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
-#include "pico_pio_loader/pico_pio_loader.h"
 
 #include "dshot.pio.h"
 
@@ -12,7 +11,7 @@
 #define DSHOT_MIN_THROTTLE_COMMAND (48)
 #define DSHOT_MAX_THROTTLE_COMMAND (2047)
 
-static int pio_sm = -1;
+static uint pio_sm;
 static PIO pio;
 static uint pio_offset;
 
@@ -24,9 +23,11 @@ bool dshot_Init(uint dshot_gpio, bool enable_repeat)
         return false;
     }
 
-    if (!pio_loader_add_or_get_offset(pio, &dshot_program, &pio_offset)) {
+    bool success = pio_claim_free_sm_and_add_program(
+        &dshot_program, &pio, &pio_sm, &pio_offset);
+
+    if (!success) {
         pio_sm_unclaim(pio, pio_sm);
-        pio_sm = -1;
         return false;
     }
 
@@ -73,6 +74,5 @@ uint16_t dshot_GetThrottleCommand(float t)
 
 void dshot_Stop()
 {
-    // Signal PIO to wait for the next push
     pio_sm_put_blocking(pio, pio_sm, 0);
 }

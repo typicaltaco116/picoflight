@@ -6,8 +6,6 @@ include($ENV{PICO_SDK_PATH}/pico_sdk_init.cmake)
 
 project(picoflight C CXX ASM)
 
-add_subdirectory(submodules/pico-pio-loader)
-
 set(LINKED_LIBRARIES
     # pico-sdk libraries
     pico_stdlib
@@ -16,9 +14,6 @@ set(LINKED_LIBRARIES
     hardware_pio
     hardware_pwm
     hardware_flash
-
-    # Additional libraries
-    pico_pio_loader
 )
 
 set(SOURCES
