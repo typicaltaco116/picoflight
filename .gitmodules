@@ -1,3 +1,6 @@
 [submodule "submodules/pico-pio-loader"]
 	path = submodules/pico-pio-loader
 	url = https://github.com/cadouthat/pico-pio-loader.git
+[submodule "modules/pio-dshot"]
+	path = modules/pio-dshot
+	url = https://github.com/simonwunderlich/pio-dshot.git

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 set(PICO_BOARD pico2)
 
 include($ENV{PICO_SDK_PATH}/pico_sdk_init.cmake)
+add_subdirectory(modules/pio-dshot)
 
 project(picoflight C CXX ASM)
 
@@ -14,6 +15,9 @@ set(LINKED_LIBRARIES
     hardware_pio
     hardware_pwm
     hardware_flash
+
+    # External libraries
+    dshot
 )
 
 set(SOURCES
@@ -39,8 +43,6 @@ set(SOURCES
     src/actuators/mixer.h
     src/actuators/mixer.c
     src/actuators/outputs.h
-    src/actuators/dshot.h
-    src/actuators/dshot.c
 
     src/stability/PID.h
     src/stability/PID.c
@@ -69,8 +71,6 @@ if (TARGET tinyusb_device)
     )
 
     pico_set_linker_script(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/picoflight.ld)
-
-    pico_generate_pio_header(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/PIO/dshot.pio)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(${PROJECT_NAME} 1)
