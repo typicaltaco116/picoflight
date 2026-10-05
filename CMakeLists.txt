@@ -34,6 +34,10 @@ set(INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+set(PIO_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/pio/dshot.pio
+)
+
 pico_sdk_init()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -48,7 +52,7 @@ target_compile_options(${PROJECT_NAME}
 
 pico_set_linker_script(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/picoflight.ld)
 
-pico_generate_pio_header(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/PIO/dshot.pio)
+pico_generate_pio_header(${PROJECT_NAME} ${PIO_SOURCES})
 
 # enable usb output, disable uart output
 pico_enable_stdio_usb(${PROJECT_NAME} 1)
