@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "src/sensors/IMU.h"
+#include <picoflight/sensors/IMU.h>
 
 #define IMU_CALIBRATION_CYCLES 20000.0 // must be double literal
 

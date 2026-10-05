@@ -1,12 +1,12 @@
-#include "IMU.h"
+#include <picoflight/sensors/IMU.h>
 
 #include <stdint.h>
 #include <stdlib.h>
-#include "pico/stdlib.h"
-#include "hardware/i2c.h"
+#include <pico/stdlib.h>
+#include <hardware/i2c.h>
 
-#include "src/sensors/IMU_processing.h"
-#include "src/sensors/MPU6050_register_map.h"
+#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/MPU6050_register_map.h>
 
 static i2c_inst_t *IMU_i2c_instance;
 static IMU_sample_rate_e sample_rate;

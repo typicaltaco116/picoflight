@@ -1,14 +1,14 @@
-#include "init.h"
+#include <picoflight/core/init.h>
 
 #include <stdbool.h>
 
-#include "src/config/flash.h"
-#include "src/sensors/IMU.h"
-#include "src/sensors/IMU_processing.h"
-#include "src/estimation/madgwick.h"
+#include <picoflight/config/flash.h>
+#include <picoflight/sensors/IMU.h>
+#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/estimation/madgwick.h>
 
-#include "src/config/pin_mapping.h"
-#include "src/config/IMU.h"
+#include <picoflight/config/pin_mapping.h>
+#include <picoflight/config/IMU.h>
 
 #define FIRST_BOOT_CHECK_VAL 0x67
 

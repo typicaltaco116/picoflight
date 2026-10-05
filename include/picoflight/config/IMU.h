@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/sensors/IMU.h"
+#include <picoflight/sensors/IMU.h>
 
 #define MPU6050_SAMPLE_RATE IMU_1KHZ_RATE
 #define MPU6050_G_SCALE     IMU_GYRO_SCALE_500

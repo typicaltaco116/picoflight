@@ -1,7 +1,7 @@
 #pragma once
 
-#include "hardware/pio.h"
-#include "hardware/clocks.h"
+#include <hardware/pio.h>
+#include <hardware/clocks.h>
 
 #include <stdint.h>
 

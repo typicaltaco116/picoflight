@@ -1,8 +1,8 @@
-#include "dshot.h"
+#include <picoflight/actuators/dshot.h>
 
-#include "pico/stdlib.h"
-#include "hardware/sync.h"
-#include "hardware/pio.h"
+#include <pico/stdlib.h>
+#include <hardware/sync.h>
+#include <hardware/pio.h>
 
 #include "dshot.pio.h"
 

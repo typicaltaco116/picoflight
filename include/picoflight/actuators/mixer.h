@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/actuators/outputs.h"
-#include "src/orientation/types.h"
+#include <picoflight/actuators/outputs.h>
+#include <picoflight/orientation/types.h>
 
 #include <stdbool.h>
 

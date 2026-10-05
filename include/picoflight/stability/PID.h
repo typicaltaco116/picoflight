@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/orientation/types.h"
+#include <picoflight/orientation/types.h>
 
 typedef struct {
     float k_P;

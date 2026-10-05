@@ -1,8 +1,8 @@
-#include "mixer.h"
+#include <picoflight/actuators/mixer.h>
 
-#include "src/actuators/PWM.h"
-#include "src/actuators/outputs.h"
-#include "src/orientation/types.h"
+#include <picoflight/actuators/PWM.h>
+#include <picoflight/actuators/outputs.h>
+#include <picoflight/orientation/types.h>
 
 #include <stdbool.h>
 #include <stdint.h>

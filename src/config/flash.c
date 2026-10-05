@@ -1,8 +1,8 @@
-#include "flash.h"
+#include <picoflight/config/flash.h>
 
-#include "hardware/flash.h"
-#include "pico/flash.h"
-#include "pico/stdlib.h"
+#include <hardware/flash.h>
+#include <pico/flash.h>
+#include <pico/stdlib.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>

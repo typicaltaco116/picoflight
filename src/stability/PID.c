@@ -1,6 +1,6 @@
-#include "PID.h"
+#include <picoflight/stability/PID.h>
 
-#include "src/orientation/types.h"
+#include <picoflight/orientation/types.h>
 
 static float singleLoopRun(PID_gains_t gain,
                            float setpoint, float input,

@@ -1,6 +1,6 @@
-#include "board_orientation.h"
+#include <picoflight/orientiation/board_orientation.h>
 
-#include "src/orientation/types.h"
+#include <picoflight/orientation/types.h>
 
 static euler_t _angles_offset = 0.0f;
 static rates_t _rates_offset = 0.0f;

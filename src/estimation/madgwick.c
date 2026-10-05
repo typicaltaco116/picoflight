@@ -1,10 +1,10 @@
-#include "madgwick.h"
+#include <picoflight/estimation/madgwick.h>
 
 #include <math.h>
 #include <stdbool.h>
 
-#include "src/orientation/types.h"
-#include "src/sensors/IMU_processing.h"
+#include <picoflight/orientation/types.h>
+#include <picoflight/sensors/IMU_processing.h>
 
 #define DEG_TO_RAD(x) (x * M_PI / 180.0f)
 #define RAD_TO_DEG(x) (x * 180.0f / M_PI)

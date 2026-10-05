@@ -17,68 +17,42 @@ set(LINKED_LIBRARIES
 )
 
 set(SOURCES
-    src/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/estimation/madgwick.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sensors/IMU.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sensors/IMU_processing.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RC/SBUS.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/PWM.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/mixer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/dshot.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/stability/PID.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/config/flash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/init.c
+)
 
-    src/orientation/types.h
-
-    src/estimation/madgwick.h
-    src/estimation/madgwick.c
-
-    src/sensors/MPU6050_register_map.h
-    src/sensors/IMU.h
-    src/sensors/IMU.c
-    src/sensors/IMU_processing.h
-    src/sensors/IMU_processing.c
-
-    src/RC/RC.h
-    src/RC/SBUS.h
-    src/RC/SBUS.c
-
-    src/actuators/PWM.h
-    src/actuators/PWM.c
-    src/actuators/mixer.h
-    src/actuators/mixer.c
-    src/actuators/outputs.h
-    src/actuators/dshot.h
-    src/actuators/dshot.c
-
-    src/stability/PID.h
-    src/stability/PID.c
-
-    src/config/flash.h
-    src/config/flash.c
-    src/config/IMU.h
-    src/config/pin_mapping.h
-
-    src/core/init.h
-    src/core/init.c
+set(INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 pico_sdk_init()
 
-if (TARGET tinyusb_device)
-    add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDES})
 
-    # pull in common dependencies
-    target_link_libraries(${PROJECT_NAME} ${LINKED_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${LINKED_LIBRARIES})
 
-    target_compile_options(${PROJECT_NAME}
-        PRIVATE -Wall -Wextra
-    )
+target_compile_options(${PROJECT_NAME}
+    PRIVATE -Wall -Wextra
+)
 
-    pico_set_linker_script(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/picoflight.ld)
+pico_set_linker_script(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/picoflight.ld)
 
-    pico_generate_pio_header(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/PIO/dshot.pio)
+pico_generate_pio_header(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/PIO/dshot.pio)
 
-    # enable usb output, disable uart output
-    pico_enable_stdio_usb(${PROJECT_NAME} 1)
-    pico_enable_stdio_uart(${PROJECT_NAME} 0)
+# enable usb output, disable uart output
+pico_enable_stdio_usb(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
-    # create map/bin/hex/uf2 file etc.
-    pico_add_extra_outputs(${PROJECT_NAME})
-
-elseif(PICO_ON_DEVICE)
-    message("Skipping hello_usb because TinyUSB submodule is not initialized in the SDK")
-endif()
+# create map/bin/hex/uf2 file etc.
+pico_add_extra_outputs(${PROJECT_NAME})

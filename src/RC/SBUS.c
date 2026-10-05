@@ -1,11 +1,11 @@
-#include "SBUS.h"
+#include <picoflight/RC/SBUS.h>
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "hardware/uart.h"
-#include "hardware/gpio.h"
+#include <hardware/uart.h>
+#include <hardware/gpio.h>
 
-#include "src/RC/RC.h"
+#include <picoflight/RC/RC.h>
 
 #define SBUS_BAUD       100000
 #define SBUS_DATA_BITS  8

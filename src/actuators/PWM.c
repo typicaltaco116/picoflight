@@ -1,7 +1,7 @@
-#include "PWM.h"
+#include <picoflight/actuators/PWM.h>
 
-#include "hardware/pwm.h"
-#include "hardware/gpio.h"
+#include <hardware/pwm.h>
+#include <hardware/gpio.h>
 
 #ifdef PICO_RP2350
 #define SYSTEM_CLK 150000000.0f

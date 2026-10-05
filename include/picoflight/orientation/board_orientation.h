@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/orientation/types.h"
+#include <picoflight/orientation/types.h>
 
 void board_orientation_SetOffsets(euler_t angles, euler_t rates);
 

@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "hardware/uart.h"
+#include <hardware/uart.h>
 
-#include "src/RC/RC.h"
+#include <picoflight/RC/RC.h>
 
 void SBUS_InitBus(uart_inst_t *uart, uint32_t rx);
 

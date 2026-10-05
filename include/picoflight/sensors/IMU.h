@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "hardware/i2c.h"
+#include <hardware/i2c.h>
 
 typedef enum {
     IMU_5HZ_RATE,

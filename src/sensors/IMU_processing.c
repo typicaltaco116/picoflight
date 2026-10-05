@@ -1,9 +1,9 @@
-#include "IMU_processing.h"
+#include <picoflight/sensors/IMU_processing.h>
 
 #include <stdint.h>
 
-#include "src/sensors/IMU.h"
-#include "src/sensors/MPU6050_register_map.h"
+#include <picoflight/sensors/IMU.h>
+#include <picoflight/sensors/MPU6050_register_map.h>
 
 static IMU_vectors_t error = {
     .gyro = {0, 0, 0},

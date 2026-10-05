@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/orientation/types.h"
-#include "src/sensors/IMU_processing.h"
+#include <picoflight/orientation/types.h>
+#include <picoflight/sensors/IMU_processing.h>
 
 void madgwick_SetStepSize(float B_val);
 

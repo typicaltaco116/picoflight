@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
-#include "pico/stdlib.h"
+#include <pico/stdlib.h>
 
-#include "src/actuators/dshot.h"
+#include <picoflight/actuators/dshot.h>
 
 #ifndef DSHOT_PIN
 #define DSHOT_PIN 5
