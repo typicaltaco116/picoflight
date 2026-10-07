@@ -20,53 +20,53 @@
  * @DSHOT_TELEMETRY_TEMPERATURE: Temperature in Celsius
  */
 typedef enum dshot_telemetry_type {
-	DSHOT_TELEMETRY_ERPM,
-	DSHOT_TELEMETRY_VOLTAGE,
-	DSHOT_TELEMETRY_CURRENT,
-	DSHOT_TELEMETRY_TEMPERATURE,
+    DSHOT_TELEMETRY_ERPM,
+    DSHOT_TELEMETRY_VOLTAGE,
+    DSHOT_TELEMETRY_CURRENT,
+    DSHOT_TELEMETRY_TEMPERATURE,
 } dshot_telemetry_type_e;
 
 /**
  * dshot_commands - DSHOT commands available
  */
 typedef enum dshot_commands {
-	DSHOT_CMD_BEEP1 = 1,
-	DSHOT_CMD_BEEP2 = 2,
-	DSHOT_CMD_BEEP3	= 3,
-	DSHOT_CMD_BEEP4 = 4,
-	DSHOT_CMD_BEEP5	= 5,
-	DSHOT_CMD_ESC_INFO = 6,
-	DSHOT_CMD_SPIN_DIRECTION_1 = 7,
-	DSHOT_CMD_SPIN_DIRECTION_2 = 8,
-	DSHOT_CMD_3D_MODE_OFF = 9,
-	DSHOT_CMD_3D_MODE_ON = 10,
-	DSHOT_CMD_SETTINGS_REQUEST = 11,
-	DSHOT_CMD_SAVE_SETTINGS = 12,
-	DSHOT_EXTENDED_TELEMETRY_ENABLE	= 13,
-	DSHOT_EXTENDED_TELEMETRY_DISABLE = 14,
-	DSHOT_CMD_SPIN_DIRECTION_NORMAL = 20,
-	DSHOT_CMD_SPIN_DIRECTION_REVERSED = 21,
-	DSHOT_CMD_LED0_ON = 22,
-	DSHOT_CMD_LED1_ON = 23,
-	DSHOT_CMD_LED2_ON = 24,
-	DSHOT_CMD_LED3_ON = 25,
-	DSHOT_CMD_LED0_OFF = 26,
-	DSHOT_CMD_LED1_OFF = 27,
-	DSHOT_CMD_LED2_OFF = 28,
-	DSHOT_CMD_LED3_OFF = 29,
-	DSHOT_AUDIO_STREAM_TOGGLE = 30,
-	DSHOT_SILENT_MODE_TOGGLE = 31,
-	DSHOT_CMD_SIGNAL_LINE_TELEMETRY_DISABLE	= 32,
-	DSHOT_CMD_SIGNAL_LINE_TELEMETRY_ENABLE = 33,
-	DSHOT_CMD_SIGNAL_LINE_CONTINUOUS_ERPM_TELEMETRY = 34,
-	DSHOT_CMD_SIGNAL_LINE_CONTINUOUS_ERPM_PERIOD_TELEMETRY = 35,
-	DSHOT_CMD_SIGNAL_LINE_TEMPERATURE_TELEMETRY = 42,
-	DSHOT_CMD_SIGNAL_LINE_VOLTAGE_TELEMETRY = 43,
-	DSHOT_CMD_SIGNAL_LINE_CURRENT_TELEMETRY = 44,
-	DSHOT_CMD_SIGNAL_LINE_CONSUMPTION_TELEMETRY = 45,
-	DSHOT_CMD_SIGNAL_LINE_ERPM_TELEMETRY = 46,
-	DSHOT_CMD_SIGNAL_LINE_ERPM_PERIOD_TELEMETRY = 47,
-	DSHOT_MAX_COMMAND = 48,
+    DSHOT_CMD_BEEP1 = 1,
+    DSHOT_CMD_BEEP2 = 2,
+    DSHOT_CMD_BEEP3	= 3,
+    DSHOT_CMD_BEEP4 = 4,
+    DSHOT_CMD_BEEP5	= 5,
+    DSHOT_CMD_ESC_INFO = 6,
+    DSHOT_CMD_SPIN_DIRECTION_1 = 7,
+    DSHOT_CMD_SPIN_DIRECTION_2 = 8,
+    DSHOT_CMD_3D_MODE_OFF = 9,
+    DSHOT_CMD_3D_MODE_ON = 10,
+    DSHOT_CMD_SETTINGS_REQUEST = 11,
+    DSHOT_CMD_SAVE_SETTINGS = 12,
+    DSHOT_EXTENDED_TELEMETRY_ENABLE	= 13,
+    DSHOT_EXTENDED_TELEMETRY_DISABLE = 14,
+    DSHOT_CMD_SPIN_DIRECTION_NORMAL = 20,
+    DSHOT_CMD_SPIN_DIRECTION_REVERSED = 21,
+    DSHOT_CMD_LED0_ON = 22,
+    DSHOT_CMD_LED1_ON = 23,
+    DSHOT_CMD_LED2_ON = 24,
+    DSHOT_CMD_LED3_ON = 25,
+    DSHOT_CMD_LED0_OFF = 26,
+    DSHOT_CMD_LED1_OFF = 27,
+    DSHOT_CMD_LED2_OFF = 28,
+    DSHOT_CMD_LED3_OFF = 29,
+    DSHOT_AUDIO_STREAM_TOGGLE = 30,
+    DSHOT_SILENT_MODE_TOGGLE = 31,
+    DSHOT_CMD_SIGNAL_LINE_TELEMETRY_DISABLE	= 32,
+    DSHOT_CMD_SIGNAL_LINE_TELEMETRY_ENABLE = 33,
+    DSHOT_CMD_SIGNAL_LINE_CONTINUOUS_ERPM_TELEMETRY = 34,
+    DSHOT_CMD_SIGNAL_LINE_CONTINUOUS_ERPM_PERIOD_TELEMETRY = 35,
+    DSHOT_CMD_SIGNAL_LINE_TEMPERATURE_TELEMETRY = 42,
+    DSHOT_CMD_SIGNAL_LINE_VOLTAGE_TELEMETRY = 43,
+    DSHOT_CMD_SIGNAL_LINE_CURRENT_TELEMETRY = 44,
+    DSHOT_CMD_SIGNAL_LINE_CONSUMPTION_TELEMETRY = 45,
+    DSHOT_CMD_SIGNAL_LINE_ERPM_TELEMETRY = 46,
+    DSHOT_CMD_SIGNAL_LINE_ERPM_PERIOD_TELEMETRY = 47,
+    DSHOT_MAX_COMMAND = 48,
 } dshot_commands_e;
 
 /**
@@ -79,12 +79,12 @@ typedef enum dshot_commands {
  * @rx_bad_type: number of telemetry frames with an unsupported type
  */
 typedef struct dshot_statistics {
-	uint32_t tx_frames;
-	uint32_t rx_frames;
-	uint32_t rx_timeout;
-	uint32_t rx_bad_gcr;
-	uint32_t rx_bad_crc;
-	uint32_t rx_bad_type;
+    uint32_t tx_frames;
+    uint32_t rx_frames;
+    uint32_t rx_timeout;
+    uint32_t rx_bad_gcr;
+    uint32_t rx_bad_crc;
+    uint32_t rx_bad_type;
 } dshot_statistics_t;
 
 /**
@@ -95,10 +95,10 @@ typedef struct dshot_statistics {
  * @stats: TX/RX statistics structure
  */
 typedef struct dshot_motor {
-	uint16_t frame;
-	uint16_t last_throttle_frame;
-	uint8_t command_counter;
-	struct dshot_statistics stats;
+    uint16_t frame;
+    uint16_t last_throttle_frame;
+    uint8_t command_counter;
+    struct dshot_statistics stats;
 } dshot_motor_t;
 
 /**
@@ -125,18 +125,18 @@ typedef void (*dshot_telemetry_callback_t)(void *context, int channel, enum dsho
  * @telemetry_cb_context: user context for telemetry callback
  */
 typedef struct dshot_controller {
-	pio_sm_config c;
-	PIO pio;
-	uint8_t sm;
-	uint8_t pin;
-	uint8_t num_channels;
-	uint8_t channel;
-	uint16_t speed;
-	struct dshot_motor motor[DSHOT_MAX_CHANNELS];
-	absolute_time_t command_last_time;
+    pio_sm_config c;
+    PIO pio;
+    uint8_t sm;
+    uint8_t pin;
+    uint8_t num_channels;
+    uint8_t channel;
+    uint16_t speed;
+    struct dshot_motor motor[DSHOT_MAX_CHANNELS];
+    absolute_time_t command_last_time;
 
-	dshot_telemetry_callback_t telemetry_cb;
-	void *telemetry_cb_context;
+    dshot_telemetry_callback_t telemetry_cb;
+    void *telemetry_cb_context;
 } dshot_controller_t;
 
 /**
