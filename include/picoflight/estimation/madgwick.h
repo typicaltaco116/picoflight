@@ -5,4 +5,4 @@
 
 void madgwick_SetStepSize(float B_val);
 
-void ComputeMadgwick(euler_t *angles, IMU_vectors_t imu, float sampleFreq);
+void madgwick_Compute(euler_t *angles, IMU_vectors_t imu, float sampleFreq);
