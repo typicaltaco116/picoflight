@@ -24,7 +24,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RC/SBUS.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/PWM.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/mixer.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/dshot.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/actuators/dshotx4.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/stability/PID.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config/flash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/init.c
@@ -35,7 +35,7 @@ set(INCLUDES
 )
 
 set(PIO_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/pio/dshot.pio
+    ${CMAKE_CURRENT_SOURCE_DIR}/pio/dshotx4.pio
 )
 
 pico_sdk_init()
