@@ -5,3 +5,4 @@ compile_commands.json
 *.elf
 *.elf.map
 *.uf2
+*.hex
