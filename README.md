@@ -12,30 +12,11 @@ The RP2040 may be added in the future but its performance will be significantly
 inferior to the RP2350.
 
 ## Build Instructions
-1. Create a build directory.
-
 ```
-mkdir build && cd build
+cmake -B build
 ```
-
-2. Use CMake to generate platform specific cross compilation build files.
-
 ```
-cmake ..
-```
-
-3. Execute build (compilation platform specific).
-
-```
-make -j4
-```
-
-4. Upload the compiled UF2 container to the Pico device. This can be achieved 
-picotool or by simply holding the BOOTSEL button on the Pico while powering up
-to enter mass storage mode and copying over the UF2 container.
-
-```
-picotool load picoflight.uf2 -f
+cmake --build build -j $(nproc)
 ```
 
 ## Documentation
