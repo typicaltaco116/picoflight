@@ -115,11 +115,11 @@ void dshotx4SendRawThrottles(dshotx4_t *obj, uint16_t *data)
 
 void dshotx4SendThrottles(dshotx4_t *obj, uint16_t *data)
 {
-    for (uint8_t i = 0; obj->pinCount; ++i) {
+    for (uint8_t i = 0; i < obj->pinCount; ++i) {
         if (data[i] > 2000)
             data[i] = 2000;
         if (data[i] != 0) // Keep zero throttle zero.
-            data += 47;
+            data[i] += 47;
     }
 
     dshotx4SendRawThrottles(obj, data);
