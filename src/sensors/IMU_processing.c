@@ -28,13 +28,13 @@ static IMU_vectors_t vector_add(IMU_vectors_t A, IMU_vectors_t B)
 }
 
 
-IMU_vectors_t IMU_GetData(void)
+IMU_vectors_t IMUGetData(void)
 {
     int16_t gyro_x, gyro_y, gyro_z;
     int16_t accel_x, accel_y, accel_z;
     IMU_vectors_t data;
 
-    IMU_GetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
+    IMUGetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
 
     data.gyro.x = (float)gyro_x / gyro_scale; // convert to deg / sec
     data.gyro.y = (float)gyro_y / gyro_scale;
@@ -49,13 +49,13 @@ IMU_vectors_t IMU_GetData(void)
 }
 
 
-void IMU_SetErrorOffset(IMU_vectors_t error_offset)
+void IMUSetErrorOffset(IMU_vectors_t error_offset)
 {
     error = error_offset;
 }
 
 
-IMU_vectors_t IMU_GetCalibrationError(uint32_t cycle_count)
+IMU_vectors_t IMUGetCalibrationError(uint32_t cycle_count)
 {
     double gyro_x_sum, gyro_y_sum, gyro_z_sum;
     double accel_x_sum, accel_y_sum, accel_z_sum;
@@ -73,7 +73,7 @@ IMU_vectors_t IMU_GetCalibrationError(uint32_t cycle_count)
     error_offset.accel.z = 0.0;
 
     for (uint32_t i = cycle_count; i != 0; --i) {
-        read_data = IMU_GetData();
+        read_data = IMUGetData();
 
         gyro_x_sum += read_data.gyro.x;
         gyro_y_sum += read_data.gyro.y;
@@ -94,7 +94,7 @@ IMU_vectors_t IMU_GetCalibrationError(uint32_t cycle_count)
 }
 
 
-void IMU_SetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale)
+void IMUSetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale)
 {
     switch(g_scale) {
         default:

@@ -2,14 +2,14 @@
 
 #include <pico/stdlib.h>
 
-void config_RegisterParam(const char *key, uint size);
+void configRegisterParam(const char *key, uint size);
 
-int config_SetParam(const char *key, void *data);
+int configSetParam(const char *key, void *data);
 
-void* config_GetParam(char *key);
+void* configGetParam(char *key);
 
-int config_WriteAll(void);
+int configWriteAll(void);
 
-void config_ReadAll(void);
+void configReadAll(void);
 
-void config_FreeAll(void);
+void configFreeAll(void);

@@ -6,9 +6,9 @@
 
 #include <picoflight/RC/RC.h>
 
-void SBUS_InitBus(uart_inst_t *uart, uint32_t rx);
+void SBUSInitBus(uart_inst_t *uart, uint32_t rx);
 
 // Currently outputs channels normalized to [0, 1]
-bool SBUS_GetChannels(RC_t rc);
+bool SBUSGetChannels(RC_t rc);
 
-bool SBUS_IsFailsafe(void);
+bool SBUSIsFailsafe(void);

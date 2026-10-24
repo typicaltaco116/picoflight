@@ -16,33 +16,33 @@ static void drive_default_safe_values(mixer_type_e config)
     switch (config) {
         default:
         case MIXER_QUADCOPTER:
-            PWM_Drive(_pwm_outputs[1], -1.0f);
-            PWM_Drive(_pwm_outputs[2], -1.0f);
-            PWM_Drive(_pwm_outputs[3], -1.0f);
-            PWM_Drive(_pwm_outputs[4], -1.0f);
+            PWMDrive(_pwm_outputs[1], -1.0f);
+            PWMDrive(_pwm_outputs[2], -1.0f);
+            PWMDrive(_pwm_outputs[3], -1.0f);
+            PWMDrive(_pwm_outputs[4], -1.0f);
 
             for (int i = 5; i <= OUTPUT_MAX_COUNT; ++i)
-                PWM_Drive(_pwm_outputs[i], 0.0f);
+                PWMDrive(_pwm_outputs[i], 0.0f);
             break;
 
         case MIXER_FIXED_WING:
             for (int i = 1; i <= OUTPUT_MAX_COUNT; ++i) {
                 if (i == 3)
-                    PWM_Drive(_pwm_outputs[3], -1.0f);
+                    PWMDrive(_pwm_outputs[3], -1.0f);
                 else
-                    PWM_Drive(_pwm_outputs[i], 0.0f);
+                    PWMDrive(_pwm_outputs[i], 0.0f);
             }
             break;
     }
 }
 
-void mixer_Init(mixer_type_e config, output_pins_t out_pins)
+void mixerInit(mixer_type_e config, output_pins_t out_pins)
 {
     _armed_status = false;
 
     for (int i = 1; i <= OUTPUT_MAX_COUNT; ++i) {
-        _pwm_outputs[i] = PWM_Register(out_pins[i]);
-        PWM_Init(_pwm_outputs[i]);
+        _pwm_outputs[i] = PWMRegister(out_pins[i]);
+        PWMInit(_pwm_outputs[i]);
     }
 
     _config = config;
@@ -73,25 +73,25 @@ static void quadcopter_mixing(euler_t input, float throttle)
         motor1 = motor2 = motor3 = motor4 = 0.0f;
     }
 
-    PWM_DriveNorm(_pwm_outputs[1], motor1);
-    PWM_DriveNorm(_pwm_outputs[2], motor2);
-    PWM_DriveNorm(_pwm_outputs[3], motor3);
-    PWM_DriveNorm(_pwm_outputs[4], motor4);
+    PWMDriveNorm(_pwm_outputs[1], motor1);
+    PWMDriveNorm(_pwm_outputs[2], motor2);
+    PWMDriveNorm(_pwm_outputs[3], motor3);
+    PWMDriveNorm(_pwm_outputs[4], motor4);
 }
 
 static void fixedwing_mixing(euler_t input, float throttle)
 {
-    PWM_Drive(_pwm_outputs[1], input.roll);
-    PWM_Drive(_pwm_outputs[2], input.pitch);
-    PWM_Drive(_pwm_outputs[4], input.yaw);
+    PWMDrive(_pwm_outputs[1], input.roll);
+    PWMDrive(_pwm_outputs[2], input.pitch);
+    PWMDrive(_pwm_outputs[4], input.yaw);
 
     if (_armed_status)
-        PWM_DriveNorm(_pwm_outputs[3], normalize_input(throttle));
+        PWMDriveNorm(_pwm_outputs[3], normalize_input(throttle));
     else
-        PWM_DriveNorm(_pwm_outputs[3], 0.0f);
+        PWMDriveNorm(_pwm_outputs[3], 0.0f);
 }
 
-void mixer_DriveOutputs(euler_t input, float throttle)
+void mixerDriveOutputs(euler_t input, float throttle)
 {
     switch (_config) {
         default:
@@ -104,7 +104,7 @@ void mixer_DriveOutputs(euler_t input, float throttle)
     }
 }
 
-void mixer_SetArm(bool armed)
+void mixerSetArm(bool armed)
 {
     _armed_status = armed;
 }

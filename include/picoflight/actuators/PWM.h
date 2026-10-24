@@ -2,10 +2,10 @@
 
 typedef int32_t PWM_t;
 
-PWM_t PWM_Register(int32_t pin);
+PWM_t PWMRegister(int32_t pin);
 
-void PWM_Init(PWM_t PWM_obj);
+void PWMInit(PWM_t PWM_obj);
 
-void PWM_Drive(PWM_t PWM_obj, float x);
+void PWMDrive(PWM_t PWM_obj, float x);
 
-void PWM_DriveNorm(PWM_t PWM_obj, float x_norm);
+void PWMDriveNorm(PWM_t PWM_obj, float x_norm);

@@ -3,6 +3,6 @@
 #include <picoflight/orientation/types.h>
 #include <picoflight/sensors/IMU_processing.h>
 
-void madgwick_SetStepSize(float B_val);
+void madgwickSetStepSize(float B_val);
 
-void madgwick_Compute(euler_t *angles, IMU_vectors_t imu, float sampleFreq);
+void madgwickCompute(euler_t *angles, IMU_vectors_t imu, float sampleFreq);

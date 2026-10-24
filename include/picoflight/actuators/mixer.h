@@ -10,12 +10,12 @@ typedef enum {
     MIXER_FIXED_WING,
 } mixer_type_e;
 
-void mixer_Init(mixer_type_e config, output_pins_t out_pins);
+void mixerInit(mixer_type_e config, output_pins_t out_pins);
 
-void mixer_TranslateAttitude(euler_t input);
+void mixerTranslateAttitude(euler_t input);
 
-void mixer_TranslateThrottle(float norm_throttle);
+void mixerTranslateThrottle(float norm_throttle);
 
-void mixer_DriveOutputs(euler_t input, float throttle);
+void mixerDriveOutputs(euler_t input, float throttle);
 
-void mixer_SetArm(bool armed);
+void mixerSetArm(bool armed);

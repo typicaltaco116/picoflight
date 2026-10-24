@@ -16,16 +16,16 @@ int main()
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-    PWM_t out3 = PWM_Register(CHANNEL_3_SERVO_OUTPUT_PIN);
-    PWM_Init(out3);
-    PWM_Drive(out3, 0);
+    PWM_t out3 = PWMRegister(CHANNEL_3_SERVO_OUTPUT_PIN);
+    PWMInit(out3);
+    PWMDrive(out3, 0);
 
     while (1) {
-        PWM_Drive(out3, -1.0f);
+        PWMDrive(out3, -1.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
-        PWM_Drive(out3, 0.0f);
+        PWMDrive(out3, 0.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
-        PWM_Drive(out3, 1.0f);
+        PWMDrive(out3, 1.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
     }
 }

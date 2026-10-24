@@ -30,13 +30,13 @@ static float constrain(float value, float lower, float upper)
         return value;
 }
 
-void madgwick_SetStepSize(float B_val)
+void madgwickSetStepSize(float B_val)
 {
     B_madgwick = B_val;
 }
 
 // CODE TAKEN FROM DREHMFLIGHT BY Nicholas Rehm
-void madgwick_Compute(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
+void madgwickCompute(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
 {
     float recipNorm;
     float s0, s1, s2, s3;

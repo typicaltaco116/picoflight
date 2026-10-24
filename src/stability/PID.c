@@ -24,7 +24,7 @@ static float singleLoopRun(PID_gains_t gain,
 }
 
 
-void PID_ThreeAxisAngleControl(
+void PIDThreeAxisAngleControl(
     PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
     rates_t rates, euler_t angles, float dt,
     float roll_set, float pitch_set, float yaw_set,
@@ -50,7 +50,7 @@ void PID_ThreeAxisAngleControl(
 }
 
 
-void PID_ThreeAxisRateControl(
+void PIDThreeAxisRateControl(
     PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
     rates_t rates, euler_t angles, float dt,
     float roll_set, float pitch_set, float yaw_set,

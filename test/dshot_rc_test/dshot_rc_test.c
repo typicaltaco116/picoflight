@@ -16,18 +16,18 @@ int main(void)
     stdio_init_all();
 
     sleep_ms(1000);
-    SBUS_InitBus(SBUS_UART_INST, SBUS_RX_PIN);
+    SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
     dshotx4_t *motors = dshotx4Construct(DSHOT_PINBASE, 4, DSHOT_SPEED, pio0, 0);
 
     while (1) {
         sleep_us(200);
 
         RC_t ch;
-        if (SBUS_GetChannels(ch))
+        if (SBUSGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
 
         // Throttle is not zero at zero!!!
-        if (SBUS_IsFailsafe() || ch[3] < 0.2) {
+        if (SBUSIsFailsafe() || ch[3] < 0.2) {
             dshotx4SendRawThrottles(motors, (uint16_t[]){0, 0, 0, 0});
             continue;
         }

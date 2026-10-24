@@ -19,12 +19,12 @@
 #define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS * 1E-6)
 #define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS * 1E-6)
 
-PWM_t PWM_Register(int32_t pin)
+PWM_t PWMRegister(int32_t pin)
 {
     return pin;
 }
 
-void PWM_Init(PWM_t PWM_obj)
+void PWMInit(PWM_t PWM_obj)
 {
     pwm_config config;
 
@@ -44,7 +44,7 @@ static float map_float(float x, float L1, float H1, float L2, float H2)
     return (x - L1) * (H2 - L2) / (H1 - L1) + L2;
 }
 
-void PWM_Drive(PWM_t PWM_obj, float x)
+void PWMDrive(PWM_t PWM_obj, float x)
 {
     uint16_t level;
 
@@ -56,7 +56,7 @@ void PWM_Drive(PWM_t PWM_obj, float x)
     pwm_set_gpio_level(PWM_obj, level);
 }
 
-void PWM_DriveNorm(PWM_t PWM_obj, float x_norm)
+void PWMDriveNorm(PWM_t PWM_obj, float x_norm)
 {
     uint16_t level;
 

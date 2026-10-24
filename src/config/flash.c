@@ -25,7 +25,7 @@ static uint configTableEntries = 0;
 static config_entry_t *configTable = NULL;
 
 
-void config_RegisterParam(const char *key, uint size)
+void configRegisterParam(const char *key, uint size)
 {
     size_t key_length;
 
@@ -66,7 +66,7 @@ static int getTableIndex(const char *key)
 }
 
 
-int config_SetParam(const char *key, void *data)
+int configSetParam(const char *key, void *data)
 {
     int index;
     config_entry_t entry;
@@ -83,7 +83,7 @@ int config_SetParam(const char *key, void *data)
 }
 
 
-void* config_GetParam(char *key)
+void* configGetParam(char *key)
 {
     int index;
     config_entry_t entry;
@@ -122,7 +122,7 @@ static void flash_page_program(uintptr_t page_offset, uint8_t *data)
 }
 
 
-int config_WriteAll(void)
+int configWriteAll(void)
 {
     uint8_t programData[FLASH_PAGE_SIZE]; // aligned to 256 byte addresses
     uint8_t *dataPtr = programData;
@@ -142,7 +142,7 @@ int config_WriteAll(void)
 }
 
 
-void config_ReadAll(void)
+void configReadAll(void)
 {
     uint8_t *dataPtr = (uint8_t*)&__config_reserved_flash;
 
@@ -154,7 +154,7 @@ void config_ReadAll(void)
 }
 
 
-void config_FreeAll(void)
+void configFreeAll(void)
 {
     for (uint i = 0; i < configTableEntries; ++i) {
         config_entry_t entry = configTable[i];

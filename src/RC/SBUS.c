@@ -32,7 +32,7 @@ static uart_inst_t *_uart_instance;
 static bool _failsafe = true;
 
 
-void SBUS_InitBus(uart_inst_t *uart, uint32_t rx)
+void SBUSInitBus(uart_inst_t *uart, uint32_t rx)
 {
     _uart_instance = uart;
 
@@ -130,7 +130,7 @@ static bool GetRaw(SBUS_raw_t raw_ch)
     return false;
 }
 
-bool SBUS_GetChannels(RC_t rc)
+bool SBUSGetChannels(RC_t rc)
 {
     SBUS_raw_t raw_ch = {0};
 
@@ -149,7 +149,7 @@ bool SBUS_GetChannels(RC_t rc)
 }
 
 
-bool SBUS_IsFailsafe(void)
+bool SBUSIsFailsafe(void)
 {
     return _failsafe;
 }

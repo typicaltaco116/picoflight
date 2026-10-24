@@ -17,13 +17,13 @@ int main()
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-    SBUS_InitBus(SBUS_UART_INST, SBUS_RX_PIN);
+    SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     while (1) {
      RC_t ch;
-        if (SBUS_GetChannels(ch))
+        if (SBUSGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
-        if (SBUS_IsFailsafe())
+        if (SBUSIsFailsafe())
             puts("Failsafe");
         sleep_ms(1);
     }
