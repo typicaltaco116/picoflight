@@ -26,22 +26,25 @@ set(INCLUDES
 )
 
 add_library(picoflight_lib STATIC ${SOURCES})
-
 target_include_directories(picoflight_lib PUBLIC ${INCLUDES})
-
 target_link_libraries(picoflight_lib PUBLIC ${LINKED_LIBRARIES})
-
-target_compile_options(picoflight_lib
-    PUBLIC -Wall -Wextra
+target_compile_options(picoflight_lib PUBLIC
+    -Wall -Wextra
 )
 
-set_target_properties(picoflight_lib PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+add_executable(picoflight 
+    ${SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 )
-
+target_include_directories(picoflight PRIVATE ${INCLUDES})
+target_link_libraries(picoflight PRIVATE ${LINKED_LIBRARIES})
+target_compile_options(picoflight PRIVATE
+    -Wall -Wextra
+)
 
 # Assemble PIO program.
 set(PIO_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/pio/dshotx4.pio
 )
 pico_generate_pio_header(picoflight_lib ${PIO_SOURCES})
+pico_generate_pio_header(picoflight ${PIO_SOURCES})

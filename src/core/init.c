@@ -1,14 +1,16 @@
+// Primary Header
 #include <picoflight/core/init.h>
 
-#include <stdbool.h>
-
+// Local Headers
 #include <picoflight/config/flash.h>
 #include <picoflight/sensors/IMU.h>
 #include <picoflight/sensors/IMU_processing.h>
 #include <picoflight/estimation/madgwick.h>
+#include <picoflight/core/core_parameters.h>
 
-#include <picoflight/config/pin_mapping.h>
-#include <picoflight/config/IMU.h>
+// Standard Headers
+#include <stdbool.h>
+
 
 #define FIRST_BOOT_CHECK_VAL 0x67
 
@@ -67,4 +69,7 @@ void coreInit(void)
         parameter_set_all_default();
         configWriteAll();
     }
+
+    IMU_full_init();
+    estimator_full_init();
 }
