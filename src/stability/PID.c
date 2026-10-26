@@ -1,63 +1,99 @@
+// Primary Header
 #include <picoflight/stability/PID.h>
 
+// Local Headers
 #include <picoflight/orientation/types.h>
 
-static float singleLoopRun(PID_gains_t gain,
-                           float setpoint, float input,
-                           float dt, float *i_accumulator,
-                           float dxdt)
+// Standard Headers
+#include <stdbool.h>
+
+PID_gains_t _k_roll_angle, _k_pitch_angle;
+PID_gains_t _k_roll_rate, _k_pitch_rate, _k_yaw_rate;
+
+void PIDInit(void)
+{
+}
+
+void PIDSetGains(
+    PID_gains_t roll_angle,
+    PID_gains_t pitch_angle,
+    PID_gains_t roll_rate,
+    PID_gains_t pitch_rate,
+    PID_gains_t yaw_rate)
+{
+    _k_roll_angle = roll_angle;
+    _k_pitch_angle = pitch_angle;
+    _k_roll_rate = roll_rate;
+    _k_pitch_rate = pitch_rate;
+    _k_yaw_rate = yaw_rate;
+}
+
+static float singleLoopRun(
+        PID_gains_t K,
+        float setpoint,
+        float input,
+        float dt,
+        float *i_accumulator,
+        float dxdt)
 {
     float error, command, p_term, i_term, d_term;
 
-    error = input - setpoint;
+    error = setpoint - input;
 
-    p_term = gain.k_P * error;
+    p_term = K.p * error;
 
-    i_term = gain.k_I * error * dt + *i_accumulator;
+    i_term = K.i * error * dt + *i_accumulator;
     *i_accumulator += i_term;
     // Could also multiply the I term gain after its been integrated
 
-    d_term = gain.k_D * dxdt;
+    d_term = K.d * dxdt;
 
-    command = gain.k_All * (p_term + i_term + d_term);
+    command = K.all * (p_term + i_term + d_term);
     return command;
 }
 
-
-void PIDThreeAxisAngleControl(
-    PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
-    rates_t rates, euler_t angles, float dt,
-    float roll_set, float pitch_set, float yaw_set,
-    float *roll_cmd, float *pitch_cmd, float *yaw_cmd)
+static void PIDCalcCommandsAngle(
+        euler_t platformAngles,
+        rates_t platformRates,
+        float dt,
+        float rollSetpointNorm,
+        float pitchSetpointNorm,
+        float yawSetpointNorm,
+        float *rollCommandNorm,
+        float *pitchCommandNorm,
+        float *yawCommandNorm)
 {
+    (void)platformAngles; // surpress unused wanring for now
+    
     static float roll_I = 0.0f;
     static float pitch_I = 0.0f;
     static float yaw_I = 0.0f;
     static float yaw_old = 0.0f;
     float yaw_dxdt;
 
-    yaw_dxdt = (rates.yaw - yaw_old) / dt;
-    yaw_old = rates.yaw;
+    // Calculate the Angular Acceleration
+    yaw_dxdt = (platformRates.yaw - yaw_old) / dt;
+    yaw_old = platformRates.yaw;
 
     // Simple Angle Control
-    *roll_cmd = singleLoopRun(roll, roll_set, angles.roll, dt, &roll_I, rates.roll);
-
-    // Simple Angle Control
-    *pitch_cmd = singleLoopRun(pitch, pitch_set, angles.pitch, dt, &pitch_I, rates.pitch);
+    *rollCommandNorm = singleLoopRun(_k_roll_angle, rollSetpointNorm, platformAngles.roll, dt, &roll_I, platformRates.roll);
+    *pitchCommandNorm = singleLoopRun(_k_pitch_angle, pitchSetpointNorm, platformAngles.pitch, dt, &pitch_I, platformRates.pitch);
 
     // Simple Rate Control
-    *yaw_cmd = singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
+    *yawCommandNorm = singleLoopRun(_k_yaw_rate, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
 }
 
 
-void PIDThreeAxisRateControl(
-    PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
-    rates_t rates, euler_t angles, float dt,
-    float roll_set, float pitch_set, float yaw_set,
-    float *roll_cmd, float *pitch_cmd, float *yaw_cmd)
+static void PIDCalcCommandsRate(
+        rates_t platformRates,
+        float dt,
+        float rollSetpointNorm,
+        float pitchSetpointNorm,
+        float yawSetpointNorm,
+        float *rollCommandNorm,
+        float *pitchCommandNorm,
+        float *yawCommandNorm)
 {
-    (void)angles; // surpress unused wanring for now
-    
     static float roll_I = 0.0f;
     static float pitch_I = 0.0f;
     static float yaw_I = 0.0f;
@@ -71,15 +107,37 @@ void PIDThreeAxisRateControl(
     // May differentiate the angle in order to have a second source in the future
 
     // Calculate the Angular Acceleration
-    roll_dxdt = (rates.roll - roll_old) / dt;
-    pitch_dxdt = (rates.pitch - pitch_old) / dt;
-    yaw_dxdt = (rates.yaw - yaw_old) / dt;
-    roll_old = rates.roll;
-    pitch_old = rates.pitch;
-    yaw_old = rates.yaw;
+    roll_dxdt = (platformRates.roll - roll_old) / dt;
+    pitch_dxdt = (platformRates.pitch - pitch_old) / dt;
+    yaw_dxdt = (platformRates.yaw - yaw_old) / dt;
+    roll_old = platformRates.roll;
+    pitch_old = platformRates.pitch;
+    yaw_old = platformRates.yaw;
 
     // Simple Rate Controllers
-    *roll_cmd = singleLoopRun(roll, roll_set, rates.roll, dt, &roll_I, roll_dxdt);
-    *pitch_cmd = singleLoopRun(pitch, pitch_set, rates.pitch, dt, &pitch_I, pitch_dxdt);
-    *yaw_cmd = singleLoopRun(yaw, yaw_set, rates.yaw, dt, &yaw_I, yaw_dxdt);
+    *rollCommandNorm = singleLoopRun(_k_roll_rate, rollSetpointNorm, platformRates.roll, dt, &roll_I, roll_dxdt);
+    *pitchCommandNorm = singleLoopRun(_k_pitch_rate, pitchSetpointNorm, platformRates.pitch, dt, &pitch_I, pitch_dxdt);
+    *yawCommandNorm = singleLoopRun(_k_yaw_rate, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
+}
+
+void PIDCalcCommands(
+        bool isAngle,
+        euler_t platformAngles,
+        rates_t platformRates,
+        float dt,
+        float rollSetpoint,
+        float pitchSetpoint,
+        float yawSetpoint, // always rate setpoint
+        float *rollCommand,
+        float *pitchCommand,
+        float *yawCommand)
+{
+    if (isAngle) {
+        PIDCalcCommandsAngle(platformAngles, platformRates, dt, rollSetpoint,
+                pitchSetpoint, yawSetpoint, rollCommand, pitchCommand, yawCommand);
+    }
+    else {
+        PIDCalcCommandsRate(platformRates, dt, rollSetpoint,
+                pitchSetpoint, yawSetpoint, rollCommand, pitchCommand, yawCommand);
+    }
 }

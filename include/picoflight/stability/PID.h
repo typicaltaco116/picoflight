@@ -1,24 +1,27 @@
 #pragma once
 
+// Local Headers
 #include <picoflight/orientation/types.h>
 
+// Standard Headers
+#include <stdbool.h>
+
 typedef struct {
-    float k_P;
-    float k_I;
-    float k_D;
-    float k_All;
+    float p;
+    float i;
+    float d;
+    float all;
 } PID_gains_t;
 
-void PIDThreeAxisAngleControl(
-    PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
-    rates_t rates, euler_t angles, float dt,
-    float roll_set, float pitch_set, float yaw_set,
-    float *roll_cmd, float *pitch_cmd, float *yaw_cmd
-);
-
-void PIDThreeAxisRateControl(
-    PID_gains_t roll, PID_gains_t pitch, PID_gains_t yaw,
-    rates_t rates, euler_t angles, float dt,
-    float roll_set, float pitch_set, float yaw_set,
-    float *roll_cmd, float *pitch_cmd, float *yaw_cmd
+void PIDCalcCommands(
+        bool isAngle,
+        euler_t platformAngles,
+        rates_t platformRates,
+        float dt,
+        float rollSetpoint,
+        float pitchSetpoint,
+        float yawSetpoint, // always rate setpoint
+        float *rollCommand,
+        float *pitchCommand,
+        float *yawCommand
 );
