@@ -4,52 +4,53 @@
 // Local Headers
 #include <picoflight/orientation/types.h>
 
+// pico-sdk Header
+#include <pico/types.h>
+
 // Standard Headers
 #include <stdbool.h>
 
-PID_gains_t _k_roll_angle, _k_pitch_angle;
-PID_gains_t _k_roll_rate, _k_pitch_rate, _k_yaw_rate;
+#define PARAMS_ROLL_ANGLE   (0)
+#define PARAMS_PITCH_ANGLE  (1)
+#define PARAMS_ROLL_RATE    (2)
+#define PARAMS_PITCH_RATE   (3)
+#define PARAMS_YAW_RATE     (4)
+PID_params_t _params[5];
 
-void PIDInit(void)
+void PIDSetRateParameters(PID_params_t *roll, PID_params_t *pitch, PID_params_t *yaw)
 {
+    _params[PARAMS_ROLL_RATE] = *roll;
+    _params[PARAMS_PITCH_RATE] = *pitch;
+    _params[PARAMS_YAW_RATE] = *yaw;
 }
 
-void PIDSetGains(
-    PID_gains_t roll_angle,
-    PID_gains_t pitch_angle,
-    PID_gains_t roll_rate,
-    PID_gains_t pitch_rate,
-    PID_gains_t yaw_rate)
+void PIDSetAngleParameters(PID_params_t *roll, PID_params_t *pitch)
 {
-    _k_roll_angle = roll_angle;
-    _k_pitch_angle = pitch_angle;
-    _k_roll_rate = roll_rate;
-    _k_pitch_rate = pitch_rate;
-    _k_yaw_rate = yaw_rate;
+    _params[PARAMS_ROLL_ANGLE] = *roll;
+    _params[PARAMS_PITCH_ANGLE] = *pitch;
 }
 
-static float singleLoopRun(
-        PID_gains_t K,
+static inline float singlePIDRun(
+        uint paramIdx,
         float setpoint,
         float input,
         float dt,
         float *i_accumulator,
         float dxdt)
 {
-    float error, command, p_term, i_term, d_term;
+    PID_gains_t k = _params[paramIdx].k;
 
-    error = setpoint - input;
+    float error = setpoint - input;
 
-    p_term = K.p * error;
+    float p_term = k.p * error;
 
-    i_term = K.i * error * dt + *i_accumulator;
+    float i_term = k.i * error * dt + *i_accumulator;
     *i_accumulator += i_term;
     // Could also multiply the I term gain after its been integrated
 
-    d_term = K.d * dxdt;
+    float d_term = k.d * dxdt;
 
-    command = K.all * (p_term + i_term + d_term);
-    return command;
+    return k.all * (p_term + i_term + d_term);
 }
 
 static void PIDCalcCommandsAngle(
@@ -76,11 +77,11 @@ static void PIDCalcCommandsAngle(
     yaw_old = platformRates.yaw;
 
     // Simple Angle Control
-    *rollCommandNorm = singleLoopRun(_k_roll_angle, rollSetpointNorm, platformAngles.roll, dt, &roll_I, platformRates.roll);
-    *pitchCommandNorm = singleLoopRun(_k_pitch_angle, pitchSetpointNorm, platformAngles.pitch, dt, &pitch_I, platformRates.pitch);
+    *rollCommandNorm = singlePIDRun(PARAMS_ROLL_ANGLE, rollSetpointNorm, platformAngles.roll, dt, &roll_I, platformRates.roll);
+    *pitchCommandNorm = singlePIDRun(PARAMS_PITCH_ANGLE, pitchSetpointNorm, platformAngles.pitch, dt, &pitch_I, platformRates.pitch);
 
     // Simple Rate Control
-    *yawCommandNorm = singleLoopRun(_k_yaw_rate, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
+    *yawCommandNorm = singlePIDRun(PARAMS_YAW_RATE, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
 }
 
 
@@ -115,9 +116,9 @@ static void PIDCalcCommandsRate(
     yaw_old = platformRates.yaw;
 
     // Simple Rate Controllers
-    *rollCommandNorm = singleLoopRun(_k_roll_rate, rollSetpointNorm, platformRates.roll, dt, &roll_I, roll_dxdt);
-    *pitchCommandNorm = singleLoopRun(_k_pitch_rate, pitchSetpointNorm, platformRates.pitch, dt, &pitch_I, pitch_dxdt);
-    *yawCommandNorm = singleLoopRun(_k_yaw_rate, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
+    *rollCommandNorm = singlePIDRun(PARAMS_ROLL_RATE, rollSetpointNorm, platformRates.roll, dt, &roll_I, roll_dxdt);
+    *pitchCommandNorm = singlePIDRun(PARAMS_PITCH_RATE, pitchSetpointNorm, platformRates.pitch, dt, &pitch_I, pitch_dxdt);
+    *yawCommandNorm = singlePIDRun(PARAMS_YAW_RATE, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
 }
 
 void PIDCalcCommands(

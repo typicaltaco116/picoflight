@@ -13,6 +13,20 @@ typedef struct {
     float all;
 } PID_gains_t;
 
+typedef struct {
+    float iMin;
+    float iMax;
+} PID_integral_bounds_t;
+
+typedef struct {
+    PID_gains_t k;
+    PID_integral_bounds_t bounds;
+} PID_params_t;
+
+void PIDSetRateParameters(PID_params_t *roll, PID_params_t *pitch, PID_params_t *yaw);
+
+void PIDSetAngleParameters(PID_params_t *roll, PID_params_t *pitch);
+
 void PIDCalcCommands(
         bool isAngle,
         euler_t platformAngles,
