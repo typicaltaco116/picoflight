@@ -1,4 +1,4 @@
-#include <picoflight/core/utilites.h>
+#include <picoflight/core/utilities.h>
 
 double map(double x, double inLow, double inHigh, double outLow, double outHigh)
 {
@@ -20,7 +20,7 @@ double constrain(double x, double min, double max)
     if (x > max)
         return max;
     if (x < min)
-        return;
+        return min;
     return x;
 }
 
@@ -29,7 +29,7 @@ float constrainf(float x, float min, float max)
     if (x > max)
         return max;
     if (x < min)
-        return;
+        return min;
     return x;
 }
 
@@ -38,6 +38,6 @@ int constraini(int x, int min, int max)
     if (x > max)
         return max;
     if (x < min)
-        return;
+        return min;
     return x;
 }
