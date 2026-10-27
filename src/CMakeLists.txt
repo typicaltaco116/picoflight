@@ -13,12 +13,14 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/IMU.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/IMU_processing.c
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/SBUS.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/RC/RC_mixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/PWM.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/mixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c
     ${CMAKE_CURRENT_SOURCE_DIR}/stability/PID.c
     ${CMAKE_CURRENT_SOURCE_DIR}/config/flash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/init.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/utilities.c
 )
 
 set(INCLUDES
