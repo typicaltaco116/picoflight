@@ -43,6 +43,7 @@ target_link_libraries(picoflight PRIVATE ${LINKED_LIBRARIES})
 target_compile_options(picoflight PRIVATE
     -Wall -Wextra
 )
+pico_add_uf2_output(picoflight)
 
 # Assemble PIO program.
 set(PIO_SOURCES
