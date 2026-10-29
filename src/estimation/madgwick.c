@@ -1,10 +1,15 @@
+// Primary Header
 #include <picoflight/estimation/madgwick.h>
 
+// Local Headers
+#include <picoflight/orientation/types.h>
+#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/core/utilities.h>
+
+// Standard Headers
 #include <math.h>
 #include <stdbool.h>
 
-#include <picoflight/orientation/types.h>
-#include <picoflight/sensors/IMU_processing.h>
 
 #define DEG_TO_RAD(x) (x * M_PI / 180.0f)
 #define RAD_TO_DEG(x) (x * 180.0f / M_PI)
@@ -20,23 +25,13 @@ static float invSqrt(float x)
     return 1.0f / sqrtf(x);
 }
 
-static float constrain(float value, float lower, float upper)
-{
-    if (value < lower)
-        return lower;
-    else if (value > upper)
-        return upper;
-    else
-        return value;
-}
-
 void madgwickSetStepSize(float B_val)
 {
     B_madgwick = B_val;
 }
 
 // CODE TAKEN FROM DREHMFLIGHT BY Nicholas Rehm
-void madgwickCompute(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
+platform_state_t madgwickCompute(IMU_vectors_t imu, float sampleFreq)
 {
     float recipNorm;
     float s0, s1, s2, s3;
@@ -117,8 +112,15 @@ void madgwickCompute(euler_t *angles, IMU_vectors_t imu, float sampleFreq)
     q2 *= recipNorm;
     q3 *= recipNorm;
 
+    platform_state_t state;
+    state.omega.roll = imu.gyro.x; // I have no idea what axis this should be.
+    state.omega.pitch = imu.gyro.y;
+    state.omega.yaw = imu.gyro.z;
+
     //Compute angles
-    angles->roll = RAD_TO_DEG(atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2));
-    angles->pitch = RAD_TO_DEG(-asin(constrain(-2.0f * (q1*q3 - q0*q2),-0.999999,0.999999)));
-    angles->yaw = RAD_TO_DEG(-atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3));
+    state.theta.roll = atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2);
+    state.theta.pitch = -asin(constrainf(-2.0f * (q1*q3 - q0*q2),-0.999999,0.999999));
+    state.theta.yaw = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3);
+
+    return state;
 }

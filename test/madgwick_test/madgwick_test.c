@@ -22,16 +22,15 @@ int main()
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
     while (1) {
-        IMU_vectors_t IMU_data;
-        euler_t angles;
-
         while (IMUIsDataReady());
 
-        IMU_data = IMUGetData();
+        IMU_vectors_t IMU_data = IMUGetData();
 
-        madgwickCompute(&angles, IMU_data, 5.0f);
+        platform_state_t state = madgwickCompute(IMU_data, 5.0f);
 
-        printf("Euler Angles = {%03.03f %03.03f %03.03f}\r\n",
-               angles.roll, angles.pitch, angles.yaw);
+        printf("State = {%03.03f %03.03f %03.03f %03.03f %03.03f %03.03f}\r\n",
+                state.theta.roll, state.theta.pitch, state.theta.yaw,
+                state.omega.roll, state.omega.pitch, state.omega.yaw
+        );
     }
 }
