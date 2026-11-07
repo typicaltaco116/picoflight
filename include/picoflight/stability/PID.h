@@ -19,23 +19,66 @@ typedef struct {
 } PID_integral_bounds_t;
 
 typedef struct {
-    PID_gains_t k;
+    PID_gains_t gains;
     PID_integral_bounds_t bounds;
-} PID_params_t;
+    float accumulator;
+} PID_loop_t;
 
-void PIDSetRateParameters(PID_params_t *roll, PID_params_t *pitch, PID_params_t *yaw);
+PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds);
 
-void PIDSetAngleParameters(PID_params_t *roll, PID_params_t *pitch);
+void PIDFree(PID_loop_t *obj);
 
-void PIDCalcCommands(
-        bool isAngle,
+float PIDGetResponse(
+        PID_loop_t *obj,
+        float setpoint,
+        float measurement,
+        float measurementDot,
+        float deltaTime
+);
+
+typedef struct {
+    PID_loop_t *rollRateController;
+    PID_loop_t *rollAngleController;
+    PID_loop_t *pitchRateController;
+    PID_loop_t *pitchAngleController;
+    PID_loop_t *yawRateController;
+    float rollDifferentiatorState;
+    float pitchDifferentiatorState;
+    float yawDifferentiatorState;
+} PID_3_axis_t;
+
+PID_3_axis_t* PID3AxisConstruct(
+        PID_gains_t rollRateGains,
+        PID_gains_t rollAngleGains,
+        PID_gains_t pitchRateGains,
+        PID_gains_t pitchAngleGains,
+        PID_gains_t yawRateGains,
+        PID_integral_bounds_t rollRateBounds,
+        PID_integral_bounds_t rollAngleBounds,
+        PID_integral_bounds_t pitchRateBounds,
+        PID_integral_bounds_t pitchAngleBounds,
+        PID_integral_bounds_t yawRateBounds
+);
+
+void PID3AxisFree(PID_3_axis_t *obj);
+
+void PID3AxisGetAngleResponse(
+        PID_3_axis_t *obj,
         euler_t platformAngles,
         rates_t platformRates,
-        float dt,
-        float rollSetpoint,
-        float pitchSetpoint,
-        float yawSetpoint, // always rate setpoint
-        float *rollCommand,
-        float *pitchCommand,
-        float *yawCommand
+        float deltaTime,
+        euler_t setpoints, // the yaw in this vector is a rate!!!!!!
+        float *rollCommandNorm,
+        float *pitchCommandNorm,
+        float *yawCommandNorm
+);
+
+void PID3AxisGetRateResponse(
+        PID_3_axis_t *obj,
+        rates_t platformRates,
+        float deltaTime,
+        rates_t setpoints,
+        float *rollCommandNorm,
+        float *pitchCommandNorm,
+        float *yawCommandNorm
 );

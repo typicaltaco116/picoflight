@@ -9,136 +9,150 @@
 
 // Standard Headers
 #include <stdbool.h>
+#include <stdlib.h>
 
-#define PARAMS_ROLL_ANGLE   (0)
-#define PARAMS_PITCH_ANGLE  (1)
-#define PARAMS_ROLL_RATE    (2)
-#define PARAMS_PITCH_RATE   (3)
-#define PARAMS_YAW_RATE     (4)
-PID_params_t _params[5];
-
-void PIDSetRateParameters(PID_params_t *roll, PID_params_t *pitch, PID_params_t *yaw)
+PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds)
 {
-    _params[PARAMS_ROLL_RATE] = *roll;
-    _params[PARAMS_PITCH_RATE] = *pitch;
-    _params[PARAMS_YAW_RATE] = *yaw;
+    PID_loop_t *obj = malloc(sizeof(PID_loop_t));
+    obj->gains = gains;
+    obj->bounds = bounds;
+    obj->accumulator = 0.0f;
+    return obj;
 }
 
-void PIDSetAngleParameters(PID_params_t *roll, PID_params_t *pitch)
+void PIDFree(PID_loop_t *obj)
 {
-    _params[PARAMS_ROLL_ANGLE] = *roll;
-    _params[PARAMS_PITCH_ANGLE] = *pitch;
+    free(obj);
 }
 
-static inline float singlePIDRun(
-        uint paramIdx,
+
+float PIDGetResponse(
+        PID_loop_t *obj,
         float setpoint,
-        float input,
-        float dt,
-        float *i_accumulator,
-        float dxdt)
+        float measurement,
+        float measurementDot,
+        float deltaTime)
 {
-    PID_gains_t k = _params[paramIdx].k;
+    float error = setpoint - measurement;
 
-    float error = setpoint - input;
+    float p_term = obj->gains.p * error;
 
-    float p_term = k.p * error;
+    float i_term = obj->gains.i * error * deltaTime + obj->accumulator;
+    obj->accumulator += i_term;
 
-    float i_term = k.i * error * dt + *i_accumulator;
-    *i_accumulator += i_term;
-    // Could also multiply the I term gain after its been integrated
+    float d_term = obj->gains.d * measurementDot;
 
-    float d_term = k.d * dxdt;
-
-    return k.all * (p_term + i_term + d_term);
+    return obj->gains.all * (p_term + i_term + d_term);
 }
 
-static void PIDCalcCommandsAngle(
+
+PID_3_axis_t* PID3AxisConstruct(
+        PID_gains_t rollRateGains,
+        PID_gains_t rollAngleGains,
+        PID_gains_t pitchRateGains,
+        PID_gains_t pitchAngleGains,
+        PID_gains_t yawRateGains,
+        PID_integral_bounds_t rollRateBounds,
+        PID_integral_bounds_t rollAngleBounds,
+        PID_integral_bounds_t pitchRateBounds,
+        PID_integral_bounds_t pitchAngleBounds,
+        PID_integral_bounds_t yawRateBounds)
+{
+    PID_3_axis_t *obj = malloc(sizeof(PID_3_axis_t));
+    obj->rollRateController = PIDConstruct(rollRateGains, rollRateBounds);
+    obj->rollAngleController = PIDConstruct(rollAngleGains, rollAngleBounds);
+    obj->pitchRateController = PIDConstruct(pitchRateGains, pitchRateBounds);
+    obj->pitchAngleController = PIDConstruct(pitchAngleGains, pitchAngleBounds);
+    obj->yawRateController = PIDConstruct(yawRateGains, yawRateBounds);
+    obj->rollDifferentiatorState = 0.0f;
+    obj->pitchDifferentiatorState = 0.0f;
+    obj->yawDifferentiatorState = 0.0f;
+    return obj;
+}
+
+void PID3AxisFree(PID_3_axis_t *obj)
+{
+    PIDFree(obj->rollRateController);
+    PIDFree(obj->rollAngleController);
+    PIDFree(obj->pitchRateController);
+    PIDFree(obj->pitchAngleController);
+    PIDFree(obj->yawRateController);
+    free(obj);
+}
+
+void PID3AxisGetAngleResponse(
+        PID_3_axis_t *obj,
         euler_t platformAngles,
         rates_t platformRates,
-        float dt,
-        float rollSetpointNorm,
-        float pitchSetpointNorm,
-        float yawSetpointNorm,
+        float deltaTime,
+        euler_t setpoints, // the yaw in this vector is a rate!!!!!!
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm)
 {
-    (void)platformAngles; // surpress unused wanring for now
-    
-    static float roll_I = 0.0f;
-    static float pitch_I = 0.0f;
-    static float yaw_I = 0.0f;
-    static float yaw_old = 0.0f;
-    float yaw_dxdt;
+    *rollCommandNorm = PIDGetResponse(
+            obj->rollAngleController,
+            setpoints.roll,
+            platformAngles.roll,
+            platformRates.roll,
+            deltaTime
+    );
 
-    // Calculate the Angular Acceleration
-    yaw_dxdt = (platformRates.yaw - yaw_old) / dt;
-    yaw_old = platformRates.yaw;
+    *pitchCommandNorm = PIDGetResponse(
+            obj->pitchAngleController,
+            setpoints.pitch,
+            platformAngles.pitch,
+            platformRates.pitch,
+            deltaTime
+    );
 
-    // Simple Angle Control
-    *rollCommandNorm = singlePIDRun(PARAMS_ROLL_ANGLE, rollSetpointNorm, platformAngles.roll, dt, &roll_I, platformRates.roll);
-    *pitchCommandNorm = singlePIDRun(PARAMS_PITCH_ANGLE, pitchSetpointNorm, platformAngles.pitch, dt, &pitch_I, platformRates.pitch);
-
-    // Simple Rate Control
-    *yawCommandNorm = singlePIDRun(PARAMS_YAW_RATE, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
+    float yawDotDot = (platformRates.yaw - obj->yawDifferentiatorState) / deltaTime;
+    obj->yawDifferentiatorState = yawDotDot;
+    *yawCommandNorm = PIDGetResponse(
+            obj->yawRateController,
+            setpoints.yaw,
+            platformRates.yaw,
+            yawDotDot,
+            deltaTime
+    );
 }
 
-
-static void PIDCalcCommandsRate(
+void PID3AxisGetRateResponse(
+        PID_3_axis_t *obj,
         rates_t platformRates,
-        float dt,
-        float rollSetpointNorm,
-        float pitchSetpointNorm,
-        float yawSetpointNorm,
+        float deltaTime,
+        rates_t setpoints,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm)
 {
-    static float roll_I = 0.0f;
-    static float pitch_I = 0.0f;
-    static float yaw_I = 0.0f;
-    static float roll_old = 0.0f;
-    static float pitch_old = 0.0f;
-    static float yaw_old = 0.0f;
-    float roll_dxdt;
-    float pitch_dxdt;
-    float yaw_dxdt;
+    float rollDotDot = (platformRates.roll - obj->rollDifferentiatorState) / deltaTime;
+    obj->rollDifferentiatorState = rollDotDot;
+    *rollCommandNorm = PIDGetResponse(
+            obj->rollAngleController,
+            setpoints.roll,
+            platformRates.roll,
+            rollDotDot,
+            deltaTime
+    );
 
-    // May differentiate the angle in order to have a second source in the future
+    float pitchDotDot = (platformRates.pitch - obj->pitchDifferentiatorState) / deltaTime;
+    obj->pitchDifferentiatorState = pitchDotDot;
+    *pitchCommandNorm = PIDGetResponse(
+            obj->pitchAngleController,
+            setpoints.pitch,
+            platformRates.pitch,
+            pitchDotDot,
+            deltaTime
+    );
 
-    // Calculate the Angular Acceleration
-    roll_dxdt = (platformRates.roll - roll_old) / dt;
-    pitch_dxdt = (platformRates.pitch - pitch_old) / dt;
-    yaw_dxdt = (platformRates.yaw - yaw_old) / dt;
-    roll_old = platformRates.roll;
-    pitch_old = platformRates.pitch;
-    yaw_old = platformRates.yaw;
-
-    // Simple Rate Controllers
-    *rollCommandNorm = singlePIDRun(PARAMS_ROLL_RATE, rollSetpointNorm, platformRates.roll, dt, &roll_I, roll_dxdt);
-    *pitchCommandNorm = singlePIDRun(PARAMS_PITCH_RATE, pitchSetpointNorm, platformRates.pitch, dt, &pitch_I, pitch_dxdt);
-    *yawCommandNorm = singlePIDRun(PARAMS_YAW_RATE, yawSetpointNorm, platformRates.yaw, dt, &yaw_I, yaw_dxdt);
-}
-
-void PIDCalcCommands(
-        bool isAngle,
-        euler_t platformAngles,
-        rates_t platformRates,
-        float dt,
-        float rollSetpoint,
-        float pitchSetpoint,
-        float yawSetpoint, // always rate setpoint
-        float *rollCommand,
-        float *pitchCommand,
-        float *yawCommand)
-{
-    if (isAngle) {
-        PIDCalcCommandsAngle(platformAngles, platformRates, dt, rollSetpoint,
-                pitchSetpoint, yawSetpoint, rollCommand, pitchCommand, yawCommand);
-    }
-    else {
-        PIDCalcCommandsRate(platformRates, dt, rollSetpoint,
-                pitchSetpoint, yawSetpoint, rollCommand, pitchCommand, yawCommand);
-    }
+    float yawDotDot = (platformRates.yaw - obj->yawDifferentiatorState) / deltaTime;
+    obj->yawDifferentiatorState = yawDotDot;
+    *yawCommandNorm = PIDGetResponse(
+            obj->yawRateController,
+            setpoints.yaw,
+            platformRates.yaw,
+            yawDotDot,
+            deltaTime
+    );
 }
