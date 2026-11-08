@@ -64,8 +64,7 @@ void PID3AxisFree(PID_3_axis_t *obj);
 
 void PID3AxisGetAngleResponse(
         PID_3_axis_t *obj,
-        euler_t platformAngles,
-        rates_t platformRates,
+        platform_state_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
         float *rollCommandNorm,
@@ -75,10 +74,11 @@ void PID3AxisGetAngleResponse(
 
 void PID3AxisGetRateResponse(
         PID_3_axis_t *obj,
-        rates_t platformRates,
+        platform_state_t state,
         float deltaTime,
         rates_t setpoints,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm
 );
+

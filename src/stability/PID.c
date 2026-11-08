@@ -82,8 +82,7 @@ void PID3AxisFree(PID_3_axis_t *obj)
 
 void PID3AxisGetAngleResponse(
         PID_3_axis_t *obj,
-        euler_t platformAngles,
-        rates_t platformRates,
+        platform_state_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
         float *rollCommandNorm,
@@ -93,25 +92,25 @@ void PID3AxisGetAngleResponse(
     *rollCommandNorm = PIDGetResponse(
             obj->rollAngleController,
             setpoints.roll,
-            platformAngles.roll,
-            platformRates.roll,
+            state.theta.roll,
+            state.omega.roll,
             deltaTime
     );
 
     *pitchCommandNorm = PIDGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
-            platformAngles.pitch,
-            platformRates.pitch,
+            state.theta.pitch,
+            state.omega.pitch,
             deltaTime
     );
 
-    float yawDotDot = (platformRates.yaw - obj->yawDifferentiatorState) / deltaTime;
+    float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
     *yawCommandNorm = PIDGetResponse(
             obj->yawRateController,
             setpoints.yaw,
-            platformRates.yaw,
+            state.omega.yaw,
             yawDotDot,
             deltaTime
     );
@@ -119,39 +118,39 @@ void PID3AxisGetAngleResponse(
 
 void PID3AxisGetRateResponse(
         PID_3_axis_t *obj,
-        rates_t platformRates,
+        platform_state_t state,
         float deltaTime,
         rates_t setpoints,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm)
 {
-    float rollDotDot = (platformRates.roll - obj->rollDifferentiatorState) / deltaTime;
+    float rollDotDot = (state.omega.roll - obj->rollDifferentiatorState) / deltaTime;
     obj->rollDifferentiatorState = rollDotDot;
     *rollCommandNorm = PIDGetResponse(
             obj->rollAngleController,
             setpoints.roll,
-            platformRates.roll,
+            state.omega.roll,
             rollDotDot,
             deltaTime
     );
 
-    float pitchDotDot = (platformRates.pitch - obj->pitchDifferentiatorState) / deltaTime;
+    float pitchDotDot = (state.omega.pitch - obj->pitchDifferentiatorState) / deltaTime;
     obj->pitchDifferentiatorState = pitchDotDot;
     *pitchCommandNorm = PIDGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
-            platformRates.pitch,
+            state.omega.pitch,
             pitchDotDot,
             deltaTime
     );
 
-    float yawDotDot = (platformRates.yaw - obj->yawDifferentiatorState) / deltaTime;
+    float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
     *yawCommandNorm = PIDGetResponse(
             obj->yawRateController,
             setpoints.yaw,
-            platformRates.yaw,
+            state.omega.yaw,
             yawDotDot,
             deltaTime
     );
