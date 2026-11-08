@@ -10,11 +10,25 @@ typedef enum {
     MIXER_FIXED_WING,
 } mixer_type_e;
 
-void mixerInit(mixer_type_e config, output_pins_t out_pins);
+typedef struct {
+    int32_t m1;
+    int32_t m2;
+    int32_t m3;
+    int32_t m4;
+    int32_t numAux;
+    int32_t *aux; // this pointer must remain in scope!!
+} quad_pinout_t;
 
-void mixerTranslateAttitude(euler_t input);
+typedef struct {
+    int32_t aileron;
+    int32_t elevator;
+    int32_t throttle;
+    int32_t rudder;
+    int32_t numAux;
+    int32_t *aux;
+} fixed_wing_pinout_t;
 
-void mixerTranslateThrottle(float norm_throttle);
+void mixerInit(mixer_type_e type, void *pinoutStruct);
 
 void mixerDriveOutputs(euler_t input, float throttle);
 
