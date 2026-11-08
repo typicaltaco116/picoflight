@@ -3,6 +3,7 @@
 
 // Local Headers
 #include <picoflight/orientation/types.h>
+#include <picoflight/core/utilities.h>
 
 // pico-sdk Header
 #include <pico/types.h>
@@ -42,7 +43,7 @@ float PIDGetResponse(
 
     float d_term = obj->gains.d * measurementDot;
 
-    return obj->gains.all * (p_term + i_term + d_term);
+    return constrainf(obj->gains.all * (p_term + i_term + d_term), -1.0f, 1.0f);
 }
 
 
