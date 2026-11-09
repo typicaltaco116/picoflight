@@ -28,8 +28,19 @@ typedef struct {
     int32_t *aux;
 } fixed_wing_pinout_t;
 
+void mixerQuadInit(quad_pinout_t *pinout);
+
+void mixerFixedWingInit(fixed_wing_pinout_t *pinout);
+
 void mixerInit(mixer_type_e type, void *pinoutStruct);
 
-void mixerDriveOutputs(euler_t input, float throttle);
+// expects commands from -1 to 1
+void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs);
+
+// expects command to be -1 to 1
+void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs);
+
+// expects commands to be -1 to 1
+void mixerGetOutputs(euler_t cmd, float throttle, float *outputs);
 
 void mixerSetArm(bool armed);

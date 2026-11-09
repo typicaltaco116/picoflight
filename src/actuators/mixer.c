@@ -3,6 +3,7 @@
 #include <picoflight/actuators/PWM.h>
 #include <picoflight/actuators/outputs.h>
 #include <picoflight/orientation/types.h>
+#include <picoflight/core/utilities.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -12,100 +13,89 @@ static bool _armedFlag = false;
 static char _pinoutStruct[sizeof(quad_pinout_t)];
 static mixer_type_e _type;
 
+void mixerQuadInit(quad_pinout_t *pinout)
+{
+    PWMInit(pinout->m1); PWMDrive(pinout->m1, -1.0f);
+    PWMInit(pinout->m2); PWMDrive(pinout->m2, -1.0f);
+    PWMInit(pinout->m3); PWMDrive(pinout->m3, -1.0f);
+    PWMInit(pinout->m4); PWMDrive(pinout->m4, -1.0f);
+
+    for (int32_t i = 0; i <= pinout->numAux; ++i) {
+        PWMInit(pinout->aux[i]);
+        PWMDrive(pinout->aux[i], 0.0f);
+    }
+}
+
+void mixerFixedWingInit(fixed_wing_pinout_t *pinout)
+{
+    PWMInit(pinout->aileron);   PWMDrive(pinout->aileron, 0.0f);
+    PWMInit(pinout->elevator);  PWMDrive(pinout->elevator, 0.0f);
+    PWMInit(pinout->throttle);  PWMDrive(pinout->throttle, -1.0f); 
+    PWMInit(pinout->rudder);    PWMDrive(pinout->rudder, 0.0f);
+
+    for (int32_t i = 0; i <= pinout->numAux; ++i){
+        PWMInit(pinout->aux[i]);
+        PWMDrive(pinout->aux[i], 0.0f);
+    }
+}
+
 void mixerInit(mixer_type_e type, void *pinoutStruct)
 {
     _armedFlag = false;
     _type = type;
     memcpy(_pinoutStruct, pinoutStruct, sizeof(quad_pinout_t));
-
-    switch (_type) {
-        default:
-        case MIXER_QUADCOPTER: {
-            quad_pinout_t *pinout = (quad_pinout_t*)_pinoutStruct;
-            PWMInit(pinout->m1); PWMDrive(pinout->m1, -1.0f);
-            PWMInit(pinout->m2); PWMDrive(pinout->m2, -1.0f);
-            PWMInit(pinout->m3); PWMDrive(pinout->m3, -1.0f);
-            PWMInit(pinout->m4); PWMDrive(pinout->m4, -1.0f);
-
-            for (int32_t i = 0; i <= pinout->numAux; ++i) {
-                PWMInit(pinout->aux[i]);
-                PWMDrive(pinout->aux[i], 0.0f);
-            }
-            break;
-        }
-
-        case MIXER_FIXED_WING: {
-            fixed_wing_pinout_t *pinout = (fixed_wing_pinout_t*)_pinoutStruct;
-            PWMInit(pinout->aileron);   PWMDrive(pinout->aileron, 0.0f);
-            PWMInit(pinout->elevator);  PWMDrive(pinout->elevator, 0.0f);
-            PWMInit(pinout->throttle);  PWMDrive(pinout->throttle, -1.0f); 
-            PWMInit(pinout->rudder);    PWMDrive(pinout->rudder, 0.0f);
-
-            for (int32_t i = 0; i <= pinout->numAux; ++i){
-                PWMInit(pinout->aux[i]);
-                PWMDrive(pinout->aux[i], 0.0f);
-            }
-            break;
-        }
-    }
-}
-
-static float normalize_input(float input)
-// Expects input values to be -1 to 1
-{
-    return (input + 1.0f) / 2.0f;
 }
 
 // expects commands from -1 to 1
-static void quadcopter_mix_drive(euler_t cmd, float throttle)
+void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs)
 {
     float motor1, motor2, motor3, motor4;
+    quad_pinout_t *pinout = (quad_pinout_t*)_pinoutStruct;
 
     if (_armedFlag) {
-        throttle    = normalize_input(throttle);
-        cmd.roll    = normalize_input(cmd.roll);
-        cmd.pitch   = normalize_input(cmd.pitch);
-        cmd.yaw     = normalize_input(cmd.yaw);
+        throttle    = mapf(throttle, -1.0f, 1.0f, 0.0f, 1.0f);
+        cmd.roll    = mapf(cmd.roll, -1.0f, 1.0f, 0.0f, 1.0f);
+        cmd.pitch   = mapf(cmd.pitch, -1.0f, 1.0f, 0.0f, 1.0f);
+        cmd.yaw     = mapf(cmd.yaw, -1.0f, 1.0f, 0.0f, 1.0f);
 
-        motor1 = throttle - cmd.pitch + cmd.roll + cmd.yaw;
-        motor2 = throttle - cmd.pitch - cmd.roll - cmd.yaw;
-        motor3 = throttle + cmd.pitch - cmd.roll + cmd.yaw;
-        motor4 = throttle + cmd.pitch + cmd.roll - cmd.yaw;
+        motor1 = constrainf(throttle - cmd.pitch + cmd.roll + cmd.yaw, 0.0f, 1.0f);
+        motor2 = constrainf(throttle - cmd.pitch - cmd.roll - cmd.yaw, 0.0f, 1.0f);
+        motor3 = constrainf(throttle + cmd.pitch - cmd.roll + cmd.yaw, 0.0f, 1.0f);
+        motor4 = constrainf(throttle + cmd.pitch + cmd.roll - cmd.yaw, 0.0f, 1.0f);
     } else {
         motor1 = motor2 = motor3 = motor4 = 0.0f;
     }
 
-    PWMDriveNorm(((quad_pinout_t*)_pinoutStruct)->m1, motor1);
-    PWMDriveNorm(((quad_pinout_t*)_pinoutStruct)->m2, motor1);
-    PWMDriveNorm(((quad_pinout_t*)_pinoutStruct)->m3, motor1);
-    PWMDriveNorm(((quad_pinout_t*)_pinoutStruct)->m4, motor1);
+    outputs[pinout->m1 - 1] = mapf(motor1, 0.0f, 1.0f, -1.0f, 1.0f);
+    outputs[pinout->m2 - 1] = mapf(motor2, 0.0f, 1.0f, -1.0f, 1.0f);
+    outputs[pinout->m3 - 1] = mapf(motor3, 0.0f, 1.0f, -1.0f, 1.0f);
+    outputs[pinout->m4 - 1] = mapf(motor4, 0.0f, 1.0f, -1.0f, 1.0f);
 }
 
 // expects command to be -1 to 1
-static void fixedwing_mixing(euler_t cmd, float throttle)
+void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs)
 {
+    fixed_wing_pinout_t *pinout = (fixed_wing_pinout_t*)_pinoutStruct;
+
     if (!_armedFlag)
         throttle = -1.0f;
-        
-    PWMDrive(
-        ((fixed_wing_pinout_t*)_pinoutStruct)->throttle,
-        throttle
-    );
-    PWMDrive(((fixed_wing_pinout_t*)_pinoutStruct)->aileron, cmd.roll);
-    PWMDrive(((fixed_wing_pinout_t*)_pinoutStruct)->elevator, cmd.pitch);
-    PWMDrive(((fixed_wing_pinout_t*)_pinoutStruct)->rudder, cmd.yaw);
+
+    outputs[pinout->throttle - 1]   = throttle;
+    outputs[pinout->aileron - 1]    = cmd.roll;
+    outputs[pinout->elevator - 1]   = cmd.pitch;
+    outputs[pinout->rudder - 1]     = cmd.yaw;
 }
 
 // expects commands to be -1 to 1
-void mixerDriveOutputs(euler_t input, float throttle)
+void mixerGetOutputs(euler_t cmd, float throttle, float *outputs)
 {
     switch (_type) {
         default:
         case MIXER_QUADCOPTER:
-            quadcopter_mix_drive(input, throttle);
+            mixerGetQuadOutputs(cmd, throttle, outputs);
             break;
         case MIXER_FIXED_WING:
-            fixedwing_mixing(input, throttle);
+            mixerGetFixedWingOutputs(cmd, throttle, outputs);
             break;
     }
 }
