@@ -1,6 +1,9 @@
 // Primary Header
 #include <picoflight/actuators/dshotx4.h>
 
+// Local Headers
+#include <picoflight/core/utilities.h>
+
 // PICO-sdk Headers
 #include <hardware/pio.h>
 #include <hardware/clocks.h>
@@ -124,6 +127,19 @@ void dshotx4SendThrottles(dshotx4_t *obj, uint16_t *data)
     }
 
     dshotx4SendRawThrottles(obj, data);
+}
+
+void dshotx4SendNormThrottles(dshotx4_t *obj, float *data)
+{
+    uint16_t intThrottles[4];
+    for (uint8_t i = 0; i < obj->pinCount; ++i) {
+        intThrottles[i] = mapf(data[i], -1.0f, 1.0f, 0, 2000);
+        if (intThrottles[i] > 2000)
+            intThrottles[i] = 2000;
+        if (intThrottles[i] != 0)
+            intThrottles[i] += 47;
+    }
+    dshotx4SendRawThrottles(obj, intThrottles);
 }
 
 

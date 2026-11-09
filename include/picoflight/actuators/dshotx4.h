@@ -29,6 +29,8 @@ void dshotx4SendRawThrottles(dshotx4_t *obj, uint16_t *data);
 
 void dshotx4SendThrottles(dshotx4_t *obj, uint16_t *data);
 
+void dshotx4SendNormThrottles(dshotx4_t *obj, float *data);
+
 typedef enum {
 	DSHOT_CMD_MOTOR_STOP = 0,
 	DSHOT_CMD_BEACON1,
