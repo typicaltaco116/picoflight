@@ -6,6 +6,7 @@
 #include <picoflight/RC/SBUS.h>
 #include <picoflight/RC/RC_mixer.h>
 #include <picoflight/stability/PID.h>
+#include <picoflight/actuators/mixer.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>

@@ -1,9 +1,11 @@
 #pragma once
 
-#include <picoflight/actuators/outputs.h>
+// Local Headers
 #include <picoflight/orientation/types.h>
 
+// Standard Headers
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
     MIXER_QUADCOPTER,

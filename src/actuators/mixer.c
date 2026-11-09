@@ -1,10 +1,12 @@
+// Primary Header
 #include <picoflight/actuators/mixer.h>
 
+// Local Headers
 #include <picoflight/actuators/PWM.h>
-#include <picoflight/actuators/outputs.h>
 #include <picoflight/orientation/types.h>
 #include <picoflight/core/utilities.h>
 
+// Standard Headers
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
