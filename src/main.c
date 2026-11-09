@@ -89,6 +89,7 @@ int main(void)
         DSHOT_PIO,
         DSHOT_SM
     );
+    dshotx4SendThrottles(motors, (uint16_t[]){0, 0, 0, 0});
 
     SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
@@ -122,6 +123,12 @@ int main(void)
             (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f}
     );
 
+    quad_pinout_t pinout = {
+        .m1 = 5, .m2 = 6, .m3 = 7, .m4 = 8,
+        .numAux = 0, .aux = NULL
+    };
+    mixerInit(MIXER_QUADCOPTER, &pinout);
+
     // Main loop.
     uint64_t deltaTime_us = LOOP_PERIOD_US;
     while (1) {
@@ -131,12 +138,12 @@ int main(void)
         RC_t radioChannels;
         SBUSGetChannels(radioChannels);
 
-        if (radioChannels[ARM_CHANNEL] < 0.0f) // disarm
-            break; // placeholders
-
+        bool isArmed = (radioChannels[ARM_CHANNEL] < 0.0f);
         bool isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
+        float throttle = radioChannels[THROT_CHANNEL];
+        mixerSetArm(isArmed);
 
-        float rollCommandNorm, pitchCommandNorm, yawCommandNorm;
+        euler_t command;
         if (isAngle) {
             euler_t angleSetpoints = RCMixerGetAngleSetpoints(radioChannels);
             PID3AxisGetAngleResponse(
@@ -144,9 +151,9 @@ int main(void)
                     state,
                     (float)deltaTime_us * 1E-6,
                     angleSetpoints,
-                    &rollCommandNorm,
-                    &pitchCommandNorm,
-                    &yawCommandNorm
+                    &command.roll,
+                    &command.pitch,
+                    &command.yaw
             );
         }
         else {
@@ -156,12 +163,17 @@ int main(void)
                     state,
                     (float)deltaTime_us * 1E-6,
                     rateSetpoints,
-                    &rollCommandNorm,
-                    &pitchCommandNorm,
-                    &yawCommandNorm
+                    &command.roll,
+                    &command.pitch,
+                    &command.yaw
             );
         }
 
+        float outputs[4];
+        mixerGetOutputs(command, throttle, outputs);
+
+        dshotx4SendNormThrottles(motors, outputs);
+
         deltaTime_us = smartDelay(LOOP_PERIOD_US);
-    }
+    } // end while (true)
 }
