@@ -1,7 +1,12 @@
+// Primary Header
 #include <picoflight/actuators/PWM.h>
 
+// Pico-SDK Headers
 #include <hardware/pwm.h>
 #include <hardware/gpio.h>
+
+// Picoflight Headers
+#include <picoflight/core/utilities.h>
 
 #ifdef PICO_RP2350
 #define SYSTEM_CLK 150000000.0f
@@ -39,11 +44,6 @@ void PWMInit(PWM_t PWM_obj)
     gpio_set_function(PWM_obj, GPIO_FUNC_PWM);
 }
 
-static float map_float(float x, float L1, float H1, float L2, float H2)
-{
-    return (x - L1) * (H2 - L2) / (H1 - L1) + L2;
-}
-
 void PWMDrive(PWM_t PWM_obj, float x)
 {
     uint16_t level;
@@ -51,7 +51,7 @@ void PWMDrive(PWM_t PWM_obj, float x)
     if (PWM_obj < 0)
         return;
 
-    level = (uint16_t)map_float(x, -1.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
+    level = (uint16_t)mapf(x, -1.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
 
     pwm_set_gpio_level(PWM_obj, level);
 }
@@ -63,7 +63,7 @@ void PWMDriveNorm(PWM_t PWM_obj, float x_norm)
     if (PWM_obj < 0)
         return;
 
-    level = (uint16_t)map_float(x_norm, 0.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
+    level = (uint16_t)mapf(x_norm, 0.0f, 1.0f, LOWER_BOUND_LEVEL, UPPER_BOUND_LEVEL);
 
     pwm_set_gpio_level(PWM_obj, level);
 }
