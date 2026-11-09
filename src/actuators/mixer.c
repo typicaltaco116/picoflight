@@ -17,35 +17,25 @@ static mixer_type_e _type;
 
 void mixerQuadInit(quad_pinout_t *pinout)
 {
-    PWMInit(pinout->m1); PWMDrive(pinout->m1, -1.0f);
-    PWMInit(pinout->m2); PWMDrive(pinout->m2, -1.0f);
-    PWMInit(pinout->m3); PWMDrive(pinout->m3, -1.0f);
-    PWMInit(pinout->m4); PWMDrive(pinout->m4, -1.0f);
-
-    for (int32_t i = 0; i <= pinout->numAux; ++i) {
-        PWMInit(pinout->aux[i]);
-        PWMDrive(pinout->aux[i], 0.0f);
-    }
+    _armedFlag = false;
+    _type = MIXER_QUADCOPTER;
+    memcpy(_pinoutStruct, pinout, sizeof(quad_pinout_t));
 }
 
 void mixerFixedWingInit(fixed_wing_pinout_t *pinout)
 {
-    PWMInit(pinout->aileron);   PWMDrive(pinout->aileron, 0.0f);
-    PWMInit(pinout->elevator);  PWMDrive(pinout->elevator, 0.0f);
-    PWMInit(pinout->throttle);  PWMDrive(pinout->throttle, -1.0f); 
-    PWMInit(pinout->rudder);    PWMDrive(pinout->rudder, 0.0f);
-
-    for (int32_t i = 0; i <= pinout->numAux; ++i){
-        PWMInit(pinout->aux[i]);
-        PWMDrive(pinout->aux[i], 0.0f);
-    }
+    _armedFlag = false;
+    _type = MIXER_FIXED_WING;
+    memcpy(_pinoutStruct, pinout, sizeof(fixed_wing_pinout_t));
 }
 
-void mixerInit(mixer_type_e type, void *pinoutStruct)
+void mixerInit(mixer_type_e type, void *pinout)
 {
-    _armedFlag = false;
-    _type = type;
-    memcpy(_pinoutStruct, pinoutStruct, sizeof(quad_pinout_t));
+    switch (type) {
+        default:
+        case MIXER_QUADCOPTER: mixerQuadInit(pinout); break;
+        case MIXER_FIXED_WING: mixerFixedWingInit(pinout); break;
+    }
 }
 
 // expects commands from -1 to 1
