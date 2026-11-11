@@ -2,7 +2,7 @@
 #include <picoflight/core/cli.h>
 
 // Local Headers
-#include <picoflight/config/flash.h>
+#include <picoflight/core/config.h>
 
 // Standard Headers
 #include <stdint.h>

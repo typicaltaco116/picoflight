@@ -18,7 +18,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/mixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c
     ${CMAKE_CURRENT_SOURCE_DIR}/stability/PID.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/flash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/init.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/utilities.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/cli.c

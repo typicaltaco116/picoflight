@@ -1,5 +1,5 @@
 // Local Headers
-#include <picoflight/config/flash.h>
+#include <picoflight/core/config.h>
 
 // PICO-sdk Headers
 #include <pico/stdlib.h>

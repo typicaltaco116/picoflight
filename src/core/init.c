@@ -2,7 +2,7 @@
 #include <picoflight/core/init.h>
 
 // Local Headers
-#include <picoflight/config/flash.h>
+#include <picoflight/core/config.h>
 #include <picoflight/sensors/IMU.h>
 #include <picoflight/sensors/IMU_processing.h>
 #include <picoflight/estimation/madgwick.h>
@@ -13,6 +13,9 @@
 
 
 #define FIRST_BOOT_CHECK_VAL 0x67
+
+
+// MARKED FOR REMOVAL !!!!!
 
 const uint32_t __attribute__((section(".reserved"))) first_boot_check_val =
     FIRST_BOOT_CHECK_VAL;

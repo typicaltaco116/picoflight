@@ -1,4 +1,4 @@
-#include <picoflight/config/flash.h>
+#include <picoflight/core/config.h>
 
 #include <hardware/flash.h>
 #include <pico/flash.h>
