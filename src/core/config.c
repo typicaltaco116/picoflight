@@ -1,9 +1,15 @@
+// Primary Header
 #include <picoflight/core/config.h>
 
+// Local Headers
+#include <picoflight/core/utilities.h>
+
+// Pico-SDK Headers
 #include <hardware/flash.h>
 #include <pico/flash.h>
 #include <pico/stdlib.h>
 
+// Standard Headers
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -39,26 +45,10 @@ void configRegisterParam(const char *key, uint size)
     configTable[configTableEntries - 1].size = size;
 }
 
-
-static bool simple_strcmp(const char *str1, const char *str2)
-{
-    while (*str1 && *str2) {
-        if (*str1 != *str2)
-            return false;
-        str1++;
-        str2++;
-    }
-
-    if (*str1 != *str2)
-        return false;
-
-    return true;
-}
-
 static int getTableIndex(const char *key)
 {
     for (uint i = 0; i < configTableEntries; ++i) {
-        if (simple_strcmp(configTable[i].key, key))
+        if (exactStrcmp(configTable[i].key, key))
             return i;
     }
 

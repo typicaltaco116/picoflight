@@ -1,5 +1,8 @@
 #include <picoflight/core/utilities.h>
 
+// Standard Headers
+#include <stdbool.h>
+
 double map(double x, double inLow, double inHigh, double outLow, double outHigh)
 {
     return ((x - inLow) * (outHigh - outLow)) / (inHigh - inLow) + outLow;
@@ -40,4 +43,19 @@ int constraini(int x, int min, int max)
     if (x < min)
         return min;
     return x;
+}
+
+bool exactStrcmp(const char *str1, const char *str2)
+{
+    while (*str1 && *str2) {
+        if (*str1 != *str2)
+            return false;
+        str1++;
+        str2++;
+    }
+
+    if (*str1 != *str2)
+        return false;
+
+    return true;
 }

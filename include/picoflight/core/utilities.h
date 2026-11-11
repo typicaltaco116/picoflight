@@ -7,3 +7,5 @@ int mapi(int x, int inLow, int inHigh, int outLow, int outHigh);
 double constrain(double x, double min, double max);
 float constrainf(float x, float min, float max);
 int constraini(int x, int min, int max);
+
+bool exactStrcmp(const char *str1, const char *str2);
