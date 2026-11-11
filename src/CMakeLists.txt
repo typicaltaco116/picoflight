@@ -21,6 +21,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/config/flash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/init.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/utilities.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/cli.c
 )
 
 set(INCLUDES
