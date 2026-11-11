@@ -3,6 +3,8 @@
 
 // Local Headers
 #include <picoflight/core/config.h>
+#include <picoflight/core/shell.h>
+#include <picoflight/core/utilities.h>
 
 // Standard Headers
 #include <stdint.h>
@@ -12,24 +14,37 @@
 #include <stdio.h>
 
 static const char* _path[] = {
-    "get",
-    "set",
+    "get", // Gets a specific parameter.
+    "set", // Stages a specific parameter.
     "echo",
+    "write", // writes parameter changes that are staged in memory.
+    "reset", // sets all config parameters to default values.
 };
 typedef enum {
     PATH_GET,
     PATH_SET,
     PATH_ECHO,
+    PATH_WRITE,
+    PATH_RESET,
 } path_e;
 static const uint32_t _pathEntries = sizeof(_path) / sizeof(_path[0]);
 
+typedef int32_t (*executablePtr_t)(char **argv, int32_t argc);
+
+executablePtr_t _pathExecutables[] = {
+    shellExecuteGet,
+    shellExecuteSet,
+    shellExecuteEcho,
+    shellExecuteWrite,
+    shellExecuteReset,
+};
 
 // If value is found return path index. Else return -1.
 static int checkPath(const char *token)
 {
     int exitCode = -1;
     for (uint32_t i = 0; i < _pathEntries; ++i) {
-        if (strcmp(token, _path[i]) == 0)
+        if (exactStrcmp(token, _path[i]))
             exitCode = i;
     }
     return exitCode;
@@ -110,43 +125,6 @@ static void freeTokens(char **tokens, uint32_t numTokens)
     free(tokens);
 }
 
-// WIP
-static int executeGet(char **argv, uint32_t argc)
-{
-    return 0;
-}
-
-// WIP
-// set <type> <parameter> <val> 
-static int executeSet(char **argv, uint32_t argc)
-{
-    if (argc != 4)
-        return 1;
-
-    const char *typeStr = argv[1];
-    const char *nameStr = argv[2];
-    const char *valStr = argv[3];
-
-    if (strcmp(typeStr, "int") == 0) {
-    }
-    else if (strcmp(typeStr, "float") == 0) {
-    }
-    else if (strcmp(typeStr, "string") == 0) {
-    }
-    else
-        return 1;
-
-    return 0;
-}
-
-static int executeEcho(char **argv, uint32_t argc)
-{
-    for (uint32_t i = 1; i < argc; ++i) {
-        puts(argv[i]);
-    }
-    return 0;
-}
-
 void cliExecuteString(const char *str)
 {
     uint32_t numTokens;
@@ -158,12 +136,8 @@ void cliExecuteString(const char *str)
         return;
     }
 
-    switch (pathIdx) {
-        case PATH_GET:  executeGet(tokens, numTokens); break;
-        case PATH_SET:  executeSet(tokens, numTokens); break;
-        case PATH_ECHO: executeEcho(tokens, numTokens); break;
-        default: break;
-    }
+    // Call function pointer.
+    _pathExecutables[pathIdx](tokens, numTokens);
 
     freeTokens(tokens, numTokens);
 }
