@@ -22,6 +22,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/core/utilities.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/cli.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/shell.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/configHelpers.c
 )
 
 set(INCLUDES
