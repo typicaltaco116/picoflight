@@ -7,6 +7,7 @@
 #include <picoflight/RC/RC_mixer.h>
 #include <picoflight/stability/PID.h>
 #include <picoflight/actuators/mixer.h>
+#include <picoflight/core/utilities.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>
@@ -56,17 +57,6 @@
 #define RATES_ACRO_YAW_DPS      (100.0f)
 #define RATES_ANGLE_ROLL_DEG    (90.0f)
 #define RATES_ANGLE_PITCH_DEG    (90.0f)
-
-uint64_t smartDelay(uint64_t delay_us)
-{
-    static uint64_t prevTime = 0;
-    uint64_t currentTime = time_us_64();
-    while (currentTime - prevTime <= delay_us)
-        currentTime = time_us_64();
-    uint64_t actual_delay = currentTime - prevTime;
-    prevTime = currentTime;
-    return actual_delay;
-}
 
 int main(void)
 {

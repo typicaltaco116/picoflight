@@ -7,10 +7,14 @@
 #include <picoflight/RC/RC_mixer.h>
 #include <picoflight/stability/PID.h>
 #include <picoflight/actuators/mixer.h>
+#include <picoflight/core/utilities.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>
 #include <hardware/i2c.h>
+
+// Standard Headers
+#include <stdio.h>
 
 // Global Parameters
 #define LOOP_FREQ_HZ    (4E3) // 4kHz
@@ -57,20 +61,17 @@
 #define RATES_ANGLE_ROLL_DEG    (90.0f)
 #define RATES_ANGLE_PITCH_DEG    (90.0f)
 
-uint64_t smartDelay(uint64_t delay_us)
-{
-    static uint64_t prevTime = 0;
-    uint64_t currentTime = time_us_64();
-    while (currentTime - prevTime <= delay_us)
-        currentTime = time_us_64();
-    uint64_t actual_delay = currentTime - prevTime;
-    prevTime = currentTime;
-    return actual_delay;
-}
 
-int main(void)
+// Global Variables
+dshotx4_t *motors;
+PID_3_axis_t *controller;
+
+void picoflightInit(void)
 {
     stdio_init_all();
+
+    if (stdio_usb_connected()) {
+    }
 
     IMUInitBus(
         MPU6050_I2C_INST,
@@ -82,7 +83,7 @@ int main(void)
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
-    dshotx4_t *motors = dshotx4Construct(
+    motors = dshotx4Construct(
         DSHOT_PINBASE,
         DSHOT_COUNT,
         DSHOT_SPEED,
@@ -110,7 +111,7 @@ int main(void)
     RCMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
     RCMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
-    PID_3_axis_t *controller = PID3AxisConstruct(
+    controller = PID3AxisConstruct(
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
@@ -128,6 +129,11 @@ int main(void)
         .numAux = 0, .aux = NULL
     };
     mixerInit(MIXER_QUADCOPTER, &pinout);
+}
+
+int main(void)
+{
+    picoflightInit();
 
     // Main loop.
     uint64_t deltaTime_us = LOOP_PERIOD_US;

@@ -39,6 +39,7 @@ add_executable(picoflight
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 )
 target_link_libraries(picoflight PRIVATE picoflight_lib)
+pico_enable_stdio_usb(picoflight 1)
 pico_add_uf2_output(picoflight)
 
 # Assemble PIO program.
