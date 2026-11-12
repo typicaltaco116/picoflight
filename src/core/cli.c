@@ -135,6 +135,9 @@ int32_t cliExecuteString(const char *str)
     uint32_t numTokens;
     char **tokens = tokenize(str, ' ', &numTokens);
 
+    if (tokens == NULL)
+        return CLI_COMMAND_NOT_FOUND;
+
     int32_t pathIdx = checkPath(tokens[0]);
     if (pathIdx == -1) {
         freeTokens(tokens, numTokens);

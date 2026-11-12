@@ -31,7 +31,11 @@ int32_t shellExecuteGet(char **argv, int32_t argc)
     }
     else if (exactStrcmp(typeStr, "float")) {
         if (configCheckExists(nameStr))
-            printf("%s = %.03f\n", nameStr, (float)configGetEntry(nameStr));
+            printf(
+                "%s = %.03f\n",
+                nameStr,
+                safeCastFloat(configGetEntry(nameStr))
+            );
         else
             printf("%s error: %s not defined\n", argv[0], nameStr);
     }

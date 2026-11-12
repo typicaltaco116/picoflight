@@ -1,5 +1,6 @@
 // Local Headers
 #include <picoflight/core/cli.h>
+#include <picoflight/core/configHelpers.h>
 
 // Pico-SDK Headers
 #include <pico/stdlib.h>
@@ -13,6 +14,14 @@ int main(void)
 
     while (!stdio_usb_connected())
         sleep_ms(100);
+
+    PID_gains_t defaultValue = (PID_gains_t){
+        .p = 1.0f,
+        .i = 2.0f,
+        .d = 3.0f,
+        .all = 4.0f
+    };
+    configGetIfPIDGains("TEST", defaultValue);
 
     cliProcessInput();
 
