@@ -1,9 +1,13 @@
+// Primary Header
 #include <picoflight/sensors/IMU_processing.h>
 
-#include <stdint.h>
-
+// Local Headers
 #include <picoflight/sensors/IMU.h>
 #include <picoflight/sensors/MPU6050_register_map.h>
+#include <picoflight/core/config.h>
+
+// Standard Headers
+#include <stdint.h>
 
 static IMU_vectors_t error = {
     .gyro = {0, 0, 0},
@@ -127,4 +131,35 @@ void IMUSetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale)
             accel_scale = MPU6050_ACCEL_16_LSB_SENS;
             break;
     }
+}
+
+
+void IMULoadSaveCalibrationBlocking(uint32_t cycles)
+{
+    configFetch();
+
+    IMU_vectors_t error;
+
+    if (configCheckExists("CALIBRATED")) {
+        error.gyro.x = (float)configGetEntry("GYRO_ERROR_X");
+        error.gyro.y = (float)configGetEntry("GYRO_ERROR_Y");
+        error.gyro.z = (float)configGetEntry("GYRO_ERROR_Z");
+        error.accel.x = (float)configGetEntry("ACCEL_ERROR_X");
+        error.accel.y = (float)configGetEntry("ACCEL_ERROR_Y");
+        error.accel.z = (float)configGetEntry("ACCEL_ERROR_Z");
+        IMUSetErrorOffset(error);
+        return;
+    }
+
+    configAddNewEntry("CALIBRATED", 1);
+
+    error = IMUGetCalibrationError(cycles);
+    configAddNewEntry("GYRO_ERROR_X", (float)error.gyro.x);
+    configAddNewEntry("GYRO_ERROR_Y", (float)error.gyro.y);
+    configAddNewEntry("GYRO_ERROR_Z", (float)error.gyro.z);
+    configAddNewEntry("ACCEL_ERROR_X", (float)error.accel.x);
+    configAddNewEntry("ACCEL_ERROR_Y", (float)error.accel.y);
+    configAddNewEntry("ACCEL_ERROR_Z", (float)error.accel.z);
+
+    configCommit();
 }

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <stdint.h>
-
+// Local Headers
 #include <picoflight/sensors/IMU.h>
+
+// Standard Headers
+#include <stdint.h>
 
 #define IMU_CALIBRATION_CYCLES 20000.0 // must be double literal
 
@@ -30,3 +32,5 @@ void IMUSetErrorOffset(IMU_vectors_t error_offset);
 IMU_vectors_t IMUGetCalibrationError(uint32_t cycle_count); 
 
 void IMUSetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale);
+
+void IMULoadSaveCalibrationBlocking(uint32_t cycles);

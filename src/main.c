@@ -8,6 +8,7 @@
 #include <picoflight/stability/PID.h>
 #include <picoflight/actuators/mixer.h>
 #include <picoflight/core/utilities.h>
+#include <picoflight/core/config.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>
@@ -80,6 +81,7 @@ void picoflightInit(void)
     );
     IMUInitDevice(MPU6050_SAMPLE_RATE, MPU6050_G_SCALE, MPU6050_A_SCALE);
     IMUSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
+    IMULoadSaveCalibrationBlocking(10000);
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
