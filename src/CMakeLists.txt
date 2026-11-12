@@ -38,14 +38,9 @@ target_compile_options(picoflight_lib INTERFACE
 )
 
 add_executable(picoflight 
-    ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 )
-target_include_directories(picoflight PRIVATE ${INCLUDES})
-target_link_libraries(picoflight PRIVATE ${LINKED_LIBRARIES})
-target_compile_options(picoflight PRIVATE
-    -Wall -Wextra
-)
+target_link_libraries(picoflight PRIVATE picoflight_lib)
 pico_add_uf2_output(picoflight)
 
 # Assemble PIO program.
@@ -53,4 +48,3 @@ set(PIO_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/pio/dshotx4.pio
 )
 pico_generate_pio_header(picoflight_lib ${PIO_SOURCES})
-pico_generate_pio_header(picoflight ${PIO_SOURCES})
