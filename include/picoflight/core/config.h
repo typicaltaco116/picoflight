@@ -6,7 +6,7 @@ void configRegisterParam(const char *key, uint size);
 
 int configSetParam(const char *key, void *data);
 
-void* configGetParam(char *key);
+void* configGetParam(const char *key);
 
 int configWriteAll(void);
 

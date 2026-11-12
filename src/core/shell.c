@@ -26,9 +26,8 @@ int32_t shellExecuteGet(char **argv, int32_t argc)
     }
     else if (exactStrcmp(typeStr, "string")) {
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 } 
 
 int32_t shellExecuteSet(char **argv, int32_t argc)

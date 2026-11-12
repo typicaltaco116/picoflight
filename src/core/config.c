@@ -17,9 +17,11 @@
 
 #define INVALID_KEY (-1)
 
-extern char __config_reserved_flash;
+#define STORAGE_SIZE (4 * 1024)
 
-#define RESERVED_FLASH_OFFSET ((uintptr_t)&__config_reserved_flash - XIP_BASE)
+// Calculate offset relative to the top of flash.
+#define RESERVED_FLASH_OFFSET (PICO_FLASH_SIZE_BYTES - STORAGE_SIZE)
+#define RESERVED_SECTION_START (XIP_BASE + RESERVED_FLASH_OFFSET)
 
 typedef struct {
     char *key;
@@ -73,7 +75,7 @@ int configSetParam(const char *key, void *data)
 }
 
 
-void* configGetParam(char *key)
+void* configGetParam(const char *key)
 {
     int index;
     config_entry_t entry;
@@ -134,7 +136,7 @@ int configWriteAll(void)
 
 void configReadAll(void)
 {
-    uint8_t *dataPtr = (uint8_t*)&__config_reserved_flash;
+    uint8_t *dataPtr = (uint8_t*)RESERVED_SECTION_START;
 
     for (uint i = 0; i < configTableEntries; ++i) {
         config_entry_t entry = configTable[i];

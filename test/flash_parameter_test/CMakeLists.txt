@@ -9,6 +9,4 @@ target_link_libraries(${TEST_NAME} PRIVATE picoflight_lib)
 pico_enable_stdio_usb(${TEST_NAME} 1)
 pico_enable_stdio_uart(${TEST_NAME} 0)
 
-pico_set_linker_script(${TEST_NAME} ${CMAKE_SOURCE_DIR}/picoflight.ld)
-
 pico_add_uf2_output(${TEST_NAME})

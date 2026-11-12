@@ -9,8 +9,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-extern char __config_reserved_flash;
-
 int main(void) 
 {
     stdio_init_all();
