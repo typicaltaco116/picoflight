@@ -17,14 +17,12 @@ static const char* _path[] = {
     "get", // Gets a specific parameter.
     "set", // Stages a specific parameter.
     "echo",
-    "write", // writes parameter changes that are staged in memory.
     "reset", // sets all config parameters to default values.
 };
 typedef enum {
     PATH_GET,
     PATH_SET,
     PATH_ECHO,
-    PATH_WRITE,
     PATH_RESET,
 } path_e;
 static const uint32_t _pathEntries = sizeof(_path) / sizeof(_path[0]);
@@ -35,7 +33,6 @@ executablePtr_t _pathExecutables[] = {
     shellExecuteGet,
     shellExecuteSet,
     shellExecuteEcho,
-    shellExecuteWrite,
     shellExecuteReset,
 };
 

@@ -1,15 +1,14 @@
 #pragma once
 
-#include <pico/stdlib.h>
+// Standard Headers
+#include <stdint.h>
+#include <stdbool.h>
 
-void configRegisterParam(const char *key, uint size);
-
-int configSetParam(const char *key, void *data);
-
-void* configGetParam(const char *key);
-
-int configWriteAll(void);
-
-void configReadAll(void);
-
-void configFreeAll(void);
+void configFetch(void);
+void configCommit(void);
+void configReset(void);
+int32_t configAddNewEntry(const char *name, uint32_t data);
+int32_t configSeek(const char *name);
+bool configCheckExists(const char *name);
+void configModifyEntry(const char *name, uint32_t data);
+uint32_t configGetEntry(const char *name);

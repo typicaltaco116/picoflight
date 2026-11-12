@@ -2,6 +2,7 @@
 
 // Standard Headers
 #include <stdbool.h>
+#include <stdint.h>
 
 double map(double x, double inLow, double inHigh, double outLow, double outHigh)
 {
@@ -58,4 +59,14 @@ bool exactStrcmp(const char *str1, const char *str2)
         return false;
 
     return true;
+}
+
+uint32_t hashFNV1A32(const char *data, uint32_t size)
+{
+    uint32_t hash = 0x811c9dc5;
+    for (uint32_t i = 0; i < size; ++i) {
+        hash ^= data[i];
+        hash *= 0x01000193;
+    }
+    return hash;
 }

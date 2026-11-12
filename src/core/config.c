@@ -10,7 +10,6 @@
 #include <pico/stdlib.h>
 
 // Standard Headers
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -24,71 +23,22 @@
 #define RESERVED_SECTION_START (XIP_BASE + RESERVED_FLASH_OFFSET)
 
 typedef struct {
-    char *key;
-    void *data;
-    uint size;
-} config_entry_t;
+    uint32_t key; // hashed value
+    uint32_t data;
+} configTableEntry_t;
 
-static uint configTableEntries = 0;
-static config_entry_t *configTable = NULL;
+#define CONFIG_TABLE_NUMEL 64
+configTableEntry_t *_flashTableBase = (void*)RESERVED_SECTION_START;
+configTableEntry_t _memTableBase[CONFIG_TABLE_NUMEL];
 
-
-void configRegisterParam(const char *key, uint size)
+void configFetch(void)
 {
-    size_t key_length;
-
-    configTable = realloc(configTable, (++configTableEntries) * sizeof(config_entry_t));
-
-    configTable[configTableEntries - 1].data = malloc(size);
-    key_length = strlen(key) + 1; // include \0 character
-    configTable[configTableEntries - 1].key = malloc(key_length);
-
-    memcpy(configTable[configTableEntries - 1].key, key, key_length);
-    configTable[configTableEntries - 1].size = size;
+    memcpy(
+        _memTableBase,
+        _flashTableBase,
+        sizeof(configTableEntry_t) * CONFIG_TABLE_NUMEL
+    );
 }
-
-static int getTableIndex(const char *key)
-{
-    for (uint i = 0; i < configTableEntries; ++i) {
-        if (exactStrcmp(configTable[i].key, key))
-            return i;
-    }
-
-    return INVALID_KEY;
-}
-
-
-int configSetParam(const char *key, void *data)
-{
-    int index;
-    config_entry_t entry;
-
-    index = getTableIndex(key);
-    if (index == INVALID_KEY)
-        return -1;
-
-    entry = configTable[index];
-
-    memcpy(entry.data, data, entry.size);
-
-    return 0;
-}
-
-
-void* configGetParam(const char *key)
-{
-    int index;
-    config_entry_t entry;
-
-    index = getTableIndex(key);
-    if (index == INVALID_KEY)
-        return NULL;
-
-    entry = configTable[index];
-
-    return entry.data;
-}
-
 
 static void call_flash_range_erase(void *func_params)
 {
@@ -113,46 +63,68 @@ static void flash_page_program(uintptr_t page_offset, uint8_t *data)
     flash_safe_execute(call_flash_range_program, params, UINT32_MAX);
 }
 
-
-int configWriteAll(void)
+void configCommit(void)
 {
-    uint8_t programData[FLASH_PAGE_SIZE]; // aligned to 256 byte addresses
-    uint8_t *dataPtr = programData;
-
-    memset(programData, 0xFF, FLASH_PAGE_SIZE);
-
-    for (uint i = 0; i < configTableEntries; ++i) {
-        config_entry_t entry = configTable[i];
-        memcpy(dataPtr, entry.data, entry.size);
-        dataPtr += entry.size;
-    }
-
     flash_erase(RESERVED_FLASH_OFFSET);
-    flash_page_program(RESERVED_FLASH_OFFSET, programData);
-
-    return 0; // useful for errors in the future
+    flash_page_program(RESERVED_FLASH_OFFSET, (uint8_t*)_memTableBase);
+    // The config table should be 256 bytes!!!
 }
 
-
-void configReadAll(void)
+void configReset(void) 
 {
-    uint8_t *dataPtr = (uint8_t*)RESERVED_SECTION_START;
-
-    for (uint i = 0; i < configTableEntries; ++i) {
-        config_entry_t entry = configTable[i];
-        memcpy(entry.data, dataPtr, entry.size);
-        dataPtr += entry.size;
-    }
+    flash_erase(RESERVED_FLASH_OFFSET);
 }
 
-
-void configFreeAll(void)
+static int32_t findNextAvailable(void)
 {
-    for (uint i = 0; i < configTableEntries; ++i) {
-        config_entry_t entry = configTable[i];
-        free(entry.data);
-        free(entry.key);
+    for (int32_t i = 0; i < CONFIG_TABLE_NUMEL; ++i) {
+        if (_memTableBase[i].key == 0xFFFFFFFF) // all 1s is the unitialized value
+            return i;
     }
+    return -1;
+}
 
-    free(configTable);
+int32_t configAddNewEntry(const char *name, uint32_t data)
+{
+    uint32_t key = hashFNV1A32(name, strlen(name));
+
+    int32_t idx = findNextAvailable();
+    if (idx == -1)
+        return 1;
+
+    _memTableBase[idx].key = key;
+    _memTableBase[idx].data = data;
+
+    return 0;
+}
+
+int32_t configSeek(const char *name)
+{
+    uint32_t key = hashFNV1A32(name, strlen(name));
+
+    for (uint32_t i = 0; i < CONFIG_TABLE_NUMEL; ++i) {
+        if (_memTableBase[i].key == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool configCheckExists(const char *name)
+{
+    return (configSeek(name) != -1);
+}
+
+void configModifyEntry(const char *name, uint32_t data)
+{
+    int32_t idx = configSeek(name);
+    if (idx == -1)
+        return;
+
+    _memTableBase[idx].data = data;
+}
+
+uint32_t configGetEntry(const char *name)
+{
+    return _memTableBase[configSeek(name)].data;
 }
