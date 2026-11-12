@@ -5,6 +5,7 @@
 #include <picoflight/sensors/IMU.h>
 #include <picoflight/sensors/MPU6050_register_map.h>
 #include <picoflight/core/config.h>
+#include <picoflight/core/utilities.h>
 
 // Standard Headers
 #include <stdint.h>
@@ -141,12 +142,12 @@ void IMULoadSaveCalibrationBlocking(uint32_t cycles)
     IMU_vectors_t error;
 
     if (configCheckExists("CALIBRATED")) {
-        error.gyro.x = (float)configGetEntry("GYRO_ERROR_X");
-        error.gyro.y = (float)configGetEntry("GYRO_ERROR_Y");
-        error.gyro.z = (float)configGetEntry("GYRO_ERROR_Z");
-        error.accel.x = (float)configGetEntry("ACCEL_ERROR_X");
-        error.accel.y = (float)configGetEntry("ACCEL_ERROR_Y");
-        error.accel.z = (float)configGetEntry("ACCEL_ERROR_Z");
+        error.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));
+        error.gyro.y = safeCastFloat(configGetEntry("GYRO_ERROR_Y"));
+        error.gyro.z = safeCastFloat(configGetEntry("GYRO_ERROR_Z"));
+        error.accel.x = safeCastFloat(configGetEntry("ACCEL_ERROR_X"));
+        error.accel.y = safeCastFloat(configGetEntry("ACCEL_ERROR_Y"));
+        error.accel.z = safeCastFloat(configGetEntry("ACCEL_ERROR_Z"));
         IMUSetErrorOffset(error);
         return;
     }
@@ -154,12 +155,12 @@ void IMULoadSaveCalibrationBlocking(uint32_t cycles)
     configAddNewEntry("CALIBRATED", 1);
 
     error = IMUGetCalibrationError(cycles);
-    configAddNewEntry("GYRO_ERROR_X", (float)error.gyro.x);
-    configAddNewEntry("GYRO_ERROR_Y", (float)error.gyro.y);
-    configAddNewEntry("GYRO_ERROR_Z", (float)error.gyro.z);
-    configAddNewEntry("ACCEL_ERROR_X", (float)error.accel.x);
-    configAddNewEntry("ACCEL_ERROR_Y", (float)error.accel.y);
-    configAddNewEntry("ACCEL_ERROR_Z", (float)error.accel.z);
+    configAddNewEntry("GYRO_ERROR_X", safeCastInt(error.gyro.x));
+    configAddNewEntry("GYRO_ERROR_Y", safeCastInt(error.gyro.y));
+    configAddNewEntry("GYRO_ERROR_Z", safeCastInt(error.gyro.z));
+    configAddNewEntry("ACCEL_ERROR_X", safeCastInt(error.accel.x));
+    configAddNewEntry("ACCEL_ERROR_Y", safeCastInt(error.accel.y));
+    configAddNewEntry("ACCEL_ERROR_Z", safeCastInt(error.accel.z));
 
     configCommit();
 }

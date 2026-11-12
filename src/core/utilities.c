@@ -84,3 +84,25 @@ uint64_t smartDelay(uint64_t delay_us)
     prevTime = currentTime;
     return actual_delay;
 }
+
+float safeCastFloat(uint32_t x)
+{
+   union {
+        uint32_t u32;
+        float f32;
+    } converter;
+    
+    converter.u32 = x;
+    return converter.f32;
+}
+
+uint32_t safeCastInt(float x)
+{
+   union {
+        uint32_t u32;
+        float f32;
+    } converter;
+    
+    converter.f32 = x;
+    return converter.u32;
+}

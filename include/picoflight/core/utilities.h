@@ -18,3 +18,6 @@ uint32_t hashFNV1A32(const char *data, uint32_t size);
 
 // HOLDS STATE BEWARE!!! ONLY USE ONCE.
 uint64_t smartDelay(uint64_t delay_us);
+
+float safeCastFloat(uint32_t x);
+uint32_t safeCastInt(float x);
