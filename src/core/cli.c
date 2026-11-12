@@ -167,7 +167,8 @@ static void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
         }
         else if ((char)c == DEL_CHAR) {
             printf("\b");
-            idx--;
+            if (idx > 0)
+                idx--;
         }
         else {
             buffer[idx++] = (char)c;
