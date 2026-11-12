@@ -14,7 +14,7 @@
 int32_t shellExecuteGet(char **argv, int32_t argc)
 {
     if (argc != 3) {
-        printf("Argument error.\n");
+        printf("Usage: %s <int/float> <parameter>\n", argv[0]);
         return 1;
     }
 
@@ -27,23 +27,25 @@ int32_t shellExecuteGet(char **argv, int32_t argc)
         if (configCheckExists(nameStr))
             printf("%s = %d\n", nameStr, (int)configGetEntry(nameStr));
         else
-            printf("%s not defined\n", nameStr);
+            printf("%s error: %s not defined\n", argv[0], nameStr);
     }
     else if (exactStrcmp(typeStr, "float")) {
         if (configCheckExists(nameStr))
             printf("%s = %.03f\n", nameStr, (float)configGetEntry(nameStr));
         else
-            printf("%s not defined\n", nameStr);
+            printf("%s error: %s not defined\n", argv[0], nameStr);
+    }
+    else {
+        printf("%s error: Invalid type.\n", argv[0]);
     }
 
     return 1;
-
 } 
 
 int32_t shellExecuteSet(char **argv, int32_t argc)
 {
     if (argc != 4) {
-        printf("Argument error.\n");
+        printf("Usage: %s <int/float> <parameter> <value>\n", argv[0]);
         return 1;
     }
 
@@ -59,6 +61,7 @@ int32_t shellExecuteSet(char **argv, int32_t argc)
         data = (uint32_t)atof(valStr);
     }
     else {
+        printf("%s error: Invalid type.\n", argv[0]);
         return 1;
     }
 

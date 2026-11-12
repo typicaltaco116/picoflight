@@ -166,9 +166,10 @@ static void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
             break;
         }
         else if ((char)c == DEL_CHAR) {
-            printf("\b");
-            if (idx > 0)
+            if (idx > 0) {
+                printf("\b");
                 idx--;
+            }
         }
         else {
             buffer[idx++] = (char)c;
