@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 #define CLI_SHELL_EXIT -5
+#define CLI_COMMAND_NOT_FOUND -6
 
 static const char* _path[] = {
     "get", // Gets a specific parameter.
@@ -137,7 +138,7 @@ int32_t cliExecuteString(const char *str)
     int32_t pathIdx = checkPath(tokens[0]);
     if (pathIdx == -1) {
         freeTokens(tokens, numTokens);
-        return 1;
+        return CLI_COMMAND_NOT_FOUND;
     }
 
     // Call function pointer.
@@ -187,7 +188,11 @@ void cliProcessInput(void)
         printf("PicoFlightCLI: ");
         char line[128];
         blockingReadlineStripped(line, sizeof(line));
-        if (cliExecuteString(line) == CLI_SHELL_EXIT)
+        int32_t exitCode = cliExecuteString(line);
+        if (exitCode == CLI_COMMAND_NOT_FOUND) {
+            printf("Command not found...\n");
+        }
+        else if (exitCode == CLI_SHELL_EXIT)
             keepGoing = false;
     }
 }

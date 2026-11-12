@@ -11,7 +11,8 @@ int main(void)
 {
     stdio_init_all();
 
-    while (stdio_getchar_timeout_us(100) != (int)'\r');
+    while (!stdio_usb_connected())
+        sleep_ms(100);
 
     cliProcessInput();
 
