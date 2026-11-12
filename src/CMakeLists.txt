@@ -19,7 +19,6 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c
     ${CMAKE_CURRENT_SOURCE_DIR}/stability/PID.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/config.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/core/init.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/utilities.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/cli.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/shell.c
@@ -29,11 +28,10 @@ set(INCLUDES
     ${CMAKE_SOURCE_DIR}/include
 )
 
-add_library(picoflight_lib INTERFACE ${SOURCES})
-target_sources(picoflight_lib INTERFACE ${SOURCES})
-target_include_directories(picoflight_lib INTERFACE ${INCLUDES})
-target_link_libraries(picoflight_lib INTERFACE ${LINKED_LIBRARIES})
-target_compile_options(picoflight_lib INTERFACE
+add_library(picoflight_lib STATIC ${SOURCES})
+target_include_directories(picoflight_lib PUBLIC ${INCLUDES})
+target_link_libraries(picoflight_lib PUBLIC ${LINKED_LIBRARIES})
+target_compile_options(picoflight_lib PUBLIC
     -Wall -Wextra
 )
 
