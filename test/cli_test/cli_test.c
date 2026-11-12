@@ -23,7 +23,7 @@ void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
         }
     }
 
-    buffer[idx - 1] = '\0';
+    buffer[idx] = '\0'; // null terminate
 }
 
 int main(void) 
