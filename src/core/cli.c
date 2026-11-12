@@ -6,6 +6,9 @@
 #include <picoflight/core/shell.h>
 #include <picoflight/core/utilities.h>
 
+// Pico-SDK Headers
+#include <pico/stdlib.h>
+
 // Standard Headers
 #include <stdint.h>
 #include <string.h>
@@ -13,17 +16,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define CLI_SHELL_EXIT -5
+
 static const char* _path[] = {
     "get", // Gets a specific parameter.
     "set", // Stages a specific parameter.
     "echo",
     "reset", // sets all config parameters to default values.
+    "exit"
 };
 typedef enum {
     PATH_GET,
     PATH_SET,
     PATH_ECHO,
     PATH_RESET,
+    PATH_EXIT
 } path_e;
 static const uint32_t _pathEntries = sizeof(_path) / sizeof(_path[0]);
 
@@ -122,7 +129,7 @@ static void freeTokens(char **tokens, uint32_t numTokens)
     free(tokens);
 }
 
-void cliExecuteString(const char *str)
+int32_t cliExecuteString(const char *str)
 {
     uint32_t numTokens;
     char **tokens = tokenize(str, ' ', &numTokens);
@@ -130,11 +137,55 @@ void cliExecuteString(const char *str)
     int32_t pathIdx = checkPath(tokens[0]);
     if (pathIdx == -1) {
         freeTokens(tokens, numTokens);
-        return;
+        return 1;
     }
 
     // Call function pointer.
-    _pathExecutables[pathIdx](tokens, numTokens);
+    int32_t exitCode;
+    if (pathIdx == PATH_EXIT) {
+        exitCode = CLI_SHELL_EXIT;
+    }
+    else
+        exitCode = _pathExecutables[pathIdx](tokens, numTokens);
 
     freeTokens(tokens, numTokens);
+
+    return exitCode;
+}
+
+#define DEL_CHAR 0x7F
+static void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
+{
+    uint32_t idx = 0;
+
+    while (idx < bufferSize - 1) {
+        int c = stdio_getchar();
+        stdio_putchar(c);
+        if (c == PICO_ERROR_TIMEOUT || (char)c == '\r') {
+            printf("\n");
+            break;
+        }
+        else if ((char)c == DEL_CHAR) {
+            printf("\b");
+            idx--;
+        }
+        else {
+            buffer[idx++] = (char)c;
+        }
+    }
+
+    buffer[idx] = '\0'; // null terminate
+}
+
+void cliProcessInput(void)
+{
+    bool keepGoing = true;
+
+    while (keepGoing) {
+        printf("PicoFlightCLI: ");
+        char line[128];
+        blockingReadlineStripped(line, sizeof(line));
+        if (cliExecuteString(line) == CLI_SHELL_EXIT)
+            keepGoing = false;
+    }
 }

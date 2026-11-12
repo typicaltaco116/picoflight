@@ -13,8 +13,10 @@
 
 int32_t shellExecuteGet(char **argv, int32_t argc)
 {
-    if (argc != 3)
+    if (argc != 3) {
+        printf("Argument error.\n");
         return 1;
+    }
 
     const char *typeStr = argv[1];
     const char *nameStr = argv[2];
@@ -40,8 +42,10 @@ int32_t shellExecuteGet(char **argv, int32_t argc)
 
 int32_t shellExecuteSet(char **argv, int32_t argc)
 {
-    if (argc != 4)
+    if (argc != 4) {
+        printf("Argument error.\n");
         return 1;
+    }
 
     const char *typeStr = argv[1];
     const char *nameStr = argv[2];

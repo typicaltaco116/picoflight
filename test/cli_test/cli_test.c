@@ -6,25 +6,6 @@
 
 // Standard Headers
 #include <stdio.h>
-#include <stdint.h>
-
-void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
-{
-    uint32_t idx = 0;
-
-    while (idx < bufferSize - 1) {
-        int c = stdio_getchar();
-        printf("%c", c);
-        if (c == PICO_ERROR_TIMEOUT || c == '\r') { // makes sure \r is read.
-            break;
-        }
-        else {
-            buffer[idx++] = (char)c;
-        }
-    }
-
-    buffer[idx] = '\0'; // null terminate
-}
 
 int main(void) 
 {
@@ -32,13 +13,8 @@ int main(void)
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-    while (1) {
-        char buffer[128];
-        printf("PicoFlightCLI: ");
-        blockingReadlineStripped(buffer, sizeof(buffer));
-        printf("\n");
+    cliProcessInput();
 
-        cliExecuteString(buffer);
-    }
-    return 0;
+    printf("Done ...\n");
+    while (1);
 }
