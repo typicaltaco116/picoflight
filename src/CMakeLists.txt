@@ -29,10 +29,11 @@ set(INCLUDES
     ${CMAKE_SOURCE_DIR}/include
 )
 
-add_library(picoflight_lib STATIC ${SOURCES})
-target_include_directories(picoflight_lib PUBLIC ${INCLUDES})
-target_link_libraries(picoflight_lib PUBLIC ${LINKED_LIBRARIES})
-target_compile_options(picoflight_lib PUBLIC
+add_library(picoflight_lib INTERFACE ${SOURCES})
+target_sources(picoflight_lib INTERFACE ${SOURCES})
+target_include_directories(picoflight_lib INTERFACE ${INCLUDES})
+target_link_libraries(picoflight_lib INTERFACE ${LINKED_LIBRARIES})
+target_compile_options(picoflight_lib INTERFACE
     -Wall -Wextra
 )
 
