@@ -15,3 +15,6 @@ int constraini(int x, int min, int max);
 bool exactStrcmp(const char *str1, const char *str2);
 
 uint32_t hashFNV1A32(const char *data, uint32_t size);
+
+// HOLDS STATE BEWARE!!! ONLY USE ONCE.
+uint64_t smartDelay(uint64_t delay_us);

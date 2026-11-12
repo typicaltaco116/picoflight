@@ -1,5 +1,8 @@
 #include <picoflight/core/utilities.h>
 
+// Pico-SDK Headers
+#include <pico/stdlib.h>
+
 // Standard Headers
 #include <stdbool.h>
 #include <stdint.h>
@@ -69,4 +72,15 @@ uint32_t hashFNV1A32(const char *data, uint32_t size)
         hash *= 0x01000193;
     }
     return hash;
+}
+
+uint64_t smartDelay(uint64_t delay_us)
+{
+    static uint64_t prevTime = 0;
+    uint64_t currentTime = time_us_64();
+    while (currentTime - prevTime <= delay_us)
+        currentTime = time_us_64();
+    uint64_t actual_delay = currentTime - prevTime;
+    prevTime = currentTime;
+    return actual_delay;
 }
