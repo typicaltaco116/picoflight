@@ -4,6 +4,7 @@
 // Local Headers
 #include <picoflight/orientation/types.h>
 #include <picoflight/core/utilities.h>
+#include <picoflight/core/configHelpers.h>
 
 // pico-sdk Header
 #include <pico/types.h>
@@ -19,6 +20,17 @@ PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds)
     obj->bounds = bounds;
     obj->accumulator = 0.0f;
     return obj;
+}
+
+PID_loop_t* PIDConstructFromFlash(
+        const char *prefix,
+        PID_gains_t defaultGains,
+        PID_integral_bounds_t defaultBounds)
+{
+    PID_gains_t gains = configGetIfPIDGains(prefix, defaultGains);
+    PID_integral_bounds_t bounds = configGetIfPIDBounds(prefix, defaultBounds);
+
+    return PIDConstruct(gains, bounds);
 }
 
 void PIDFree(PID_loop_t *obj)
@@ -65,6 +77,35 @@ PID_3_axis_t* PID3AxisConstruct(
     obj->pitchRateController = PIDConstruct(pitchRateGains, pitchRateBounds);
     obj->pitchAngleController = PIDConstruct(pitchAngleGains, pitchAngleBounds);
     obj->yawRateController = PIDConstruct(yawRateGains, yawRateBounds);
+    obj->rollDifferentiatorState = 0.0f;
+    obj->pitchDifferentiatorState = 0.0f;
+    obj->yawDifferentiatorState = 0.0f;
+    return obj;
+}
+
+PID_3_axis_t* PID3AxisConstructFromFlash(
+        PID_gains_t rollRateGains,
+        PID_gains_t rollAngleGains,
+        PID_gains_t pitchRateGains,
+        PID_gains_t pitchAngleGains,
+        PID_gains_t yawRateGains,
+        PID_integral_bounds_t rollRateBounds,
+        PID_integral_bounds_t rollAngleBounds,
+        PID_integral_bounds_t pitchRateBounds,
+        PID_integral_bounds_t pitchAngleBounds,
+        PID_integral_bounds_t yawRateBounds)
+{
+    PID_3_axis_t *obj = malloc(sizeof(PID_3_axis_t));
+    obj->rollRateController = PIDConstructFromFlash(
+            "ROLL_RATE", rollRateGains, rollRateBounds);
+    obj->rollAngleController = PIDConstructFromFlash(
+            "ROLL_ANGLE", rollAngleGains, rollAngleBounds);
+    obj->pitchRateController = PIDConstructFromFlash(
+            "PITCH_RATE", pitchRateGains, pitchRateBounds);
+    obj->pitchAngleController = PIDConstructFromFlash(
+            "PITCH_ANGLE", pitchAngleGains, pitchAngleBounds);
+    obj->yawRateController = PIDConstructFromFlash(
+            "YAW_RATE", yawRateGains, yawRateBounds);
     obj->rollDifferentiatorState = 0.0f;
     obj->pitchDifferentiatorState = 0.0f;
     obj->yawDifferentiatorState = 0.0f;

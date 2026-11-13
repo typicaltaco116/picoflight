@@ -27,7 +27,8 @@ typedef struct {
     uint32_t data;
 } configTableEntry_t;
 
-#define CONFIG_TABLE_NUMEL 64
+#define CONFIG_TABLE_NUMEL 128
+#define CONFIG_TABLE_NUMPAGES (CONFIG_TABLE_NUMEL*sizeof(configTableEntry_t)/256)
 configTableEntry_t *_flashTableBase = (void*)RESERVED_SECTION_START;
 configTableEntry_t _memTableBase[CONFIG_TABLE_NUMEL];
 
@@ -66,8 +67,11 @@ static void flash_page_program(uintptr_t page_offset, uint8_t *data)
 void configCommit(void)
 {
     flash_erase(RESERVED_FLASH_OFFSET);
-    flash_page_program(RESERVED_FLASH_OFFSET, (uint8_t*)_memTableBase);
-    // The config table should be 256 bytes!!!
+    for (uint32_t i = 0; i < CONFIG_TABLE_NUMPAGES; ++i) {
+        uintptr_t wrtOffset = RESERVED_FLASH_OFFSET + i * 256;
+        uint8_t *srcPtr = (uint8_t*)_memTableBase + i * 256;
+        flash_page_program(wrtOffset, srcPtr);
+    }
 }
 
 void configReset(void) 

@@ -26,6 +26,12 @@ typedef struct {
 
 PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds);
 
+PID_loop_t* PIDConstructFromFlash(
+        const char *prefix,
+        PID_gains_t defaultGains,
+        PID_integral_bounds_t defaultBounds
+);
+
 void PIDFree(PID_loop_t *obj);
 
 float PIDGetResponse(
@@ -58,6 +64,19 @@ PID_3_axis_t* PID3AxisConstruct(
         PID_integral_bounds_t pitchRateBounds,
         PID_integral_bounds_t pitchAngleBounds,
         PID_integral_bounds_t yawRateBounds
+);
+
+PID_3_axis_t* PID3AxisConstructFromFlash(
+        PID_gains_t defualtRollRateGains,
+        PID_gains_t defualtRollAngleGains,
+        PID_gains_t defualtPitchRateGains,
+        PID_gains_t defualtPitchAngleGains,
+        PID_gains_t defualtYawRateGains,
+        PID_integral_bounds_t defualtRollRateBounds,
+        PID_integral_bounds_t defualtRollAngleBounds,
+        PID_integral_bounds_t defualtPitchRateBounds,
+        PID_integral_bounds_t defualtPitchAngleBounds,
+        PID_integral_bounds_t defualtYawRateBounds
 );
 
 void PID3AxisFree(PID_3_axis_t *obj);

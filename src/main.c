@@ -113,7 +113,7 @@ void picoflightInit(void)
     RCMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
     RCMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
-    controller = PID3AxisConstruct(
+    controller = PID3AxisConstructFromFlash(
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
             (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
