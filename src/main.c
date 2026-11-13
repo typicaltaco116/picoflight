@@ -9,10 +9,12 @@
 #include <picoflight/actuators/mixer.h>
 #include <picoflight/core/utilities.h>
 #include <picoflight/core/config.h>
+#include <picoflight/core/cli.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>
 #include <hardware/i2c.h>
+#include <hardware/watchdog.h>
 
 // Standard Headers
 #include <stdio.h>
@@ -70,9 +72,6 @@ PID_3_axis_t *controller;
 void picoflightInit(void)
 {
     stdio_init_all();
-
-    if (stdio_usb_connected()) {
-    }
 
     IMUInitBus(
         MPU6050_I2C_INST,
@@ -133,6 +132,16 @@ void picoflightInit(void)
     mixerInit(MIXER_QUADCOPTER, &pinout);
 }
 
+void handleUSBCLI(void)
+{
+    if (!stdio_usb_connected())
+        return;
+
+    cliProcessInput(); // Interactive and blocking function.
+    watchdog_enable(1 ,1);
+    while (1); // Hold until hardware reset.
+}
+
 int main(void)
 {
     picoflightInit();
@@ -140,6 +149,9 @@ int main(void)
     // Main loop.
     uint64_t deltaTime_us = LOOP_PERIOD_US;
     while (1) {
+
+        handleUSBCLI();
+
         IMU_vectors_t IMU_data = IMUGetData();
         platform_state_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
 

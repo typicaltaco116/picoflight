@@ -62,7 +62,7 @@ int32_t shellExecuteSet(char **argv, int32_t argc)
         data = (uint32_t)atoi(valStr);
     }
     else if (exactStrcmp(typeStr, "float")) {
-        data = (uint32_t)atof(valStr);
+        data = safeCastInt(atof(valStr));
     }
     else {
         printf("%s error: Invalid type.\n", argv[0]);
