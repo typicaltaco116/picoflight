@@ -7,6 +7,9 @@
 #include <picoflight/core/utilities.h>
 #include <picoflight/actuators/dshotx4.h>
 
+// Pico-SDK
+#include <pico/stdlib.h>
+
 // Standard Headers
 #include <stdint.h>
 #include <stdlib.h>
@@ -136,5 +139,9 @@ int32_t shellExecuteDirection(char **argv, int32_t argc)
     }
 
     dshotx4SendCommands(cmd);
+    sleep_us(200);
+    dshotx4SendCommand(DSHOT_CMD_MOTOR_STOP);
+    sleep_us(200);
+    
     return 0;
 }
