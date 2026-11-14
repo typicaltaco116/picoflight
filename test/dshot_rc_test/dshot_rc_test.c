@@ -17,7 +17,7 @@ int main(void)
 
     sleep_ms(1000);
     SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
-    dshotx4_t *motors = dshotx4Construct(DSHOT_PINBASE, 4, DSHOT_SPEED, pio0, 0);
+    dshotx4Init(DSHOT_PINBASE, 4, DSHOT_SPEED, pio0, 0);
 
     while (1) {
         sleep_us(200);
@@ -28,12 +28,12 @@ int main(void)
 
         // Throttle is not zero at zero!!!
         if (SBUSIsFailsafe() || ch[3] < 0.2) {
-            dshotx4SendRawThrottles(motors, (uint16_t[]){0, 0, 0, 0});
+            dshotx4SendRawThrottles((uint16_t[]){0, 0, 0, 0});
             continue;
         }
 
         uint16_t throttleVal = (float)(ch[3]) * 2000.0;
-        dshotx4SendThrottles(motors, (uint16_t[]){
+        dshotx4SendThrottles((uint16_t[]){
             throttleVal, throttleVal, throttleVal, throttleVal});
     }
 }

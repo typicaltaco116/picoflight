@@ -10,13 +10,13 @@
 
 // Standard Headers
 #include <stdint.h>
-#include <stdlib.h>
 
 // PIO assembly generated Header.
 #include "dshotx4.pio.h"
 
+static dshotx4_t _motors;
 
-dshotx4_t* dshotx4Construct(
+void dshotx4Init(
         uint8_t pinBase,
         uint8_t pinCount,
         uint32_t speed,
@@ -24,23 +24,21 @@ dshotx4_t* dshotx4Construct(
         uint8_t sm)
 {
     if (speed != 150 && speed != 300 && speed != 600 && speed != 1200)
-        return NULL;
+        while (1);
 
     if (pio_sm_is_claimed(pio, sm))
-        return NULL;
+        while (1);
 
     if (!pio_can_add_program(pio, &dshotx4_program))
-        return NULL;
+        while (1);
 
-    dshotx4_t *obj = calloc(1, sizeof(dshotx4_t));
+    _motors.pio = pio;
+    _motors.pinBase = pinBase;
+    _motors.pinCount = pinCount;
+    _motors.sm = sm;
+    _motors.speed = speed;
 
-    obj->pio = pio;
-    obj->pinBase = pinBase;
-    obj->pinCount = pinCount;
-    obj->sm = sm;
-    obj->speed = speed;
-
-    obj->offset = pio_add_program(pio, &dshotx4_program);
+    _motors.offset = pio_add_program(pio, &dshotx4_program);
 
     for (uint8_t i = 0; i < pinCount; ++i) {
         uint8_t pin = pinBase + i;
@@ -48,43 +46,36 @@ dshotx4_t* dshotx4Construct(
         gpio_set_pulls(pin, false, false); // subject to change.
     }
 
-    pio_sm_config cfg = dshotx4_program_get_default_config(obj->offset);
+    pio_sm_config cfg = dshotx4_program_get_default_config(_motors.offset);
     sm_config_set_set_pins(&cfg, pinBase, pinCount);
 	sm_config_set_out_pins(&cfg, pinBase, pinCount);
 	sm_config_set_out_shift(&cfg, false, false, 32);
-	pio_sm_set_consecutive_pindirs(pio, obj->sm, pinBase, pinCount, true);
-	pio_sm_init(pio, obj->sm, obj->offset, &cfg);
-	pio_sm_set_enabled(pio, obj->sm, true);
+	pio_sm_set_consecutive_pindirs(pio, _motors.sm, pinBase, pinCount, true);
+	pio_sm_init(pio, _motors.sm, _motors.offset, &cfg);
+	pio_sm_set_enabled(pio, _motors.sm, true);
 
     uint32_t targetClock = 12000000 / 300 * speed;
     uint32_t cpuClock = clock_get_hz(clk_sys);
-    pio_sm_set_clkdiv(pio, obj->sm, (float)cpuClock / targetClock);
-
-    return obj;
+    pio_sm_set_clkdiv(pio, _motors.sm, (float)cpuClock / targetClock);
 }
 
-
-void dshotx4Free(dshotx4_t *obj)
+void dshotx4Destroy(void)
 {
-    pio_sm_set_enabled(obj->pio, obj->sm, false);
+    pio_sm_set_enabled(_motors.pio, _motors.sm, false);
 
-    pio_sm_unclaim(obj->pio, obj->sm);
+    pio_sm_unclaim(_motors.pio, _motors.sm);
 
-    pio_remove_program(obj->pio, &dshotx4_program, obj->offset);
+    pio_remove_program(_motors.pio, &dshotx4_program, _motors.offset);
 
     // Free any gpio pins
-    for (uint8_t i = 0; i < obj->pinCount; ++i)
-        gpio_init(obj->pinBase + i);
-
-    free(obj);
+    for (uint8_t i = 0; i < _motors.pinCount; ++i)
+        gpio_init(_motors.pinBase + i);
 }
-
 
 static uint16_t appendTelemetry(uint16_t data)
 {
     return (data << 1) | 0; // Appends a high telemetry bit;
 }
-
 
 static uint16_t appendChecksum(uint16_t data)
 {
@@ -95,9 +86,7 @@ static uint16_t appendChecksum(uint16_t data)
 	return (data << 4) | checksum;
 }
 
-
-// Consider rework with the fact that this code needs obj->pinCount must be 4.
-void dshotx4SendRawThrottles(dshotx4_t *obj, uint16_t *data)
+void dshotx4SendRawThrottles(uint16_t *data)
 {
     for (uint8_t i = 0; i < 4; ++i) {
         data[i] = appendTelemetry(data[i]);
@@ -112,38 +101,43 @@ void dshotx4SendRawThrottles(dshotx4_t *obj, uint16_t *data)
         packet[1] |= ((data[motor] >> pos) & 1) << i;
     }
 
-    pio_sm_put(obj->pio, obj->sm, packet[0]);
-    pio_sm_put(obj->pio, obj->sm, packet[1]);
+    pio_sm_put(_motors.pio, _motors.sm, packet[0]);
+    pio_sm_put(_motors.pio, _motors.sm, packet[1]);
 }
 
 
-void dshotx4SendThrottles(dshotx4_t *obj, uint16_t *data)
+void dshotx4SendThrottles(uint16_t *data)
 {
-    for (uint8_t i = 0; i < obj->pinCount; ++i) {
+    for (uint8_t i = 0; i < _motors.pinCount; ++i) {
         if (data[i] > 2000)
             data[i] = 2000;
         if (data[i] != 0) // Keep zero throttle zero.
             data[i] += 47;
     }
 
-    dshotx4SendRawThrottles(obj, data);
+    dshotx4SendRawThrottles(data);
 }
 
-void dshotx4SendNormThrottles(dshotx4_t *obj, float *data)
+void dshotx4SendNormThrottles(float *data)
 {
     uint16_t intThrottles[4];
-    for (uint8_t i = 0; i < obj->pinCount; ++i) {
+    for (uint8_t i = 0; i < _motors.pinCount; ++i) {
         intThrottles[i] = mapf(data[i], -1.0f, 1.0f, 0, 2000);
         if (intThrottles[i] > 2000)
             intThrottles[i] = 2000;
         if (intThrottles[i] != 0)
             intThrottles[i] += 47;
     }
-    dshotx4SendRawThrottles(obj, intThrottles);
+    dshotx4SendRawThrottles(intThrottles);
 }
 
 
-void dshotx4SendCommand(dshotx4_t *obj, dshotCommands_e cmd)
+void dshotx4SendCommand(dshotCommands_e cmd)
 {
-    dshotx4SendRawThrottles(obj, (uint16_t[]){cmd, cmd, cmd, cmd});
+    dshotx4SendRawThrottles((uint16_t[]){cmd, cmd, cmd, cmd});
+}
+
+void dshotx4SendCommands(dshotCommands_e *cmd)
+{
+    dshotx4SendRawThrottles((uint16_t[]){cmd[0], cmd[1], cmd[2], cmd[3]});
 }

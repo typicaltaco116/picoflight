@@ -72,14 +72,14 @@ int main(void)
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
-    dshotx4_t *motors = dshotx4Construct(
+    dshotx4Init(
         DSHOT_PINBASE,
         DSHOT_COUNT,
         DSHOT_SPEED,
         DSHOT_PIO,
         DSHOT_SM
     );
-    dshotx4SendThrottles(motors, (uint16_t[]){0, 0, 0, 0});
+    dshotx4SendThrottles((uint16_t[]){0, 0, 0, 0});
 
     SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
@@ -162,7 +162,7 @@ int main(void)
         float outputs[4];
         mixerGetOutputs(command, throttle, outputs);
 
-        dshotx4SendNormThrottles(motors, outputs);
+        dshotx4SendNormThrottles(outputs);
 
         deltaTime_us = smartDelay(LOOP_PERIOD_US);
     } // end while (true)

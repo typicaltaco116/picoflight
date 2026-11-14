@@ -15,7 +15,7 @@ typedef struct {
     uint8_t offset;
 } dshotx4_t;
 
-dshotx4_t* dshotx4Construct(
+void dshotx4Init(
     uint8_t pinBase,
     uint8_t pinCount,
     uint32_t speed,
@@ -23,13 +23,11 @@ dshotx4_t* dshotx4Construct(
     uint8_t sm
 );
 
-void dshotx4Free(dshotx4_t *obj);
+void dshotx4SendRawThrottles(uint16_t *data);
 
-void dshotx4SendRawThrottles(dshotx4_t *obj, uint16_t *data);
+void dshotx4SendThrottles(uint16_t *data);
 
-void dshotx4SendThrottles(dshotx4_t *obj, uint16_t *data);
-
-void dshotx4SendNormThrottles(dshotx4_t *obj, float *data);
+void dshotx4SendNormThrottles(float *data);
 
 typedef enum {
 	DSHOT_CMD_MOTOR_STOP = 0,
@@ -62,4 +60,5 @@ typedef enum {
 	DSHOT_CMD_MAX = 47
 } dshotCommands_e;
 
-void dshotx4SendCommand(dshotx4_t *obj, dshotCommands_e cmd);
+void dshotx4SendCommand(dshotCommands_e cmd);
+void dshotx4SendCommands(dshotCommands_e *cmd);
