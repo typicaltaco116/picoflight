@@ -17,3 +17,6 @@ int32_t shellExecuteEcho(char **argv, int32_t argc);
 
 // reset
 int32_t shellExecuteReset(char **argv, int32_t argc);
+
+// reverse <motor idx>
+int32_t shellExecuteDirection(char **argv, int32_t argc);

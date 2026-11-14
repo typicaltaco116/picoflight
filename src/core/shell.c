@@ -5,6 +5,7 @@
 #include <picoflight/core/cli.h>
 #include <picoflight/core/config.h>
 #include <picoflight/core/utilities.h>
+#include <picoflight/actuators/dshotx4.h>
 
 // Standard Headers
 #include <stdint.h>
@@ -100,5 +101,40 @@ int32_t shellExecuteReset(char **argv, int32_t argc)
 {
     (void)argc; (void)argv;
     configReset();
+    return 0;
+}
+
+int32_t shellExecuteDirection(char **argv, int32_t argc)
+{
+    if (argc != 3) {
+        printf("Usage: %s <motor idx> <reverse/normal>\n", argv[0]);
+        return 1;
+    }
+
+    int32_t motorIdx = atoi(argv[1]);
+
+    if (motorIdx > 3 || motorIdx < 0) {
+        printf("%s error: Invalid motor index.\n", argv[0]);
+        return 1;
+    }
+    
+    dshotCommands_e cmd[] = {
+        DSHOT_CMD_MOTOR_STOP,
+        DSHOT_CMD_MOTOR_STOP,
+        DSHOT_CMD_MOTOR_STOP,
+        DSHOT_CMD_MOTOR_STOP
+    };
+    if (exactStrcmp(argv[2], "reverse")) {
+        cmd[motorIdx] = DSHOT_CMD_SPIN_DIRECTION_REVERSED;
+    }
+    else if (exactStrcmp(argv[2], "normal")) {
+        cmd[motorIdx] = DSHOT_CMD_SPIN_DIRECTION_NORMAL;
+    }
+    else {
+        printf("%s error: Invalid motor direction.\n", argv[0]);
+        return 1;
+    }
+
+    dshotx4SendCommands(cmd);
     return 0;
 }

@@ -24,6 +24,7 @@ static const char* _path[] = {
     "set", // Stages a specific parameter.
     "echo",
     "reset", // sets all config parameters to default values.
+    "direction",
     "exit"
 };
 typedef enum {
@@ -31,6 +32,7 @@ typedef enum {
     PATH_SET,
     PATH_ECHO,
     PATH_RESET,
+    PATH_DIRECTION,
     PATH_EXIT
 } path_e;
 static const uint32_t _pathEntries = sizeof(_path) / sizeof(_path[0]);
@@ -42,6 +44,7 @@ executablePtr_t _pathExecutables[] = {
     shellExecuteSet,
     shellExecuteEcho,
     shellExecuteReset,
+    shellExecuteDirection,
 };
 
 // If value is found return path index. Else return -1.
