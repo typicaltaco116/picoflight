@@ -10,7 +10,7 @@
 // Standard Headers
 #include <stdint.h>
 
-static IMU_vectors_t error = {
+static IMUVectors_t error = {
     .gyro = {0, 0, 0},
     .accel = {0, 0, 0}
 };
@@ -18,9 +18,9 @@ static float gyro_scale;
 static float accel_scale;
 
 
-static IMU_vectors_t vector_add(IMU_vectors_t A, IMU_vectors_t B)
+static IMUVectors_t vector_add(IMUVectors_t A, IMUVectors_t B)
 {
-    IMU_vectors_t sum;
+    IMUVectors_t sum;
 
     sum.gyro.x = A.gyro.x + B.gyro.x;
     sum.gyro.y = A.gyro.y + B.gyro.y;
@@ -33,11 +33,11 @@ static IMU_vectors_t vector_add(IMU_vectors_t A, IMU_vectors_t B)
 }
 
 
-IMU_vectors_t IMUGetData(void)
+IMUVectors_t IMUGetData(void)
 {
     int16_t gyro_x, gyro_y, gyro_z;
     int16_t accel_x, accel_y, accel_z;
-    IMU_vectors_t data;
+    IMUVectors_t data;
 
     IMUGetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
 
@@ -54,18 +54,18 @@ IMU_vectors_t IMUGetData(void)
 }
 
 
-void IMUSetErrorOffset(IMU_vectors_t error_offset)
+void IMUSetErrorOffset(IMUVectors_t error_offset)
 {
     error = error_offset;
 }
 
 
-IMU_vectors_t IMUGetCalibrationError(uint32_t cycle_count)
+IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count)
 {
     double gyro_x_sum, gyro_y_sum, gyro_z_sum;
     double accel_x_sum, accel_y_sum, accel_z_sum;
-    IMU_vectors_t read_data;
-    IMU_vectors_t error_offset;
+    IMUVectors_t read_data;
+    IMUVectors_t error_offset;
 
     gyro_x_sum = gyro_y_sum = gyro_z_sum = 0.0;
     accel_x_sum = accel_y_sum = accel_z_sum = 0.0;
@@ -99,7 +99,7 @@ IMU_vectors_t IMUGetCalibrationError(uint32_t cycle_count)
 }
 
 
-void IMUSetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale)
+void IMUSetProcessingScale(IMUGyroScale_e g_scale, IMUAccelScale_e a_scale)
 {
     switch(g_scale) {
         default:
@@ -139,7 +139,7 @@ void IMULoadSaveCalibrationBlocking(uint32_t cycles)
 {
     configFetch();
 
-    IMU_vectors_t error;
+    IMUVectors_t error;
 
     if (configCheckExists("CALIBRATED")) {
         error.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));

@@ -31,7 +31,7 @@ void madgwickSetStepSize(float B_val)
 }
 
 // CODE TAKEN FROM DREHMFLIGHT BY Nicholas Rehm
-platform_state_t madgwickCompute(IMU_vectors_t imu, float sampleFreq)
+platformState_t madgwickCompute(IMUVectors_t imu, float sampleFreq)
 {
     float recipNorm;
     float s0, s1, s2, s3;
@@ -112,7 +112,7 @@ platform_state_t madgwickCompute(IMU_vectors_t imu, float sampleFreq)
     q2 *= recipNorm;
     q3 *= recipNorm;
 
-    platform_state_t state;
+    platformState_t state;
     state.omega.roll = imu.gyro.x; // I have no idea what axis this should be.
     state.omega.pitch = imu.gyro.y;
     state.omega.yaw = imu.gyro.z;

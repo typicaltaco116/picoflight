@@ -15,7 +15,7 @@ int main(void)
     while (!stdio_usb_connected())
         sleep_ms(100);
 
-    PID_gains_t defaultValue = (PID_gains_t){
+    PIDGains_t defaultValue = (PIDGains_t){
         .p = 1.0f,
         .i = 2.0f,
         .d = 3.0f,

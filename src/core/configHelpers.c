@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include <stdio.h>
-PID_gains_t configGetIfPIDGains(const char *prefix, PID_gains_t val)
+PIDGains_t configGetIfPIDGains(const char *prefix, PIDGains_t val)
 {
     char pName[32];
     char iName[32];
@@ -24,7 +24,7 @@ PID_gains_t configGetIfPIDGains(const char *prefix, PID_gains_t val)
     configFetch();
 
     if (configCheckExists(pName)) {
-        PID_gains_t gains;
+        PIDGains_t gains;
         gains.p     = safeCastFloat(configGetEntry(pName));
         gains.i     = safeCastFloat(configGetEntry(iName));
         gains.d     = safeCastFloat(configGetEntry(dName));
@@ -41,9 +41,9 @@ PID_gains_t configGetIfPIDGains(const char *prefix, PID_gains_t val)
     }
 }
 
-PID_integral_bounds_t configGetIfPIDBounds(
+PIDIntegralLimits_t configGetIfPIDBounds(
         const char *prefix,
-        PID_integral_bounds_t val)
+        PIDIntegralLimits_t val)
 {
     char minName[32];
     char maxName[32];
@@ -53,7 +53,7 @@ PID_integral_bounds_t configGetIfPIDBounds(
     configFetch();
 
     if (configCheckExists(minName)) {
-        PID_integral_bounds_t bounds;
+        PIDIntegralLimits_t bounds;
         bounds.iMin = safeCastFloat(configGetEntry(minName));
         bounds.iMax = safeCastFloat(configGetEntry(maxName));
         return bounds;

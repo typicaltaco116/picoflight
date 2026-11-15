@@ -15,4 +15,4 @@ typedef struct {
 typedef struct {
     rates_t omega; // Rad / sec
     euler_t theta; // Rad
-} platform_state_t;
+} platformState_t;

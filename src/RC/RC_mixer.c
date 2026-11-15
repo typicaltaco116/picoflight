@@ -12,7 +12,7 @@
 // Standard Headers
 #include <stdbool.h>
 
-static RC_mixer_channel_parameters_t _channel_params[RC_MAX_CH]; // Zero-indexed
+static RCMixerChannelParameters_t _channel_params[RC_MAX_CH]; // Zero-indexed
 
 void RCMixerInit(void)
 {
@@ -21,7 +21,7 @@ void RCMixerInit(void)
     }
 }
 
-void RCMixerSetChannelParameters(uint ch, RC_mixer_channel_parameters_t params)
+void RCMixerSetChannelParameters(uint ch, RCMixerChannelParameters_t params)
 {
     if (ch - 1 > RC_MAX_CH || ch == 0)
         return;

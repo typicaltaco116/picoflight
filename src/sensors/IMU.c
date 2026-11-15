@@ -9,9 +9,9 @@
 #include <picoflight/sensors/MPU6050_register_map.h>
 
 static i2c_inst_t *IMU_i2c_instance;
-static IMU_sample_rate_e sample_rate;
-static IMU_gyro_scale_e gyro_scale;
-static IMU_accel_scale_e accel_scale;
+static IMUSampleRate_e sample_rate;
+static IMUGyroScale_e gyro_scale;
+static IMUAccelScale_e accel_scale;
 
 
 void IMUInitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t speed)
@@ -28,7 +28,7 @@ void IMUInitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t sp
 }
 
 
-void IMUInitDevice(IMU_sample_rate_e rate, IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale)
+void IMUInitDevice(IMUSampleRate_e rate, IMUGyroScale_e g_scale, IMUAccelScale_e a_scale)
 {
     uint8_t gyro_config_value, accel_config_value, divider_value;
 
@@ -157,17 +157,17 @@ bool IMUIsDataReady(void)
 }
 
 
-IMU_sample_rate_e IMUGetCurrentRate(void)
+IMUSampleRate_e IMUGetCurrentRate(void)
 {
     return sample_rate;
 }
 
-IMU_gyro_scale_e IMUGetCurrentGyroScale(void)
+IMUGyroScale_e IMUGetCurrentGyroScale(void)
 {
     return gyro_scale;
 }
 
-IMU_accel_scale_e IMUGetCurrentAccelScale(void)
+IMUAccelScale_e IMUGetCurrentAccelScale(void)
 {
     return accel_scale;
 }

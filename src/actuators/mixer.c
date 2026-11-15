@@ -12,24 +12,24 @@
 #include <stdint.h>
 
 static bool _armedFlag = false;
-static char _pinoutStruct[sizeof(quad_pinout_t)];
-static mixer_type_e _type;
+static char _pinoutStruct[sizeof(mixerQuadPinout_t)];
+static mixerType_e _type;
 
-void mixerQuadInit(quad_pinout_t *pinout)
+void mixerQuadInit(mixerQuadPinout_t *pinout)
 {
     _armedFlag = false;
     _type = MIXER_QUADCOPTER;
-    memcpy(_pinoutStruct, pinout, sizeof(quad_pinout_t));
+    memcpy(_pinoutStruct, pinout, sizeof(mixerQuadPinout_t));
 }
 
-void mixerFixedWingInit(fixed_wing_pinout_t *pinout)
+void mixerFixedWingInit(mixerFixedWingPinout_t *pinout)
 {
     _armedFlag = false;
     _type = MIXER_FIXED_WING;
-    memcpy(_pinoutStruct, pinout, sizeof(fixed_wing_pinout_t));
+    memcpy(_pinoutStruct, pinout, sizeof(mixerFixedWingPinout_t));
 }
 
-void mixerInit(mixer_type_e type, void *pinout)
+void mixerInit(mixerType_e type, void *pinout)
 {
     switch (type) {
         default:
@@ -42,7 +42,7 @@ void mixerInit(mixer_type_e type, void *pinout)
 void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs)
 {
     float motor1, motor2, motor3, motor4;
-    quad_pinout_t *pinout = (quad_pinout_t*)_pinoutStruct;
+    mixerQuadPinout_t *pinout = (mixerQuadPinout_t*)_pinoutStruct;
 
     if (_armedFlag) {
         throttle    = mapf(throttle, -1.0f, 1.0f, 0.0f, 1.0f);
@@ -67,7 +67,7 @@ void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs)
 // expects command to be -1 to 1
 void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs)
 {
-    fixed_wing_pinout_t *pinout = (fixed_wing_pinout_t*)_pinoutStruct;
+    mixerFixedWingPinout_t *pinout = (mixerFixedWingPinout_t*)_pinoutStruct;
 
     if (!_armedFlag)
         throttle = -1.0f;

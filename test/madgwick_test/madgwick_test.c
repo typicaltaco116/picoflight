@@ -24,9 +24,9 @@ int main()
     while (1) {
         while (IMUIsDataReady());
 
-        IMU_vectors_t IMU_data = IMUGetData();
+        IMUVectors_t IMU_data = IMUGetData();
 
-        platform_state_t state = madgwickCompute(IMU_data, 5.0f);
+        platformState_t state = madgwickCompute(IMU_data, 5.0f);
 
         printf("State = {%03.03f %03.03f %03.03f %03.03f %03.03f %03.03f}\r\n",
                 state.theta.roll, state.theta.pitch, state.theta.yaw,

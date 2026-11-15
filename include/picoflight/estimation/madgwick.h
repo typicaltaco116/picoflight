@@ -5,4 +5,4 @@
 
 void madgwickSetStepSize(float B_val);
 
-platform_state_t madgwickCompute(IMU_vectors_t imu, float sampleFreq);
+platformState_t madgwickCompute(IMUVectors_t imu, float sampleFreq);

@@ -12,25 +12,25 @@ typedef struct {
     float x;
     float y;
     float z;
-} IMU_accel_t;
+} accel_t;
 
 typedef struct {
     float x;
     float y;
     float z;
-} IMU_gyro_t;
+} gyro_t;
 
 typedef struct {
-    IMU_gyro_t gyro;
-    IMU_gyro_t accel;
-} IMU_vectors_t;
+    gyro_t gyro;
+    gyro_t accel;
+} IMUVectors_t;
 
-IMU_vectors_t IMUGetData(void);
+IMUVectors_t IMUGetData(void);
 
-void IMUSetErrorOffset(IMU_vectors_t error_offset);
+void IMUSetErrorOffset(IMUVectors_t error_offset);
 
-IMU_vectors_t IMUGetCalibrationError(uint32_t cycle_count); 
+IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count); 
 
-void IMUSetProcessingScale(IMU_gyro_scale_e g_scale, IMU_accel_scale_e a_scale);
+void IMUSetProcessingScale(IMUGyroScale_e g_scale, IMUAccelScale_e a_scale);
 
 void IMULoadSaveCalibrationBlocking(uint32_t cycles);

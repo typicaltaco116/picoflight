@@ -84,7 +84,7 @@ int main(void)
     SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     RCMixerInit();
-    RC_mixer_channel_parameters_t mixParams = (RC_mixer_channel_parameters_t){
+    RCMixerChannelParameters_t mixParams = (RCMixerChannelParameters_t){
         .enabled = true,
         .trimNorm = 0.0f,
         .inMin = SBUS_MIN_VALUE,
@@ -100,20 +100,20 @@ int main(void)
     RCMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
     RCMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
-    PID_3_axis_t *controller = PID3AxisConstruct(
-            (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
-            (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
-            (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
-            (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Angle
-            (PID_gains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Yaw Rate
-            (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PID_integral_bounds_t){.iMax = 10.0f, .iMin = -10.0f}
+    PID3Axis_t *controller = PID3AxisConstruct(
+            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
+            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
+            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
+            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Angle
+            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Yaw Rate
+            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f}
     );
 
-    quad_pinout_t pinout = {
+    mixerQuadPinout_t pinout = {
         .m1 = 5, .m2 = 6, .m3 = 7, .m4 = 8,
         .numAux = 0, .aux = NULL
     };
@@ -122,8 +122,8 @@ int main(void)
     // Main loop.
     uint64_t deltaTime_us = LOOP_PERIOD_US;
     while (1) {
-        IMU_vectors_t IMU_data = IMUGetData();
-        platform_state_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
+        IMUVectors_t IMU_data = IMUGetData();
+        platformState_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
 
         RC_t radioChannels;
         SBUSGetChannels(radioChannels);

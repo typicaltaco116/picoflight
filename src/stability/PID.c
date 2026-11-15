@@ -13,34 +13,34 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds)
+PIDLoop_t* PIDConstruct(PIDGains_t gains, PIDIntegralLimits_t bounds)
 {
-    PID_loop_t *obj = malloc(sizeof(PID_loop_t));
+    PIDLoop_t *obj = malloc(sizeof(PIDLoop_t));
     obj->gains = gains;
     obj->bounds = bounds;
     obj->accumulator = 0.0f;
     return obj;
 }
 
-PID_loop_t* PIDConstructFromFlash(
+PIDLoop_t* PIDConstructFromFlash(
         const char *prefix,
-        PID_gains_t defaultGains,
-        PID_integral_bounds_t defaultBounds)
+        PIDGains_t defaultGains,
+        PIDIntegralLimits_t defaultBounds)
 {
-    PID_gains_t gains = configGetIfPIDGains(prefix, defaultGains);
-    PID_integral_bounds_t bounds = configGetIfPIDBounds(prefix, defaultBounds);
+    PIDGains_t gains = configGetIfPIDGains(prefix, defaultGains);
+    PIDIntegralLimits_t bounds = configGetIfPIDBounds(prefix, defaultBounds);
 
     return PIDConstruct(gains, bounds);
 }
 
-void PIDFree(PID_loop_t *obj)
+void PIDFree(PIDLoop_t *obj)
 {
     free(obj);
 }
 
 
 float PIDGetResponse(
-        PID_loop_t *obj,
+        PIDLoop_t *obj,
         float setpoint,
         float measurement,
         float measurementDot,
@@ -59,19 +59,19 @@ float PIDGetResponse(
 }
 
 
-PID_3_axis_t* PID3AxisConstruct(
-        PID_gains_t rollRateGains,
-        PID_gains_t rollAngleGains,
-        PID_gains_t pitchRateGains,
-        PID_gains_t pitchAngleGains,
-        PID_gains_t yawRateGains,
-        PID_integral_bounds_t rollRateBounds,
-        PID_integral_bounds_t rollAngleBounds,
-        PID_integral_bounds_t pitchRateBounds,
-        PID_integral_bounds_t pitchAngleBounds,
-        PID_integral_bounds_t yawRateBounds)
+PID3Axis_t* PID3AxisConstruct(
+        PIDGains_t rollRateGains,
+        PIDGains_t rollAngleGains,
+        PIDGains_t pitchRateGains,
+        PIDGains_t pitchAngleGains,
+        PIDGains_t yawRateGains,
+        PIDIntegralLimits_t rollRateBounds,
+        PIDIntegralLimits_t rollAngleBounds,
+        PIDIntegralLimits_t pitchRateBounds,
+        PIDIntegralLimits_t pitchAngleBounds,
+        PIDIntegralLimits_t yawRateBounds)
 {
-    PID_3_axis_t *obj = malloc(sizeof(PID_3_axis_t));
+    PID3Axis_t *obj = malloc(sizeof(PID3Axis_t));
     obj->rollRateController = PIDConstruct(rollRateGains, rollRateBounds);
     obj->rollAngleController = PIDConstruct(rollAngleGains, rollAngleBounds);
     obj->pitchRateController = PIDConstruct(pitchRateGains, pitchRateBounds);
@@ -83,19 +83,19 @@ PID_3_axis_t* PID3AxisConstruct(
     return obj;
 }
 
-PID_3_axis_t* PID3AxisConstructFromFlash(
-        PID_gains_t rollRateGains,
-        PID_gains_t rollAngleGains,
-        PID_gains_t pitchRateGains,
-        PID_gains_t pitchAngleGains,
-        PID_gains_t yawRateGains,
-        PID_integral_bounds_t rollRateBounds,
-        PID_integral_bounds_t rollAngleBounds,
-        PID_integral_bounds_t pitchRateBounds,
-        PID_integral_bounds_t pitchAngleBounds,
-        PID_integral_bounds_t yawRateBounds)
+PID3Axis_t* PID3AxisConstructFromFlash(
+        PIDGains_t rollRateGains,
+        PIDGains_t rollAngleGains,
+        PIDGains_t pitchRateGains,
+        PIDGains_t pitchAngleGains,
+        PIDGains_t yawRateGains,
+        PIDIntegralLimits_t rollRateBounds,
+        PIDIntegralLimits_t rollAngleBounds,
+        PIDIntegralLimits_t pitchRateBounds,
+        PIDIntegralLimits_t pitchAngleBounds,
+        PIDIntegralLimits_t yawRateBounds)
 {
-    PID_3_axis_t *obj = malloc(sizeof(PID_3_axis_t));
+    PID3Axis_t *obj = malloc(sizeof(PID3Axis_t));
     obj->rollRateController = PIDConstructFromFlash(
             "ROLL_RATE", rollRateGains, rollRateBounds);
     obj->rollAngleController = PIDConstructFromFlash(
@@ -112,7 +112,7 @@ PID_3_axis_t* PID3AxisConstructFromFlash(
     return obj;
 }
 
-void PID3AxisFree(PID_3_axis_t *obj)
+void PID3AxisFree(PID3Axis_t *obj)
 {
     PIDFree(obj->rollRateController);
     PIDFree(obj->rollAngleController);
@@ -123,8 +123,8 @@ void PID3AxisFree(PID_3_axis_t *obj)
 }
 
 void PID3AxisGetAngleResponse(
-        PID_3_axis_t *obj,
-        platform_state_t state,
+        PID3Axis_t *obj,
+        platformState_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
         float *rollCommandNorm,
@@ -159,8 +159,8 @@ void PID3AxisGetAngleResponse(
 }
 
 void PID3AxisGetRateResponse(
-        PID_3_axis_t *obj,
-        platform_state_t state,
+        PID3Axis_t *obj,
+        platformState_t state,
         float deltaTime,
         rates_t setpoints,
         float *rollCommandNorm,

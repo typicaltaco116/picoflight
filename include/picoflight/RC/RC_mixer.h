@@ -15,11 +15,11 @@ typedef struct {
     float trimNorm;
     float inMin;
     float inMax;
-} RC_mixer_channel_parameters_t;
+} RCMixerChannelParameters_t;
 
 void RCMixerInit(void);
 
-void RCMixerSetChannelParameters(uint ch, RC_mixer_channel_parameters_t params);
+void RCMixerSetChannelParameters(uint ch, RCMixerChannelParameters_t params);
 
 void RCMixerRunInPlace(RC_t channels);
 

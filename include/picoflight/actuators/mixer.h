@@ -10,7 +10,7 @@
 typedef enum {
     MIXER_QUADCOPTER,
     MIXER_FIXED_WING,
-} mixer_type_e;
+} mixerType_e;
 
 typedef struct {
     int32_t m1;
@@ -19,7 +19,7 @@ typedef struct {
     int32_t m4;
     int32_t numAux;
     int32_t *aux; // this pointer must remain in scope!!
-} quad_pinout_t;
+} mixerQuadPinout_t;
 
 typedef struct {
     int32_t aileron;
@@ -28,13 +28,13 @@ typedef struct {
     int32_t rudder;
     int32_t numAux;
     int32_t *aux;
-} fixed_wing_pinout_t;
+} mixerFixedWingPinout_t;
 
-void mixerQuadInit(quad_pinout_t *pinout);
+void mixerQuadInit(mixerQuadPinout_t *pinout);
 
-void mixerFixedWingInit(fixed_wing_pinout_t *pinout);
+void mixerFixedWingInit(mixerFixedWingPinout_t *pinout);
 
-void mixerInit(mixer_type_e type, void *pinoutStruct);
+void mixerInit(mixerType_e type, void *pinoutStruct);
 
 // expects commands from -1 to 1
 void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs);

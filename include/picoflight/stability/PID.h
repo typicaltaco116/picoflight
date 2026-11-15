@@ -11,31 +11,31 @@ typedef struct {
     float i;
     float d;
     float all;
-} PID_gains_t;
+} PIDGains_t;
 
 typedef struct {
     float iMin;
     float iMax;
-} PID_integral_bounds_t;
+} PIDIntegralLimits_t;
 
 typedef struct {
-    PID_gains_t gains;
-    PID_integral_bounds_t bounds;
+    PIDGains_t gains;
+    PIDIntegralLimits_t bounds;
     float accumulator;
-} PID_loop_t;
+} PIDLoop_t;
 
-PID_loop_t* PIDConstruct(PID_gains_t gains, PID_integral_bounds_t bounds);
+PIDLoop_t* PIDConstruct(PIDGains_t gains, PIDIntegralLimits_t bounds);
 
-PID_loop_t* PIDConstructFromFlash(
+PIDLoop_t* PIDConstructFromFlash(
         const char *prefix,
-        PID_gains_t defaultGains,
-        PID_integral_bounds_t defaultBounds
+        PIDGains_t defaultGains,
+        PIDIntegralLimits_t defaultBounds
 );
 
-void PIDFree(PID_loop_t *obj);
+void PIDFree(PIDLoop_t *obj);
 
 float PIDGetResponse(
-        PID_loop_t *obj,
+        PIDLoop_t *obj,
         float setpoint,
         float measurement,
         float measurementDot,
@@ -43,47 +43,47 @@ float PIDGetResponse(
 );
 
 typedef struct {
-    PID_loop_t *rollRateController;
-    PID_loop_t *rollAngleController;
-    PID_loop_t *pitchRateController;
-    PID_loop_t *pitchAngleController;
-    PID_loop_t *yawRateController;
+    PIDLoop_t *rollRateController;
+    PIDLoop_t *rollAngleController;
+    PIDLoop_t *pitchRateController;
+    PIDLoop_t *pitchAngleController;
+    PIDLoop_t *yawRateController;
     float rollDifferentiatorState;
     float pitchDifferentiatorState;
     float yawDifferentiatorState;
-} PID_3_axis_t;
+} PID3Axis_t;
 
-PID_3_axis_t* PID3AxisConstruct(
-        PID_gains_t rollRateGains,
-        PID_gains_t rollAngleGains,
-        PID_gains_t pitchRateGains,
-        PID_gains_t pitchAngleGains,
-        PID_gains_t yawRateGains,
-        PID_integral_bounds_t rollRateBounds,
-        PID_integral_bounds_t rollAngleBounds,
-        PID_integral_bounds_t pitchRateBounds,
-        PID_integral_bounds_t pitchAngleBounds,
-        PID_integral_bounds_t yawRateBounds
+PID3Axis_t* PID3AxisConstruct(
+        PIDGains_t rollRateGains,
+        PIDGains_t rollAngleGains,
+        PIDGains_t pitchRateGains,
+        PIDGains_t pitchAngleGains,
+        PIDGains_t yawRateGains,
+        PIDIntegralLimits_t rollRateBounds,
+        PIDIntegralLimits_t rollAngleBounds,
+        PIDIntegralLimits_t pitchRateBounds,
+        PIDIntegralLimits_t pitchAngleBounds,
+        PIDIntegralLimits_t yawRateBounds
 );
 
-PID_3_axis_t* PID3AxisConstructFromFlash(
-        PID_gains_t defualtRollRateGains,
-        PID_gains_t defualtRollAngleGains,
-        PID_gains_t defualtPitchRateGains,
-        PID_gains_t defualtPitchAngleGains,
-        PID_gains_t defualtYawRateGains,
-        PID_integral_bounds_t defualtRollRateBounds,
-        PID_integral_bounds_t defualtRollAngleBounds,
-        PID_integral_bounds_t defualtPitchRateBounds,
-        PID_integral_bounds_t defualtPitchAngleBounds,
-        PID_integral_bounds_t defualtYawRateBounds
+PID3Axis_t* PID3AxisConstructFromFlash(
+        PIDGains_t defualtRollRateGains,
+        PIDGains_t defualtRollAngleGains,
+        PIDGains_t defualtPitchRateGains,
+        PIDGains_t defualtPitchAngleGains,
+        PIDGains_t defualtYawRateGains,
+        PIDIntegralLimits_t defualtRollRateBounds,
+        PIDIntegralLimits_t defualtRollAngleBounds,
+        PIDIntegralLimits_t defualtPitchRateBounds,
+        PIDIntegralLimits_t defualtPitchAngleBounds,
+        PIDIntegralLimits_t defualtYawRateBounds
 );
 
-void PID3AxisFree(PID_3_axis_t *obj);
+void PID3AxisFree(PID3Axis_t *obj);
 
 void PID3AxisGetAngleResponse(
-        PID_3_axis_t *obj,
-        platform_state_t state,
+        PID3Axis_t *obj,
+        platformState_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
         float *rollCommandNorm,
@@ -92,8 +92,8 @@ void PID3AxisGetAngleResponse(
 );
 
 void PID3AxisGetRateResponse(
-        PID_3_axis_t *obj,
-        platform_state_t state,
+        PID3Axis_t *obj,
+        platformState_t state,
         float deltaTime,
         rates_t setpoints,
         float *rollCommandNorm,
