@@ -4,7 +4,7 @@
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/actuators/dshotx4.h>
 #include <picoflight/RC/sbus.h>
-#include <picoflight/RC/RC_mixer.h>
+#include <picoflight/RC/rcMixer.h>
 #include <picoflight/stability/PID.h>
 #include <picoflight/actuators/mixer.h>
 #include <picoflight/core/utilities.h>
@@ -99,22 +99,22 @@ void picoflightInit(void)
 
     sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
-    RCMixerInit();
-    RCMixerChannelParameters_t mixParams = (RCMixerChannelParameters_t){
+    rcMixerInit();
+    rcMixerChannelParameters_t mixParams = (rcMixerChannelParameters_t){
         .enabled = true,
         .trimNorm = 0.0f,
         .inMin = SBUS_MIN_VALUE,
         .inMax = SBUS_MAX_VALUE
     };
-    RCMixerSetChannelParameters(1, mixParams);
-    RCMixerSetChannelParameters(2, mixParams);
-    RCMixerSetChannelParameters(3, mixParams);
-    RCMixerSetChannelParameters(4, mixParams);
-    RCMixerSetChannelParameters(5, mixParams);
-    RCMixerSetChannelParameters(6, mixParams);
+    rcMixerSetChannelParameters(1, mixParams);
+    rcMixerSetChannelParameters(2, mixParams);
+    rcMixerSetChannelParameters(3, mixParams);
+    rcMixerSetChannelParameters(4, mixParams);
+    rcMixerSetChannelParameters(5, mixParams);
+    rcMixerSetChannelParameters(6, mixParams);
 
-    RCMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
-    RCMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
+    rcMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
+    rcMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
     controller = PID3AxisConstructFromFlash(
             (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
@@ -159,7 +159,7 @@ int main(void)
         imuVectors_t IMU_data = imuGetData();
         platformState_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
 
-        RC_t radioChannels;
+        rc_t radioChannels;
         sbusGetChannels(radioChannels);
 
         bool isFailsafe = sbusGetIsFailsafe();
@@ -172,7 +172,7 @@ int main(void)
 
         euler_t command;
         if (isAngle) {
-            euler_t angleSetpoints = RCMixerGetAngleSetpoints(radioChannels);
+            euler_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
             PID3AxisGetAngleResponse(
                     controller,
                     state,
@@ -185,7 +185,7 @@ int main(void)
             );
         }
         else {
-            rates_t rateSetpoints = RCMixerGetRateSetpoints(radioChannels);
+            rates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
             PID3AxisGetRateResponse(
                     controller,
                     state,

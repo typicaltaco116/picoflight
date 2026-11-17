@@ -1,11 +1,16 @@
+// Primary Header
 #include <picoflight/RC/sbus.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+// Local Headers
+#include <picoflight/RC/rc.h>
+
+// Pico-SDK Headers
 #include <hardware/uart.h>
 #include <hardware/gpio.h>
 
-#include <picoflight/RC/RC.h>
+// Standard Headers
+#include <stdint.h>
+#include <stdbool.h>
 
 #define SBUS_BAUD       100000
 #define SBUS_DATA_BITS  8
@@ -130,7 +135,7 @@ static bool GetRaw(SBUS_raw_t raw_ch)
     return false;
 }
 
-bool sbusGetChannels(RC_t rc)
+bool sbusGetChannels(rc_t rc)
 {
     SBUS_raw_t raw_ch = {0};
 

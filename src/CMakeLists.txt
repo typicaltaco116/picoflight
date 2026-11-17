@@ -13,7 +13,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/mpu6050.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/imu.c
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/sbus.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/RC/RC_mixer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/RC/rcMixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/pwm.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/mixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c

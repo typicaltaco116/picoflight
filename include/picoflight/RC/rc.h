@@ -2,4 +2,4 @@
 
 #define RC_MAX_CH 18
 
-typedef float RC_t[RC_MAX_CH + 1];
+typedef float rc_t[RC_MAX_CH + 1];

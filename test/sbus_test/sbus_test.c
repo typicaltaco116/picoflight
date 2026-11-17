@@ -1,7 +1,8 @@
 // Local Headers
-#include <picoflight/RC/RC.h>
+#include <picoflight/RC/rc.h>
 #include <picoflight/RC/sbus.h>
 
+// Pico-SDK Headers
 #include <pico/stdlib.h>
 
 // Standard Headers
@@ -20,7 +21,7 @@ int main()
     sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     while (1) {
-     RC_t ch;
+     rc_t ch;
         if (sbusGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
         if (sbusGetIsFailsafe())

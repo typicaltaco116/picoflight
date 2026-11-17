@@ -22,7 +22,7 @@ int main(void)
     while (1) {
         sleep_us(200);
 
-        RC_t ch;
+        rc_t ch;
         if (sbusGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
 
