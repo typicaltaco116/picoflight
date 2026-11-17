@@ -2,7 +2,7 @@
 #include <picoflight/actuators/mixer.h>
 
 // Local Headers
-#include <picoflight/actuators/PWM.h>
+#include <picoflight/actuators/pwm.h>
 #include <picoflight/orientation/types.h>
 #include <picoflight/core/utilities.h>
 

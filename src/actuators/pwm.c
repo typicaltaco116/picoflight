@@ -1,5 +1,5 @@
 // Primary Header
-#include <picoflight/actuators/PWM.h>
+#include <picoflight/actuators/pwm.h>
 
 // Pico-SDK Headers
 #include <hardware/pwm.h>
@@ -24,12 +24,12 @@
 #define UPPER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * UPPER_BOUND_MICROSECONDS * 1E-6)
 #define LOWER_BOUND_LEVEL ((SYSTEM_CLK / PWM_DIVIDER) * LOWER_BOUND_MICROSECONDS * 1E-6)
 
-PWM_t PWMRegister(int32_t pin)
+pwm_t pwmRegister(int32_t pin)
 {
     return pin;
 }
 
-void PWMInit(PWM_t PWM_obj)
+void pwmInit(pwm_t PWM_obj)
 {
     pwm_config config;
 
@@ -44,7 +44,7 @@ void PWMInit(PWM_t PWM_obj)
     gpio_set_function(PWM_obj, GPIO_FUNC_PWM);
 }
 
-void PWMDrive(PWM_t PWM_obj, float x)
+void pwmDrive(pwm_t PWM_obj, float x)
 {
     uint16_t level;
 
@@ -56,7 +56,7 @@ void PWMDrive(PWM_t PWM_obj, float x)
     pwm_set_gpio_level(PWM_obj, level);
 }
 
-void PWMDriveNorm(PWM_t PWM_obj, float x_norm)
+void pwmDriveNorm(pwm_t PWM_obj, float x_norm)
 {
     uint16_t level;
 

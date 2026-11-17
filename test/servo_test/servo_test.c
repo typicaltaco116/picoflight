@@ -1,5 +1,5 @@
 // Local Headers.
-#include <picoflight/actuators/PWM.h>
+#include <picoflight/actuators/pwm.h>
 
 // PICO-sdk Headers.
 #include <pico/stdlib.h>
@@ -16,16 +16,16 @@ int main()
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-    PWM_t out3 = PWMRegister(CHANNEL_3_SERVO_OUTPUT_PIN);
-    PWMInit(out3);
-    PWMDrive(out3, 0);
+    pwm_t out3 = pwmRegister(CHANNEL_3_SERVO_OUTPUT_PIN);
+    pwmInit(out3);
+    pwmDrive(out3, 0);
 
     while (1) {
-        PWMDrive(out3, -1.0f);
+        pwmDrive(out3, -1.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
-        PWMDrive(out3, 0.0f);
+        pwmDrive(out3, 0.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
-        PWMDrive(out3, 1.0f);
+        pwmDrive(out3, 1.0f);
         while (stdio_getchar_timeout_us(100) != (int)'\r');
     }
 }
