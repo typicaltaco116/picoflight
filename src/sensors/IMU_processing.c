@@ -10,12 +10,12 @@
 // Standard Headers
 #include <stdint.h>
 
-static IMUVectors_t error = {
+static IMUVectors_t _errorVec = {
     .gyro = {0, 0, 0},
     .accel = {0, 0, 0}
 };
-static float gyro_scale;
-static float accel_scale;
+static float _gyroScale;
+static float _accelScale;
 
 
 static IMUVectors_t vector_add(IMUVectors_t A, IMUVectors_t B)
@@ -41,14 +41,14 @@ IMUVectors_t IMUGetData(void)
 
     IMUGetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
 
-    data.gyro.x = (float)gyro_x / gyro_scale; // convert to deg / sec
-    data.gyro.y = (float)gyro_y / gyro_scale;
-    data.gyro.z = (float)gyro_z / gyro_scale;
-    data.accel.x = (float)accel_x / accel_scale; // convert to g
-    data.accel.y = (float)accel_y / accel_scale;
-    data.accel.z = (float)accel_z / accel_scale;
+    data.gyro.x = (float)gyro_x / _gyroScale; // convert to deg / sec
+    data.gyro.y = (float)gyro_y / _gyroScale;
+    data.gyro.z = (float)gyro_z / _gyroScale;
+    data.accel.x = (float)accel_x / _accelScale; // convert to g
+    data.accel.y = (float)accel_y / _accelScale;
+    data.accel.z = (float)accel_z / _accelScale;
 
-    data = vector_add(data, error);
+    data = vector_add(data, _errorVec);
 
     return data;
 }
@@ -56,7 +56,7 @@ IMUVectors_t IMUGetData(void)
 
 void IMUSetErrorOffset(IMUVectors_t error_offset)
 {
-    error = error_offset;
+    _errorVec = error_offset;
 }
 
 
@@ -104,63 +104,67 @@ void IMUSetProcessingScale(IMUGyroScale_e g_scale, IMUAccelScale_e a_scale)
     switch(g_scale) {
         default:
         case IMU_GYRO_SCALE_250:
-            gyro_scale = MPU6050_GYRO_250_LSB_SENS;
+            _gyroScale = MPU6050_GYRO_250_LSB_SENS;
             break;
         case IMU_GYRO_SCALE_500:
-            gyro_scale = MPU6050_GYRO_500_LSB_SENS;
+            _gyroScale = MPU6050_GYRO_500_LSB_SENS;
             break;
         case IMU_GYRO_SCALE_1000:
-            gyro_scale = MPU6050_GYRO_1000_LSB_SENS;
+            _gyroScale = MPU6050_GYRO_1000_LSB_SENS;
             break;
         case IMU_GYRO_SCALE_2000:
-            gyro_scale = MPU6050_GYRO_2000_LSB_SENS;
+            _gyroScale = MPU6050_GYRO_2000_LSB_SENS;
             break;
     }
 
     switch(a_scale) {
         default:
         case IMU_ACCEL_SCALE_2:
-            accel_scale = MPU6050_ACCEL_2_LSB_SENS;
+            _accelScale = MPU6050_ACCEL_2_LSB_SENS;
             break;
         case IMU_ACCEL_SCALE_4:
-            accel_scale = MPU6050_ACCEL_4_LSB_SENS;
+            _accelScale = MPU6050_ACCEL_4_LSB_SENS;
             break;
         case IMU_ACCEL_SCALE_8:
-            accel_scale = MPU6050_ACCEL_8_LSB_SENS;
+            _accelScale = MPU6050_ACCEL_8_LSB_SENS;
             break;
         case IMU_ACCEL_SCALE_16:
-            accel_scale = MPU6050_ACCEL_16_LSB_SENS;
+            _accelScale = MPU6050_ACCEL_16_LSB_SENS;
             break;
     }
 }
 
-
-void IMULoadSaveCalibrationBlocking(uint32_t cycles)
+bool IMUGetIsCalibrated(void)
 {
     configFetch();
+    return configCheckExists("CALIBRATED");
+}
 
-    IMUVectors_t error;
+void IMULoadCalibration(void)
+{
+    if (!IMUGetIsCalibrated())
+        while (1); // Cheap way to kill program.
 
-    if (configCheckExists("CALIBRATED")) {
-        error.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));
-        error.gyro.y = safeCastFloat(configGetEntry("GYRO_ERROR_Y"));
-        error.gyro.z = safeCastFloat(configGetEntry("GYRO_ERROR_Z"));
-        error.accel.x = safeCastFloat(configGetEntry("ACCEL_ERROR_X"));
-        error.accel.y = safeCastFloat(configGetEntry("ACCEL_ERROR_Y"));
-        error.accel.z = safeCastFloat(configGetEntry("ACCEL_ERROR_Z"));
-        IMUSetErrorOffset(error);
-        return;
-    }
+    _errorVec.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));
+    _errorVec.gyro.y = safeCastFloat(configGetEntry("GYRO_ERROR_Y"));
+    _errorVec.gyro.z = safeCastFloat(configGetEntry("GYRO_ERROR_Z"));
+    _errorVec.accel.x = safeCastFloat(configGetEntry("ACCEL_ERROR_X"));
+    _errorVec.accel.y = safeCastFloat(configGetEntry("ACCEL_ERROR_Y"));
+    _errorVec.accel.z = safeCastFloat(configGetEntry("ACCEL_ERROR_Z"));
+}
 
+void IMUSaveCalibrationBlocking(uint32_t cycles)
+{
+    configFetch();
     configAddNewEntry("CALIBRATED", 1);
 
-    error = IMUGetCalibrationError(cycles);
-    configAddNewEntry("GYRO_ERROR_X", safeCastInt(error.gyro.x));
-    configAddNewEntry("GYRO_ERROR_Y", safeCastInt(error.gyro.y));
-    configAddNewEntry("GYRO_ERROR_Z", safeCastInt(error.gyro.z));
-    configAddNewEntry("ACCEL_ERROR_X", safeCastInt(error.accel.x));
-    configAddNewEntry("ACCEL_ERROR_Y", safeCastInt(error.accel.y));
-    configAddNewEntry("ACCEL_ERROR_Z", safeCastInt(error.accel.z));
+    _errorVec = IMUGetCalibrationError(cycles);
+    configAddNewEntry("GYRO_ERROR_X", safeCastInt(_errorVec.gyro.x));
+    configAddNewEntry("GYRO_ERROR_Y", safeCastInt(_errorVec.gyro.y));
+    configAddNewEntry("GYRO_ERROR_Z", safeCastInt(_errorVec.gyro.z));
+    configAddNewEntry("ACCEL_ERROR_X", safeCastInt(_errorVec.accel.x));
+    configAddNewEntry("ACCEL_ERROR_Y", safeCastInt(_errorVec.accel.y));
+    configAddNewEntry("ACCEL_ERROR_Z", safeCastInt(_errorVec.accel.z));
 
     configCommit();
 }

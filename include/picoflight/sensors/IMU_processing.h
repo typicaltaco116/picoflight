@@ -34,3 +34,9 @@ IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count);
 void IMUSetProcessingScale(IMUGyroScale_e g_scale, IMUAccelScale_e a_scale);
 
 void IMULoadSaveCalibrationBlocking(uint32_t cycles);
+
+bool IMUGetIsCalibrated(void);
+
+void IMULoadCalibration(void);
+
+void IMUSaveCalibrationBlocking(uint32_t cycles);

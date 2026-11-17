@@ -67,6 +67,7 @@
 
 // Global Variables
 PID3Axis_t *controller;
+bool calibrationPrearm = false;
 
 void picoflightInit(void)
 {
@@ -79,7 +80,11 @@ void picoflightInit(void)
     );
     IMUInitDevice(MPU6050_SAMPLE_RATE, MPU6050_G_SCALE, MPU6050_A_SCALE);
     IMUSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
-    IMULoadSaveCalibrationBlocking(10000);
+    calibrationPrearm = IMUGetIsCalibrated();
+    if (calibrationPrearm)
+        IMUSaveCalibrationBlocking(10000);
+    else
+        IMULoadCalibration();
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
