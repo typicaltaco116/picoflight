@@ -1,6 +1,6 @@
 // Local Headers
-#include <picoflight/sensors/IMU.h>
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/mpu6050.h>
+#include <picoflight/sensors/imu.h>
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/actuators/dshotx4.h>
 #include <picoflight/RC/SBUS.h>
@@ -29,9 +29,9 @@
 #define MPU6050_I2C_SDA_PIN (14)
 #define MPU6050_I2C_INST    I2C_INSTANCE(1)
 #define MPU6050_I2C_BAUD    1000000
-#define MPU6050_SAMPLE_RATE IMU_1KHZ_RATE
-#define MPU6050_G_SCALE     IMU_GYRO_SCALE_500
-#define MPU6050_A_SCALE     IMU_ACCEL_SCALE_2
+#define MPU6050_SAMPLE_RATE MPU6050_1KHZ_RATE
+#define MPU6050_G_SCALE     MPU6050_GYRO_SCALE_500
+#define MPU6050_A_SCALE     MPU6050_ACCEL_SCALE_2
 
 // Madgwick Parameters
 #define MADGWICK_STEP_SIZE 0.2f
@@ -73,18 +73,18 @@ void picoflightInit(void)
 {
     stdio_init_all();
 
-    IMUInitBus(
+    mpu6050InitBus(
         MPU6050_I2C_INST,
         MPU6050_I2C_SDA_PIN, MPU6050_I2C_SCL_PIN,
         MPU6050_I2C_BAUD
     );
-    IMUInitDevice(MPU6050_SAMPLE_RATE, MPU6050_G_SCALE, MPU6050_A_SCALE);
-    IMUSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
-    calibrationPrearm = IMUGetIsCalibrated();
+    mpu6050InitDevice(MPU6050_SAMPLE_RATE, MPU6050_G_SCALE, MPU6050_A_SCALE);
+    imuSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
+    calibrationPrearm = imuGetIsCalibrated();
     if (calibrationPrearm)
-        IMUSaveCalibrationBlocking(10000);
+        imuSaveCalibrationBlocking(10000);
     else
-        IMULoadCalibration();
+        imuLoadCalibration();
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
@@ -156,7 +156,7 @@ int main(void)
 
         handleUSBCLI();
 
-        IMUVectors_t IMU_data = IMUGetData();
+        imuVectors_t IMU_data = imuGetData();
         platformState_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
 
         RC_t radioChannels;

@@ -10,8 +10,8 @@ set(LINKED_LIBRARIES
 
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/estimation/madgwick.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/sensors/IMU.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/sensors/IMU_processing.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/sensors/mpu6050.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/sensors/imu.c
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/SBUS.c
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/RC_mixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/PWM.c

@@ -6,7 +6,7 @@
 #include <picoflight/core/config.h>
 #include <picoflight/core/utilities.h>
 #include <picoflight/actuators/dshotx4.h>
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/imu.h>
 
 // Pico-SDK
 #include <pico/stdlib.h>
@@ -158,9 +158,9 @@ int32_t shellExecuteCalibrate(char **argv, int32_t argc)
     }
     int32_t numCycles = atoi(argv[1]);
 
-    IMUSaveCalibrationBlocking(numCycles);
+    imuSaveCalibrationBlocking(numCycles);
 
-    if (IMUGetIsCalibrated())
+    if (imuGetIsCalibrated())
         return EXIT_SUCCESS;
     else
         return EXIT_FAILURE;

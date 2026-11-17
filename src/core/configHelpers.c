@@ -9,7 +9,6 @@
 // Standard Headers
 #include <string.h>
 
-#include <stdio.h>
 PIDGains_t configGetIfPIDGains(const char *prefix, PIDGains_t val)
 {
     char pName[32];

@@ -1,8 +1,8 @@
 // Primary Header
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/imu.h>
 
 // Local Headers
-#include <picoflight/sensors/IMU.h>
+#include <picoflight/sensors/mpu6050.h>
 #include <picoflight/sensors/MPU6050_register_map.h>
 #include <picoflight/core/config.h>
 #include <picoflight/core/utilities.h>
@@ -10,7 +10,7 @@
 // Standard Headers
 #include <stdint.h>
 
-static IMUVectors_t _errorVec = {
+static imuVectors_t _errorVec = {
     .gyro = {0, 0, 0},
     .accel = {0, 0, 0}
 };
@@ -18,9 +18,9 @@ static float _gyroScale;
 static float _accelScale;
 
 
-static IMUVectors_t vector_add(IMUVectors_t A, IMUVectors_t B)
+static imuVectors_t vector_add(imuVectors_t A, imuVectors_t B)
 {
-    IMUVectors_t sum;
+    imuVectors_t sum;
 
     sum.gyro.x = A.gyro.x + B.gyro.x;
     sum.gyro.y = A.gyro.y + B.gyro.y;
@@ -33,13 +33,13 @@ static IMUVectors_t vector_add(IMUVectors_t A, IMUVectors_t B)
 }
 
 
-IMUVectors_t IMUGetData(void)
+imuVectors_t imuGetData(void)
 {
     int16_t gyro_x, gyro_y, gyro_z;
     int16_t accel_x, accel_y, accel_z;
-    IMUVectors_t data;
+    imuVectors_t data;
 
-    IMUGetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
+    mpu6050GetRawData(&gyro_x, &gyro_y, &gyro_z, &accel_x, &accel_y, &accel_z);
 
     data.gyro.x = (float)gyro_x / _gyroScale; // convert to deg / sec
     data.gyro.y = (float)gyro_y / _gyroScale;
@@ -54,18 +54,18 @@ IMUVectors_t IMUGetData(void)
 }
 
 
-void IMUSetErrorOffset(IMUVectors_t error_offset)
+void imuSetErrorOffset(imuVectors_t error_offset)
 {
     _errorVec = error_offset;
 }
 
 
-IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count)
+imuVectors_t imuGetCalibrationError(uint32_t cycle_count)
 {
     double gyro_x_sum, gyro_y_sum, gyro_z_sum;
     double accel_x_sum, accel_y_sum, accel_z_sum;
-    IMUVectors_t read_data;
-    IMUVectors_t error_offset;
+    imuVectors_t read_data;
+    imuVectors_t error_offset;
 
     gyro_x_sum = gyro_y_sum = gyro_z_sum = 0.0;
     accel_x_sum = accel_y_sum = accel_z_sum = 0.0;
@@ -78,7 +78,7 @@ IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count)
     error_offset.accel.z = 0.0;
 
     for (uint32_t i = cycle_count; i != 0; --i) {
-        read_data = IMUGetData();
+        read_data = imuGetData();
 
         gyro_x_sum += read_data.gyro.x;
         gyro_y_sum += read_data.gyro.y;
@@ -99,50 +99,50 @@ IMUVectors_t IMUGetCalibrationError(uint32_t cycle_count)
 }
 
 
-void IMUSetProcessingScale(IMUGyroScale_e g_scale, IMUAccelScale_e a_scale)
+void imuSetProcessingScale(mpu6050GyroScale_e g_scale, mpu6050AccelScale_e a_scale)
 {
     switch(g_scale) {
         default:
-        case IMU_GYRO_SCALE_250:
+        case MPU6050_GYRO_SCALE_250:
             _gyroScale = MPU6050_GYRO_250_LSB_SENS;
             break;
-        case IMU_GYRO_SCALE_500:
+        case MPU6050_GYRO_SCALE_500:
             _gyroScale = MPU6050_GYRO_500_LSB_SENS;
             break;
-        case IMU_GYRO_SCALE_1000:
+        case MPU6050_GYRO_SCALE_1000:
             _gyroScale = MPU6050_GYRO_1000_LSB_SENS;
             break;
-        case IMU_GYRO_SCALE_2000:
+        case MPU6050_GYRO_SCALE_2000:
             _gyroScale = MPU6050_GYRO_2000_LSB_SENS;
             break;
     }
 
     switch(a_scale) {
         default:
-        case IMU_ACCEL_SCALE_2:
+        case MPU6050_ACCEL_SCALE_2:
             _accelScale = MPU6050_ACCEL_2_LSB_SENS;
             break;
-        case IMU_ACCEL_SCALE_4:
+        case MPU6050_ACCEL_SCALE_4:
             _accelScale = MPU6050_ACCEL_4_LSB_SENS;
             break;
-        case IMU_ACCEL_SCALE_8:
+        case MPU6050_ACCEL_SCALE_8:
             _accelScale = MPU6050_ACCEL_8_LSB_SENS;
             break;
-        case IMU_ACCEL_SCALE_16:
+        case MPU6050_ACCEL_SCALE_16:
             _accelScale = MPU6050_ACCEL_16_LSB_SENS;
             break;
     }
 }
 
-bool IMUGetIsCalibrated(void)
+bool imuGetIsCalibrated(void)
 {
     configFetch();
     return configCheckExists("CALIBRATED");
 }
 
-void IMULoadCalibration(void)
+void imuLoadCalibration(void)
 {
-    if (!IMUGetIsCalibrated())
+    if (!imuGetIsCalibrated())
         while (1); // Cheap way to kill program.
 
     _errorVec.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));
@@ -153,12 +153,12 @@ void IMULoadCalibration(void)
     _errorVec.accel.z = safeCastFloat(configGetEntry("ACCEL_ERROR_Z"));
 }
 
-void IMUSaveCalibrationBlocking(uint32_t cycles)
+void imuSaveCalibrationBlocking(uint32_t cycles)
 {
     configFetch();
     configAddNewEntry("CALIBRATED", 1);
 
-    _errorVec = IMUGetCalibrationError(cycles);
+    _errorVec = imuGetCalibrationError(cycles);
     configAddNewEntry("GYRO_ERROR_X", safeCastInt(_errorVec.gyro.x));
     configAddNewEntry("GYRO_ERROR_Y", safeCastInt(_errorVec.gyro.y));
     configAddNewEntry("GYRO_ERROR_Z", safeCastInt(_errorVec.gyro.z));

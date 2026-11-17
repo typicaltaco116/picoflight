@@ -3,7 +3,7 @@
 
 // Local Headers
 #include <picoflight/orientation/types.h>
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/imu.h>
 #include <picoflight/core/utilities.h>
 
 // Standard Headers
@@ -31,7 +31,7 @@ void madgwickSetStepSize(float B_val)
 }
 
 // CODE TAKEN FROM DREHMFLIGHT BY Nicholas Rehm
-platformState_t madgwickCompute(IMUVectors_t imu, float sampleFreq)
+platformState_t madgwickCompute(imuVectors_t imu, float sampleFreq)
 {
     float recipNorm;
     float s0, s1, s2, s3;

@@ -1,20 +1,20 @@
-#include <picoflight/sensors/IMU.h>
+#include <picoflight/sensors/mpu6050.h>
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <pico/stdlib.h>
 #include <hardware/i2c.h>
 
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/imu.h>
 #include <picoflight/sensors/MPU6050_register_map.h>
 
 static i2c_inst_t *IMU_i2c_instance;
-static IMUSampleRate_e sample_rate;
-static IMUGyroScale_e gyro_scale;
-static IMUAccelScale_e accel_scale;
+static mpu6050SampleRate_e sample_rate;
+static mpu6050GyroScale_e gyro_scale;
+static mpu6050AccelScale_e accel_scale;
 
 
-void IMUInitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t speed)
+void mpu6050InitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t speed)
 {
     IMU_i2c_instance = i2c;
 
@@ -28,7 +28,7 @@ void IMUInitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t sp
 }
 
 
-void IMUInitDevice(IMUSampleRate_e rate, IMUGyroScale_e g_scale, IMUAccelScale_e a_scale)
+void mpu6050InitDevice(mpu6050SampleRate_e rate, mpu6050GyroScale_e g_scale, mpu6050AccelScale_e a_scale)
 {
     uint8_t gyro_config_value, accel_config_value, divider_value;
 
@@ -36,70 +36,70 @@ void IMUInitDevice(IMUSampleRate_e rate, IMUGyroScale_e g_scale, IMUAccelScale_e
     gyro_scale = g_scale;
     accel_scale = a_scale;
 
-    IMUSetProcessingScale(g_scale, a_scale);
+    imuSetProcessingScale(g_scale, a_scale);
 
     // Reset IMU_ device
-    IMURegisterWrite(MPU6050_PWR_MGMT_1, MPU6050_RESET_BIT);
+    mpu6050RegisterWrite(MPU6050_PWR_MGMT_1, MPU6050_RESET_BIT);
     sleep_ms(100);
 
     // Clear Sleep Bit
-    IMURegisterWrite(MPU6050_PWR_MGMT_1, 0x00);
+    mpu6050RegisterWrite(MPU6050_PWR_MGMT_1, 0x00);
     sleep_ms(10);
 
     switch(gyro_scale) {
         default:
-        case IMU_GYRO_SCALE_250:
+        case MPU6050_GYRO_SCALE_250:
             gyro_config_value = MPU6050_SET_GYRO_SCALE_250;
             break;
-        case IMU_GYRO_SCALE_500:
+        case MPU6050_GYRO_SCALE_500:
             gyro_config_value = MPU6050_SET_GYRO_SCALE_500;
             break;
-        case IMU_GYRO_SCALE_1000:
+        case MPU6050_GYRO_SCALE_1000:
             gyro_config_value = MPU6050_SET_GYRO_SCALE_1000;
             break;
-        case IMU_GYRO_SCALE_2000:
+        case MPU6050_GYRO_SCALE_2000:
             gyro_config_value = MPU6050_SET_GYRO_SCALE_2000;
             break;
     }
-    IMURegisterWrite(MPU6050_GYRO_CONFIG, gyro_config_value);
+    mpu6050RegisterWrite(MPU6050_GYRO_CONFIG, gyro_config_value);
 
     switch(accel_scale) {
         default:
-        case IMU_ACCEL_SCALE_2:
+        case MPU6050_ACCEL_SCALE_2:
             accel_config_value = MPU6050_SET_ACCEL_SCALE_2;
             break;
-        case IMU_ACCEL_SCALE_4:
+        case MPU6050_ACCEL_SCALE_4:
             accel_config_value = MPU6050_SET_ACCEL_SCALE_4;
             break;
-        case IMU_ACCEL_SCALE_8:
+        case MPU6050_ACCEL_SCALE_8:
             accel_config_value = MPU6050_SET_ACCEL_SCALE_8;
             break;
-        case IMU_ACCEL_SCALE_16:
+        case MPU6050_ACCEL_SCALE_16:
             accel_config_value = MPU6050_SET_ACCEL_SCALE_16;
             break;
     }
-    IMURegisterWrite(MPU6050_ACCEL_CONFIG, accel_config_value);
+    mpu6050RegisterWrite(MPU6050_ACCEL_CONFIG, accel_config_value);
 
     // Enable Digital Lowpass Filter
-    IMURegisterWrite(MPU6050_CONFIG, MPU6050_DLPF_CFG_6);
+    mpu6050RegisterWrite(MPU6050_CONFIG, MPU6050_DLPF_CFG_6);
 
     switch(sample_rate) {
-        case IMU_5HZ_RATE:
+        case MPU6050_5HZ_RATE:
             divider_value = 200-1;
             break;
         default:
-        case IMU_1KHZ_RATE:
+        case MPU6050_1KHZ_RATE:
             divider_value = 0; // no division as this is max speed
             break;
     }
-    IMURegisterWrite(MPU6050_SMPLRT_DIV, divider_value);
+    mpu6050RegisterWrite(MPU6050_SMPLRT_DIV, divider_value);
 
     // Enable Data Ready Interrupt
-    IMURegisterWrite(MPU6050_INT_ENABLE, MPU6050_DATA_RDY_INT_BIT);
+    mpu6050RegisterWrite(MPU6050_INT_ENABLE, MPU6050_DATA_RDY_INT_BIT);
 }
 
 
-void IMURegisterWrite(uint8_t address, uint8_t data)
+void mpu6050RegisterWrite(uint8_t address, uint8_t data)
 {
     uint8_t buffer[2];
     buffer[0] = address;
@@ -108,7 +108,7 @@ void IMURegisterWrite(uint8_t address, uint8_t data)
 }
 
 
-uint8_t IMURegisterRead(uint8_t address)
+uint8_t mpu6050RegisterRead(uint8_t address)
 {
     uint8_t value;
     i2c_write_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, (uint8_t[]){address}, 1, true);
@@ -117,19 +117,19 @@ uint8_t IMURegisterRead(uint8_t address)
 }
 
 
-void IMUBufferRead(uint8_t start_address, uint8_t *buffer, size_t length)
+void mpu6050BufferRead(uint8_t start_address, uint8_t *buffer, size_t length)
 {
     i2c_write_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, (uint8_t[]){start_address}, 1, true);
     i2c_read_blocking(IMU_i2c_instance, MPU6050_I2C_ADDR, buffer, length, false);
 }
 
 
-void IMUGetRawData(int16_t* gyro_x, int16_t* gyro_y, int16_t* gyro_z,
+void mpu6050GetRawData(int16_t* gyro_x, int16_t* gyro_y, int16_t* gyro_z,
                    int16_t* accel_x, int16_t* accel_y, int16_t* accel_z)
 {
     uint8_t buffer[6];
 
-    IMUBufferRead(MPU6050_GYRO_XOUT_H, (uint8_t*)buffer, 6);
+    mpu6050BufferRead(MPU6050_GYRO_XOUT_H, (uint8_t*)buffer, 6);
 
     // Need to swap placement since RP2350 is little endian and MPU6050 outputs
     // as big endian.
@@ -140,7 +140,7 @@ void IMUGetRawData(int16_t* gyro_x, int16_t* gyro_y, int16_t* gyro_z,
     *((uint8_t*)gyro_z + 0) = *(buffer + 5);
     *((uint8_t*)gyro_z + 1) = *(buffer + 4);
 
-    IMUBufferRead(MPU6050_ACCEL_XOUT_H, (uint8_t*)buffer, 6);
+    mpu6050BufferRead(MPU6050_ACCEL_XOUT_H, (uint8_t*)buffer, 6);
 
     *((uint8_t*)accel_x + 0) = *(buffer + 1);
     *((uint8_t*)accel_x + 1) = *(buffer + 0);
@@ -151,23 +151,23 @@ void IMUGetRawData(int16_t* gyro_x, int16_t* gyro_y, int16_t* gyro_z,
 }
 
 
-bool IMUIsDataReady(void)
+bool mpu6050IsDataReady(void)
 {
-    return (IMURegisterRead(MPU6050_INT_STATUS) & MPU6050_DATA_RDY_INT_BIT);
+    return (mpu6050RegisterRead(MPU6050_INT_STATUS) & MPU6050_DATA_RDY_INT_BIT);
 }
 
 
-IMUSampleRate_e IMUGetCurrentRate(void)
+mpu6050SampleRate_e mpu6050GetCurrentRate(void)
 {
     return sample_rate;
 }
 
-IMUGyroScale_e IMUGetCurrentGyroScale(void)
+mpu6050GyroScale_e mpu6050GetCurrentGyroScale(void)
 {
     return gyro_scale;
 }
 
-IMUAccelScale_e IMUGetCurrentAccelScale(void)
+mpu6050AccelScale_e IMUGetCurrentAccelScale(void)
 {
     return accel_scale;
 }

@@ -1,6 +1,6 @@
 // Local Headers
-#include <picoflight/sensors/IMU.h>
-#include <picoflight/sensors/IMU_processing.h>
+#include <picoflight/sensors/mpu6050.h>
+#include <picoflight/sensors/imu.h>
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/orientation/types.h>
 
@@ -16,15 +16,15 @@ int main()
 {
     stdio_init_all();
 
-    IMUInitBus(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
-    IMUInitDevice(IMU_5HZ_RATE, IMU_GYRO_SCALE_250, IMU_ACCEL_SCALE_2);
+    mpu6050InitBus(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
+    mpu6050InitDevice(MPU6050_5HZ_RATE, MPU6050_GYRO_SCALE_250, MPU6050_ACCEL_SCALE_2);
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
     while (1) {
-        while (IMUIsDataReady());
+        while (mpu6050IsDataReady());
 
-        IMUVectors_t IMU_data = IMUGetData();
+        imuVectors_t IMU_data = imuGetData();
 
         platformState_t state = madgwickCompute(IMU_data, 5.0f);
 
