@@ -1,5 +1,5 @@
 // Primary Header
-#include <picoflight/stability/PID.h>
+#include <picoflight/stability/pid.h>
 
 // Local Headers
 #include <picoflight/orientation/types.h>
@@ -13,34 +13,34 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-PIDLoop_t* PIDConstruct(PIDGains_t gains, PIDIntegralLimits_t bounds)
+pidLoop_t* pidConstruct(pidGains_t gains, pidIntegralLimits_t bounds)
 {
-    PIDLoop_t *obj = malloc(sizeof(PIDLoop_t));
+    pidLoop_t *obj = malloc(sizeof(pidLoop_t));
     obj->gains = gains;
     obj->bounds = bounds;
     obj->accumulator = 0.0f;
     return obj;
 }
 
-PIDLoop_t* PIDConstructFromFlash(
+pidLoop_t* pidConstructFromFlash(
         const char *prefix,
-        PIDGains_t defaultGains,
-        PIDIntegralLimits_t defaultBounds)
+        pidGains_t defaultGains,
+        pidIntegralLimits_t defaultBounds)
 {
-    PIDGains_t gains = configGetIfPIDGains(prefix, defaultGains);
-    PIDIntegralLimits_t bounds = configGetIfPIDBounds(prefix, defaultBounds);
+    pidGains_t gains = configGetIfPIDGains(prefix, defaultGains);
+    pidIntegralLimits_t bounds = configGetIfPIDBounds(prefix, defaultBounds);
 
-    return PIDConstruct(gains, bounds);
+    return pidConstruct(gains, bounds);
 }
 
-void PIDFree(PIDLoop_t *obj)
+void pidFree(pidLoop_t *obj)
 {
     free(obj);
 }
 
 
-float PIDGetResponse(
-        PIDLoop_t *obj,
+float pidGetResponse(
+        pidLoop_t *obj,
         float setpoint,
         bool isArmed,
         float measurement,
@@ -63,52 +63,52 @@ float PIDGetResponse(
 }
 
 
-PID3Axis_t* PID3AxisConstruct(
-        PIDGains_t rollRateGains,
-        PIDGains_t rollAngleGains,
-        PIDGains_t pitchRateGains,
-        PIDGains_t pitchAngleGains,
-        PIDGains_t yawRateGains,
-        PIDIntegralLimits_t rollRateBounds,
-        PIDIntegralLimits_t rollAngleBounds,
-        PIDIntegralLimits_t pitchRateBounds,
-        PIDIntegralLimits_t pitchAngleBounds,
-        PIDIntegralLimits_t yawRateBounds)
+pid3Axis_t* pid3AxisConstruct(
+        pidGains_t rollRateGains,
+        pidGains_t rollAngleGains,
+        pidGains_t pitchRateGains,
+        pidGains_t pitchAngleGains,
+        pidGains_t yawRateGains,
+        pidIntegralLimits_t rollRateBounds,
+        pidIntegralLimits_t rollAngleBounds,
+        pidIntegralLimits_t pitchRateBounds,
+        pidIntegralLimits_t pitchAngleBounds,
+        pidIntegralLimits_t yawRateBounds)
 {
-    PID3Axis_t *obj = malloc(sizeof(PID3Axis_t));
-    obj->rollRateController = PIDConstruct(rollRateGains, rollRateBounds);
-    obj->rollAngleController = PIDConstruct(rollAngleGains, rollAngleBounds);
-    obj->pitchRateController = PIDConstruct(pitchRateGains, pitchRateBounds);
-    obj->pitchAngleController = PIDConstruct(pitchAngleGains, pitchAngleBounds);
-    obj->yawRateController = PIDConstruct(yawRateGains, yawRateBounds);
+    pid3Axis_t *obj = malloc(sizeof(pid3Axis_t));
+    obj->rollRateController = pidConstruct(rollRateGains, rollRateBounds);
+    obj->rollAngleController = pidConstruct(rollAngleGains, rollAngleBounds);
+    obj->pitchRateController = pidConstruct(pitchRateGains, pitchRateBounds);
+    obj->pitchAngleController = pidConstruct(pitchAngleGains, pitchAngleBounds);
+    obj->yawRateController = pidConstruct(yawRateGains, yawRateBounds);
     obj->rollDifferentiatorState = 0.0f;
     obj->pitchDifferentiatorState = 0.0f;
     obj->yawDifferentiatorState = 0.0f;
     return obj;
 }
 
-PID3Axis_t* PID3AxisConstructFromFlash(
-        PIDGains_t rollRateGains,
-        PIDGains_t rollAngleGains,
-        PIDGains_t pitchRateGains,
-        PIDGains_t pitchAngleGains,
-        PIDGains_t yawRateGains,
-        PIDIntegralLimits_t rollRateBounds,
-        PIDIntegralLimits_t rollAngleBounds,
-        PIDIntegralLimits_t pitchRateBounds,
-        PIDIntegralLimits_t pitchAngleBounds,
-        PIDIntegralLimits_t yawRateBounds)
+pid3Axis_t* pid3AxisConstructFromFlash(
+        pidGains_t rollRateGains,
+        pidGains_t rollAngleGains,
+        pidGains_t pitchRateGains,
+        pidGains_t pitchAngleGains,
+        pidGains_t yawRateGains,
+        pidIntegralLimits_t rollRateBounds,
+        pidIntegralLimits_t rollAngleBounds,
+        pidIntegralLimits_t pitchRateBounds,
+        pidIntegralLimits_t pitchAngleBounds,
+        pidIntegralLimits_t yawRateBounds)
 {
-    PID3Axis_t *obj = malloc(sizeof(PID3Axis_t));
-    obj->rollRateController = PIDConstructFromFlash(
+    pid3Axis_t *obj = malloc(sizeof(pid3Axis_t));
+    obj->rollRateController = pidConstructFromFlash(
             "ROLL_RATE", rollRateGains, rollRateBounds);
-    obj->rollAngleController = PIDConstructFromFlash(
+    obj->rollAngleController = pidConstructFromFlash(
             "ROLL_ANGLE", rollAngleGains, rollAngleBounds);
-    obj->pitchRateController = PIDConstructFromFlash(
+    obj->pitchRateController = pidConstructFromFlash(
             "PITCH_RATE", pitchRateGains, pitchRateBounds);
-    obj->pitchAngleController = PIDConstructFromFlash(
+    obj->pitchAngleController = pidConstructFromFlash(
             "PITCH_ANGLE", pitchAngleGains, pitchAngleBounds);
-    obj->yawRateController = PIDConstructFromFlash(
+    obj->yawRateController = pidConstructFromFlash(
             "YAW_RATE", yawRateGains, yawRateBounds);
     obj->rollDifferentiatorState = 0.0f;
     obj->pitchDifferentiatorState = 0.0f;
@@ -116,18 +116,18 @@ PID3Axis_t* PID3AxisConstructFromFlash(
     return obj;
 }
 
-void PID3AxisFree(PID3Axis_t *obj)
+void pid3AxisFree(pid3Axis_t *obj)
 {
-    PIDFree(obj->rollRateController);
-    PIDFree(obj->rollAngleController);
-    PIDFree(obj->pitchRateController);
-    PIDFree(obj->pitchAngleController);
-    PIDFree(obj->yawRateController);
+    pidFree(obj->rollRateController);
+    pidFree(obj->rollAngleController);
+    pidFree(obj->pitchRateController);
+    pidFree(obj->pitchAngleController);
+    pidFree(obj->yawRateController);
     free(obj);
 }
 
-void PID3AxisGetAngleResponse(
-        PID3Axis_t *obj,
+void pid3AxisGetAngleResponse(
+        pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyAngles_t setpoints, // the yaw in this vector is a rate!!!!!!
@@ -136,7 +136,7 @@ void PID3AxisGetAngleResponse(
         float *pitchCommandNorm,
         float *yawCommandNorm)
 {
-    *rollCommandNorm = PIDGetResponse(
+    *rollCommandNorm = pidGetResponse(
             obj->rollAngleController,
             setpoints.roll,
             isArmed,
@@ -145,7 +145,7 @@ void PID3AxisGetAngleResponse(
             deltaTime
     );
 
-    *pitchCommandNorm = PIDGetResponse(
+    *pitchCommandNorm = pidGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
             isArmed,
@@ -156,7 +156,7 @@ void PID3AxisGetAngleResponse(
 
     float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
-    *yawCommandNorm = PIDGetResponse(
+    *yawCommandNorm = pidGetResponse(
             obj->yawRateController,
             setpoints.yaw,
             isArmed,
@@ -166,8 +166,8 @@ void PID3AxisGetAngleResponse(
     );
 }
 
-void PID3AxisGetRateResponse(
-        PID3Axis_t *obj,
+void pid3AxisGetRateResponse(
+        pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyRates_t setpoints,
@@ -178,7 +178,7 @@ void PID3AxisGetRateResponse(
 {
     float rollDotDot = (state.omega.roll - obj->rollDifferentiatorState) / deltaTime;
     obj->rollDifferentiatorState = rollDotDot;
-    *rollCommandNorm = PIDGetResponse(
+    *rollCommandNorm = pidGetResponse(
             obj->rollAngleController,
             setpoints.roll,
             isArmed,
@@ -189,7 +189,7 @@ void PID3AxisGetRateResponse(
 
     float pitchDotDot = (state.omega.pitch - obj->pitchDifferentiatorState) / deltaTime;
     obj->pitchDifferentiatorState = pitchDotDot;
-    *pitchCommandNorm = PIDGetResponse(
+    *pitchCommandNorm = pidGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
             isArmed,
@@ -200,7 +200,7 @@ void PID3AxisGetRateResponse(
 
     float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
-    *yawCommandNorm = PIDGetResponse(
+    *yawCommandNorm = pidGetResponse(
             obj->yawRateController,
             setpoints.yaw,
             isArmed,

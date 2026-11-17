@@ -2,14 +2,14 @@
 #include <picoflight/core/configHelpers.h>
 
 // Local Headers
-#include <picoflight/stability/PID.h>
+#include <picoflight/stability/pid.h>
 #include <picoflight/core/config.h>
 #include <picoflight/core/utilities.h>
 
 // Standard Headers
 #include <string.h>
 
-PIDGains_t configGetIfPIDGains(const char *prefix, PIDGains_t val)
+pidGains_t configGetIfPIDGains(const char *prefix, pidGains_t val)
 {
     char pName[32];
     char iName[32];
@@ -23,7 +23,7 @@ PIDGains_t configGetIfPIDGains(const char *prefix, PIDGains_t val)
     configFetch();
 
     if (configCheckExists(pName)) {
-        PIDGains_t gains;
+        pidGains_t gains;
         gains.p     = safeCastFloat(configGetEntry(pName));
         gains.i     = safeCastFloat(configGetEntry(iName));
         gains.d     = safeCastFloat(configGetEntry(dName));
@@ -40,9 +40,9 @@ PIDGains_t configGetIfPIDGains(const char *prefix, PIDGains_t val)
     }
 }
 
-PIDIntegralLimits_t configGetIfPIDBounds(
+pidIntegralLimits_t configGetIfPIDBounds(
         const char *prefix,
-        PIDIntegralLimits_t val)
+        pidIntegralLimits_t val)
 {
     char minName[32];
     char maxName[32];
@@ -52,7 +52,7 @@ PIDIntegralLimits_t configGetIfPIDBounds(
     configFetch();
 
     if (configCheckExists(minName)) {
-        PIDIntegralLimits_t bounds;
+        pidIntegralLimits_t bounds;
         bounds.iMin = safeCastFloat(configGetEntry(minName));
         bounds.iMax = safeCastFloat(configGetEntry(maxName));
         return bounds;

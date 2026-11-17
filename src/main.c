@@ -5,7 +5,7 @@
 #include <picoflight/actuators/dshotx4.h>
 #include <picoflight/RC/sbus.h>
 #include <picoflight/RC/rcMixer.h>
-#include <picoflight/stability/PID.h>
+#include <picoflight/stability/pid.h>
 #include <picoflight/actuators/mixer.h>
 #include <picoflight/core/utilities.h>
 #include <picoflight/core/config.h>
@@ -66,7 +66,7 @@
 
 
 // Global Variables
-PID3Axis_t *controller;
+pid3Axis_t *controller;
 bool calibrationPrearm = false;
 
 void picoflightInit(void)
@@ -116,17 +116,17 @@ void picoflightInit(void)
     rcMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
     rcMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
-    controller = PID3AxisConstructFromFlash(
-            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
-            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
-            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
-            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Angle
-            (PIDGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Yaw Rate
-            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
-            (PIDIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f}
+    controller = pid3AxisConstructFromFlash(
+            (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
+            (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Angle
+            (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Rate
+            (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Pitch Angle
+            (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Yaw Rate
+            (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f},
+            (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f}
     );
 
     mixerQuadPinout_t pinout = {
@@ -173,7 +173,7 @@ int main(void)
         bodyAngles_t command;
         if (isAngle) {
             bodyAngles_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
-            PID3AxisGetAngleResponse(
+            pid3AxisGetAngleResponse(
                     controller,
                     state,
                     (float)deltaTime_us * 1E-6,
@@ -186,7 +186,7 @@ int main(void)
         }
         else {
             bodyRates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
-            PID3AxisGetRateResponse(
+            pid3AxisGetRateResponse(
                     controller,
                     state,
                     (float)deltaTime_us * 1E-6,
