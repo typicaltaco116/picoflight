@@ -170,9 +170,9 @@ int main(void)
 
         float throttle = radioChannels[THROT_CHANNEL];
 
-        euler_t command;
+        bodyAngles_t command;
         if (isAngle) {
-            euler_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
+            bodyAngles_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
             PID3AxisGetAngleResponse(
                     controller,
                     state,
@@ -185,7 +185,7 @@ int main(void)
             );
         }
         else {
-            rates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
+            bodyRates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
             PID3AxisGetRateResponse(
                     controller,
                     state,

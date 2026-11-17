@@ -4,15 +4,15 @@ typedef struct {
     float roll;
     float pitch;
     float yaw;
-} euler_t;
+} bodyAngles_t;
 
 typedef struct {
     float roll;
     float pitch;
     float yaw;
-} rates_t;
+} bodyRates_t;
 
 typedef struct {
-    rates_t omega; // Rad / sec
-    euler_t theta; // Rad
+    bodyRates_t omega; // Rad / sec
+    bodyAngles_t theta; // Rad
 } platformState_t;

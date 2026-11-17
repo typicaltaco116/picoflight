@@ -73,11 +73,11 @@ void rcMixerSetAxisMapping(uint rollCh, uint pitchCh, uint yawCh)
     _yaw_ch = yawCh;
 }
 
-rates_t rcMixerGetRateSetpoints(rc_t inputRC)
+bodyRates_t rcMixerGetRateSetpoints(rc_t inputRC)
 {
     rcMixerRunInPlace(inputRC);
 
-    rates_t out;
+    bodyRates_t out;
     out.roll = inputRC[_roll_ch] * _roll_rate;
     out.pitch = inputRC[_pitch_ch] * _pitch_rate;
     out.yaw = inputRC[_yaw_ch] * _yaw_rate;
@@ -85,10 +85,10 @@ rates_t rcMixerGetRateSetpoints(rc_t inputRC)
 }
 
 // The yaw output is a RATE!!
-euler_t rcMixerGetAngleSetpoints(rc_t inputRC)
+bodyAngles_t rcMixerGetAngleSetpoints(rc_t inputRC)
 {
     rcMixerRunInPlace(inputRC);
-    euler_t out;
+    bodyAngles_t out;
     out.roll = inputRC[_roll_ch] * _roll_angle;
     out.pitch = inputRC[_pitch_ch] * _pitch_angle;
     out.yaw = inputRC[_yaw_ch] * _yaw_rate;

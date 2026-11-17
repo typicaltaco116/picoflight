@@ -130,7 +130,7 @@ void PID3AxisGetAngleResponse(
         PID3Axis_t *obj,
         platformState_t state,
         float deltaTime,
-        euler_t setpoints, // the yaw in this vector is a rate!!!!!!
+        bodyAngles_t setpoints, // the yaw in this vector is a rate!!!!!!
         bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,
@@ -170,7 +170,7 @@ void PID3AxisGetRateResponse(
         PID3Axis_t *obj,
         platformState_t state,
         float deltaTime,
-        rates_t setpoints,
+        bodyRates_t setpoints,
         bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,

@@ -32,5 +32,5 @@ void rcMixerSetAngleLimits(float roll, float pitch); // units of degrees.;
 
 void rcMixerSetAxisMapping(uint rollCh, uint pitchCh, uint yawCh);
 
-rates_t rcMixerGetRateSetpoints(rc_t inputRC);
-euler_t rcMixerGetAngleSetpoints(rc_t inputRC);
+bodyRates_t rcMixerGetRateSetpoints(rc_t inputRC);
+bodyAngles_t rcMixerGetAngleSetpoints(rc_t inputRC);

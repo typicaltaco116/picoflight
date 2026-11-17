@@ -37,12 +37,12 @@ void mixerFixedWingInit(mixerFixedWingPinout_t *pinout);
 void mixerInit(mixerType_e type, void *pinoutStruct);
 
 // expects commands from -1 to 1
-void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs);
+void mixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
 // expects command to be -1 to 1
-void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs);
+void mixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
 // expects commands to be -1 to 1
-void mixerGetOutputs(euler_t cmd, float throttle, float *outputs);
+void mixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
 void mixerSetArm(bool armed);

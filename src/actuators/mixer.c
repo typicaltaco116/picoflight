@@ -39,7 +39,7 @@ void mixerInit(mixerType_e type, void *pinout)
 }
 
 // expects commands from -1 to 1
-void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs)
+void mixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
     float motor1, motor2, motor3, motor4;
     mixerQuadPinout_t *pinout = (mixerQuadPinout_t*)_pinoutStruct;
@@ -65,7 +65,7 @@ void mixerGetQuadOutputs(euler_t cmd, float throttle, float *outputs)
 }
 
 // expects command to be -1 to 1
-void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs)
+void mixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
     mixerFixedWingPinout_t *pinout = (mixerFixedWingPinout_t*)_pinoutStruct;
 
@@ -79,7 +79,7 @@ void mixerGetFixedWingOutputs(euler_t cmd, float throttle, float *outputs)
 }
 
 // expects commands to be -1 to 1
-void mixerGetOutputs(euler_t cmd, float throttle, float *outputs)
+void mixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
     switch (_type) {
         default:
