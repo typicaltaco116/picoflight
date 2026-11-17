@@ -149,7 +149,7 @@ bool SBUSGetChannels(RC_t rc)
 }
 
 
-bool SBUSIsFailsafe(void)
+bool SBUSGetIsFailsafe(void)
 {
     return _failsafe;
 }

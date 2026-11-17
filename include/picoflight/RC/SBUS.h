@@ -11,4 +11,4 @@ void SBUSInitBus(uart_inst_t *uart, uint32_t rx);
 // Currently outputs channels normalized to [0, 1]
 bool SBUSGetChannels(RC_t rc);
 
-bool SBUSIsFailsafe(void);
+bool SBUSGetIsFailsafe(void);

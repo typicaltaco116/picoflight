@@ -162,10 +162,13 @@ int main(void)
         RC_t radioChannels;
         SBUSGetChannels(radioChannels);
 
-        bool isArmed = (radioChannels[ARM_CHANNEL] < 0.0f);
-        bool isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
-        float throttle = radioChannels[THROT_CHANNEL];
+        bool isFailsafe = SBUSGetIsFailsafe();
+        bool isArmed = !isFailsafe && calibrationPrearm;
+        isArmed = isArmed && (radioChannels[ARM_CHANNEL] > 0.0f);
         mixerSetArm(isArmed);
+        bool isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
+
+        float throttle = radioChannels[THROT_CHANNEL];
 
         euler_t command;
         if (isAngle) {
@@ -175,6 +178,7 @@ int main(void)
                     state,
                     (float)deltaTime_us * 1E-6,
                     angleSetpoints,
+                    isArmed,
                     &command.roll,
                     &command.pitch,
                     &command.yaw
@@ -187,6 +191,7 @@ int main(void)
                     state,
                     (float)deltaTime_us * 1E-6,
                     rateSetpoints,
+                    isArmed,
                     &command.roll,
                     &command.pitch,
                     &command.yaw

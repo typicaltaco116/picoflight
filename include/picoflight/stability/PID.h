@@ -37,6 +37,7 @@ void PIDFree(PIDLoop_t *obj);
 float PIDGetResponse(
         PIDLoop_t *obj,
         float setpoint,
+        bool isArmed,
         float measurement,
         float measurementDot,
         float deltaTime
@@ -86,6 +87,7 @@ void PID3AxisGetAngleResponse(
         platformState_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
+        bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm
@@ -96,6 +98,7 @@ void PID3AxisGetRateResponse(
         platformState_t state,
         float deltaTime,
         rates_t setpoints,
+        bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm

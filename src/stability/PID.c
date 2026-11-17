@@ -42,6 +42,7 @@ void PIDFree(PIDLoop_t *obj)
 float PIDGetResponse(
         PIDLoop_t *obj,
         float setpoint,
+        bool isArmed,
         float measurement,
         float measurementDot,
         float deltaTime)
@@ -50,8 +51,11 @@ float PIDGetResponse(
 
     float p_term = obj->gains.p * error;
 
-    float i_term = obj->gains.i * error * deltaTime + obj->accumulator;
-    obj->accumulator += i_term;
+    float i_term = 0.0f;
+    if (isArmed) {
+        i_term = obj->gains.i * error * deltaTime + obj->accumulator;
+        obj->accumulator += i_term;
+    }
 
     float d_term = obj->gains.d * measurementDot;
 
@@ -127,6 +131,7 @@ void PID3AxisGetAngleResponse(
         platformState_t state,
         float deltaTime,
         euler_t setpoints, // the yaw in this vector is a rate!!!!!!
+        bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm)
@@ -134,6 +139,7 @@ void PID3AxisGetAngleResponse(
     *rollCommandNorm = PIDGetResponse(
             obj->rollAngleController,
             setpoints.roll,
+            isArmed,
             state.theta.roll,
             state.omega.roll,
             deltaTime
@@ -142,6 +148,7 @@ void PID3AxisGetAngleResponse(
     *pitchCommandNorm = PIDGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
+            isArmed,
             state.theta.pitch,
             state.omega.pitch,
             deltaTime
@@ -152,6 +159,7 @@ void PID3AxisGetAngleResponse(
     *yawCommandNorm = PIDGetResponse(
             obj->yawRateController,
             setpoints.yaw,
+            isArmed,
             state.omega.yaw,
             yawDotDot,
             deltaTime
@@ -163,6 +171,7 @@ void PID3AxisGetRateResponse(
         platformState_t state,
         float deltaTime,
         rates_t setpoints,
+        bool isArmed,
         float *rollCommandNorm,
         float *pitchCommandNorm,
         float *yawCommandNorm)
@@ -172,6 +181,7 @@ void PID3AxisGetRateResponse(
     *rollCommandNorm = PIDGetResponse(
             obj->rollAngleController,
             setpoints.roll,
+            isArmed,
             state.omega.roll,
             rollDotDot,
             deltaTime
@@ -182,6 +192,7 @@ void PID3AxisGetRateResponse(
     *pitchCommandNorm = PIDGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
+            isArmed,
             state.omega.pitch,
             pitchDotDot,
             deltaTime
@@ -192,6 +203,7 @@ void PID3AxisGetRateResponse(
     *yawCommandNorm = PIDGetResponse(
             obj->yawRateController,
             setpoints.yaw,
+            isArmed,
             state.omega.yaw,
             yawDotDot,
             deltaTime
