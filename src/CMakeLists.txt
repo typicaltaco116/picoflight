@@ -12,8 +12,8 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/estimation/madgwick.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/mpu6050.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/imu.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/RC/sbus.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/RC/rcMixer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/rc/sbus.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/rc/rcMixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/pwm.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/outputMixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c

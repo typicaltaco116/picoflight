@@ -1,8 +1,8 @@
 // Primary Header
-#include <picoflight/RC/rcMixer.h>
+#include <picoflight/rc/rcMixer.h>
 
 // Local Headers
-#include <picoflight/RC/rc.h>
+#include <picoflight/rc/rc.h>
 #include <picoflight/core/utilities.h>
 #include <picoflight/orientation/types.h>
 

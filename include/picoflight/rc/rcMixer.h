@@ -1,7 +1,7 @@
 #pragma once
 
 // Local Headers
-#include <picoflight/RC/rc.h>
+#include <picoflight/rc/rc.h>
 #include <picoflight/orientation/types.h>
 
 // pico-sdk Headers

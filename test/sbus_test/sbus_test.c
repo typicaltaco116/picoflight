@@ -1,6 +1,6 @@
 // Local Headers
-#include <picoflight/RC/rc.h>
-#include <picoflight/RC/sbus.h>
+#include <picoflight/rc/rc.h>
+#include <picoflight/rc/sbus.h>
 
 // Pico-SDK Headers
 #include <pico/stdlib.h>

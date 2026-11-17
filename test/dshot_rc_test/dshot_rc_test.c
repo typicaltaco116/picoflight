@@ -1,6 +1,6 @@
 // Local Headers
 #include <picoflight/actuators/dshotx4.h>
-#include <picoflight/RC/sbus.h>
+#include <picoflight/rc/sbus.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>

@@ -1,8 +1,8 @@
 // Primary Header
-#include <picoflight/RC/sbus.h>
+#include <picoflight/rc/sbus.h>
 
 // Local Headers
-#include <picoflight/RC/rc.h>
+#include <picoflight/rc/rc.h>
 
 // Pico-SDK Headers
 #include <hardware/uart.h>

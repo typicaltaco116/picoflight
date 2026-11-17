@@ -3,8 +3,8 @@
 #include <picoflight/sensors/imu.h>
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/actuators/dshotx4.h>
-#include <picoflight/RC/sbus.h>
-#include <picoflight/RC/rcMixer.h>
+#include <picoflight/rc/sbus.h>
+#include <picoflight/rc/rcMixer.h>
 #include <picoflight/stability/pid.h>
 #include <picoflight/actuators/outputMixer.h>
 #include <picoflight/core/utilities.h>
