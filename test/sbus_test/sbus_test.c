@@ -1,6 +1,6 @@
 // Local Headers
 #include <picoflight/RC/RC.h>
-#include <picoflight/RC/SBUS.h>
+#include <picoflight/RC/sbus.h>
 
 #include <pico/stdlib.h>
 
@@ -17,13 +17,13 @@ int main()
 
     while (stdio_getchar_timeout_us(100) != (int)'\r');
 
-    SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
+    sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     while (1) {
      RC_t ch;
-        if (SBUSGetChannels(ch))
+        if (sbusGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
-        if (SBUSGetIsFailsafe())
+        if (sbusGetIsFailsafe())
             puts("Failsafe");
         sleep_ms(1);
     }

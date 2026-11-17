@@ -1,6 +1,6 @@
 // Local Headers
 #include <picoflight/actuators/dshotx4.h>
-#include <picoflight/RC/SBUS.h>
+#include <picoflight/RC/sbus.h>
 
 // pico-sdk Headers
 #include <pico/stdlib.h>
@@ -16,18 +16,18 @@ int main(void)
     stdio_init_all();
 
     sleep_ms(1000);
-    SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
+    sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
     dshotx4Init(DSHOT_PINBASE, 4, DSHOT_SPEED, pio0, 0);
 
     while (1) {
         sleep_us(200);
 
         RC_t ch;
-        if (SBUSGetChannels(ch))
+        if (sbusGetChannels(ch))
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
 
         // Throttle is not zero at zero!!!
-        if (SBUSGetIsFailsafe() || ch[3] < 0.2) {
+        if (sbusGetIsFailsafe() || ch[3] < 0.2) {
             dshotx4SendRawThrottles((uint16_t[]){0, 0, 0, 0});
             continue;
         }

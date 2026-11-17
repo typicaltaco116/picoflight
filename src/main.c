@@ -3,7 +3,7 @@
 #include <picoflight/sensors/imu.h>
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/actuators/dshotx4.h>
-#include <picoflight/RC/SBUS.h>
+#include <picoflight/RC/sbus.h>
 #include <picoflight/RC/RC_mixer.h>
 #include <picoflight/stability/PID.h>
 #include <picoflight/actuators/mixer.h>
@@ -97,7 +97,7 @@ void picoflightInit(void)
     );
     dshotx4SendThrottles((uint16_t[]){0, 0, 0, 0});
 
-    SBUSInitBus(SBUS_UART_INST, SBUS_RX_PIN);
+    sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     RCMixerInit();
     RCMixerChannelParameters_t mixParams = (RCMixerChannelParameters_t){
@@ -160,9 +160,9 @@ int main(void)
         platformState_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
 
         RC_t radioChannels;
-        SBUSGetChannels(radioChannels);
+        sbusGetChannels(radioChannels);
 
-        bool isFailsafe = SBUSGetIsFailsafe();
+        bool isFailsafe = sbusGetIsFailsafe();
         bool isArmed = !isFailsafe && calibrationPrearm;
         isArmed = isArmed && (radioChannels[ARM_CHANNEL] > 0.0f);
         mixerSetArm(isArmed);
