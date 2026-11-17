@@ -27,7 +27,7 @@ int main(void)
             printf("%0.2f %0.2f %0.2f %0.2f\r\n", ch[1], ch[2], ch[3], ch[4]);
 
         // Throttle is not zero at zero!!!
-        if (SBUSIsFailsafe() || ch[3] < 0.2) {
+        if (SBUSGetIsFailsafe() || ch[3] < 0.2) {
             dshotx4SendRawThrottles((uint16_t[]){0, 0, 0, 0});
             continue;
         }
