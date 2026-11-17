@@ -15,7 +15,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/sbus.c
     ${CMAKE_CURRENT_SOURCE_DIR}/RC/rcMixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/pwm.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/actuators/mixer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/actuators/outputMixer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/actuators/dshotx4.c
     ${CMAKE_CURRENT_SOURCE_DIR}/stability/pid.c
     ${CMAKE_CURRENT_SOURCE_DIR}/core/config.c

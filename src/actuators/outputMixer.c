@@ -1,5 +1,5 @@
 // Primary Header
-#include <picoflight/actuators/mixer.h>
+#include <picoflight/actuators/outputMixer.h>
 
 // Local Headers
 #include <picoflight/actuators/pwm.h>
@@ -12,37 +12,37 @@
 #include <stdint.h>
 
 static bool _armedFlag = false;
-static char _pinoutStruct[sizeof(mixerQuadPinout_t)];
-static mixerType_e _type;
+static char _pinoutStruct[sizeof(outputMixerQuadPinout_t)];
+static outputMixerType_e _type;
 
-void mixerQuadInit(mixerQuadPinout_t *pinout)
+void outputMixerQuadInit(outputMixerQuadPinout_t *pinout)
 {
     _armedFlag = false;
     _type = MIXER_QUADCOPTER;
-    memcpy(_pinoutStruct, pinout, sizeof(mixerQuadPinout_t));
+    memcpy(_pinoutStruct, pinout, sizeof(outputMixerQuadPinout_t));
 }
 
-void mixerFixedWingInit(mixerFixedWingPinout_t *pinout)
+void outputMixerFixedWingInit(outputMixerFixedWingPinout_t *pinout)
 {
     _armedFlag = false;
     _type = MIXER_FIXED_WING;
-    memcpy(_pinoutStruct, pinout, sizeof(mixerFixedWingPinout_t));
+    memcpy(_pinoutStruct, pinout, sizeof(outputMixerFixedWingPinout_t));
 }
 
-void mixerInit(mixerType_e type, void *pinout)
+void outputMixerInit(outputMixerType_e type, void *pinout)
 {
     switch (type) {
         default:
-        case MIXER_QUADCOPTER: mixerQuadInit(pinout); break;
-        case MIXER_FIXED_WING: mixerFixedWingInit(pinout); break;
+        case MIXER_QUADCOPTER: outputMixerQuadInit(pinout); break;
+        case MIXER_FIXED_WING: outputMixerFixedWingInit(pinout); break;
     }
 }
 
 // expects commands from -1 to 1
-void mixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
     float motor1, motor2, motor3, motor4;
-    mixerQuadPinout_t *pinout = (mixerQuadPinout_t*)_pinoutStruct;
+    outputMixerQuadPinout_t *pinout = (outputMixerQuadPinout_t*)_pinoutStruct;
 
     if (_armedFlag) {
         throttle    = mapf(throttle, -1.0f, 1.0f, 0.0f, 1.0f);
@@ -65,9 +65,9 @@ void mixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 }
 
 // expects command to be -1 to 1
-void mixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
-    mixerFixedWingPinout_t *pinout = (mixerFixedWingPinout_t*)_pinoutStruct;
+    outputMixerFixedWingPinout_t *pinout = (outputMixerFixedWingPinout_t*)_pinoutStruct;
 
     if (!_armedFlag)
         throttle = -1.0f;
@@ -79,20 +79,20 @@ void mixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 }
 
 // expects commands to be -1 to 1
-void mixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 {
     switch (_type) {
         default:
         case MIXER_QUADCOPTER:
-            mixerGetQuadOutputs(cmd, throttle, outputs);
+            outputMixerGetQuadOutputs(cmd, throttle, outputs);
             break;
         case MIXER_FIXED_WING:
-            mixerGetFixedWingOutputs(cmd, throttle, outputs);
+            outputMixerGetFixedWingOutputs(cmd, throttle, outputs);
             break;
     }
 }
 
-void mixerSetArm(bool armed)
+void outputMixerSetArm(bool armed)
 {
     _armedFlag = armed;
 }

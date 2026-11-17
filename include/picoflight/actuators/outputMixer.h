@@ -10,7 +10,7 @@
 typedef enum {
     MIXER_QUADCOPTER,
     MIXER_FIXED_WING,
-} mixerType_e;
+} outputMixerType_e;
 
 typedef struct {
     int32_t m1;
@@ -19,7 +19,7 @@ typedef struct {
     int32_t m4;
     int32_t numAux;
     int32_t *aux; // this pointer must remain in scope!!
-} mixerQuadPinout_t;
+} outputMixerQuadPinout_t;
 
 typedef struct {
     int32_t aileron;
@@ -28,21 +28,21 @@ typedef struct {
     int32_t rudder;
     int32_t numAux;
     int32_t *aux;
-} mixerFixedWingPinout_t;
+} outputMixerFixedWingPinout_t;
 
-void mixerQuadInit(mixerQuadPinout_t *pinout);
+void outputMixerQuadInit(outputMixerQuadPinout_t *pinout);
 
-void mixerFixedWingInit(mixerFixedWingPinout_t *pinout);
+void outputMixerFixedWingInit(outputMixerFixedWingPinout_t *pinout);
 
-void mixerInit(mixerType_e type, void *pinoutStruct);
+void outputMixerInit(outputMixerType_e type, void *pinoutStruct);
 
 // expects commands from -1 to 1
-void mixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
 // expects command to be -1 to 1
-void mixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
 // expects commands to be -1 to 1
-void mixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs);
 
-void mixerSetArm(bool armed);
+void outputMixerSetArm(bool armed);

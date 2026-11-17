@@ -6,7 +6,7 @@
 #include <picoflight/RC/sbus.h>
 #include <picoflight/RC/rcMixer.h>
 #include <picoflight/stability/pid.h>
-#include <picoflight/actuators/mixer.h>
+#include <picoflight/actuators/outputMixer.h>
 #include <picoflight/core/utilities.h>
 #include <picoflight/core/config.h>
 #include <picoflight/core/cli.h>
@@ -129,11 +129,11 @@ void picoflightInit(void)
             (pidIntegralLimits_t){.iMax = 10.0f, .iMin = -10.0f}
     );
 
-    mixerQuadPinout_t pinout = {
+    outputMixerQuadPinout_t pinout = {
         .m1 = 5, .m2 = 6, .m3 = 7, .m4 = 8,
         .numAux = 0, .aux = NULL
     };
-    mixerInit(MIXER_QUADCOPTER, &pinout);
+    outputMixerInit(MIXER_QUADCOPTER, &pinout);
 }
 
 void handleUSBCLI(void)
@@ -165,7 +165,7 @@ int main(void)
         bool isFailsafe = sbusGetIsFailsafe();
         bool isArmed = !isFailsafe && calibrationPrearm;
         isArmed = isArmed && (radioChannels[ARM_CHANNEL] > 0.0f);
-        mixerSetArm(isArmed);
+        outputMixerSetArm(isArmed);
         bool isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
 
         float throttle = radioChannels[THROT_CHANNEL];
@@ -199,7 +199,7 @@ int main(void)
         }
 
         float outputs[4];
-        mixerGetOutputs(command, throttle, outputs);
+        outputMixerGetOutputs(command, throttle, outputs);
 
         dshotx4SendNormThrottles(outputs);
 
