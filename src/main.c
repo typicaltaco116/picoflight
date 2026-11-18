@@ -82,9 +82,9 @@ void picoflightInit(void)
     imuSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
     calibrationPrearm = imuGetIsCalibrated();
     if (calibrationPrearm)
-        imuSaveCalibrationBlocking(10000);
-    else
         imuLoadCalibration();
+    else
+        imuSaveCalibrationBlocking(10000);
 
     madgwickSetStepSize(MADGWICK_STEP_SIZE);
 
