@@ -1,12 +1,17 @@
+// Primary Header
 #include <picoflight/sensors/mpu6050.h>
 
-#include <stdint.h>
-#include <stdlib.h>
+// Local Headers
+#include <picoflight/sensors/imu.h>
+#include <picoflight/sensors/MPU6050_register_map.h>
+
+// Pico-SDK Headers
 #include <pico/stdlib.h>
 #include <hardware/i2c.h>
 
-#include <picoflight/sensors/imu.h>
-#include <picoflight/sensors/MPU6050_register_map.h>
+// Standard Headers
+#include <stdint.h>
+#include <stdlib.h>
 
 static i2c_inst_t *IMU_i2c_instance;
 static mpu6050SampleRate_e sample_rate;
@@ -14,7 +19,11 @@ static mpu6050GyroScale_e gyro_scale;
 static mpu6050AccelScale_e accel_scale;
 
 
-void mpu6050InitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_t speed)
+void mpu6050InitBus(
+        i2c_inst_t *i2c,
+        uint32_t sda_pin,
+        uint32_t scl_pin,
+        uint32_t speed)
 {
     IMU_i2c_instance = i2c;
 
@@ -28,10 +37,11 @@ void mpu6050InitBus(i2c_inst_t *i2c, uint32_t sda_pin, uint32_t scl_pin, uint32_
 }
 
 
-void mpu6050InitDevice(mpu6050SampleRate_e rate, mpu6050GyroScale_e g_scale, mpu6050AccelScale_e a_scale)
+void mpu6050InitDevice(
+        mpu6050SampleRate_e rate,
+        mpu6050GyroScale_e g_scale,
+        mpu6050AccelScale_e a_scale)
 {
-    uint8_t gyro_config_value, accel_config_value, divider_value;
-
     sample_rate = rate;
     gyro_scale = g_scale;
     accel_scale = a_scale;
@@ -46,53 +56,75 @@ void mpu6050InitDevice(mpu6050SampleRate_e rate, mpu6050GyroScale_e g_scale, mpu
     mpu6050RegisterWrite(MPU6050_PWR_MGMT_1, 0x00);
     sleep_ms(10);
 
-    switch(gyro_scale) {
+    uint8_t gyroConfigValue;
+    switch (gyro_scale) {
         default:
         case MPU6050_GYRO_SCALE_250:
-            gyro_config_value = MPU6050_SET_GYRO_SCALE_250;
+            gyroConfigValue = MPU6050_SET_GYRO_SCALE_250;
             break;
         case MPU6050_GYRO_SCALE_500:
-            gyro_config_value = MPU6050_SET_GYRO_SCALE_500;
+            gyroConfigValue = MPU6050_SET_GYRO_SCALE_500;
             break;
         case MPU6050_GYRO_SCALE_1000:
-            gyro_config_value = MPU6050_SET_GYRO_SCALE_1000;
+            gyroConfigValue = MPU6050_SET_GYRO_SCALE_1000;
             break;
         case MPU6050_GYRO_SCALE_2000:
-            gyro_config_value = MPU6050_SET_GYRO_SCALE_2000;
+            gyroConfigValue = MPU6050_SET_GYRO_SCALE_2000;
             break;
     }
-    mpu6050RegisterWrite(MPU6050_GYRO_CONFIG, gyro_config_value);
+    mpu6050RegisterWrite(MPU6050_GYRO_CONFIG, gyroConfigValue);
 
-    switch(accel_scale) {
+    uint8_t accelConfigValue;
+    switch (accel_scale) {
         default:
         case MPU6050_ACCEL_SCALE_2:
-            accel_config_value = MPU6050_SET_ACCEL_SCALE_2;
+            accelConfigValue = MPU6050_SET_ACCEL_SCALE_2;
             break;
         case MPU6050_ACCEL_SCALE_4:
-            accel_config_value = MPU6050_SET_ACCEL_SCALE_4;
+            accelConfigValue = MPU6050_SET_ACCEL_SCALE_4;
             break;
         case MPU6050_ACCEL_SCALE_8:
-            accel_config_value = MPU6050_SET_ACCEL_SCALE_8;
+            accelConfigValue = MPU6050_SET_ACCEL_SCALE_8;
             break;
         case MPU6050_ACCEL_SCALE_16:
-            accel_config_value = MPU6050_SET_ACCEL_SCALE_16;
+            accelConfigValue = MPU6050_SET_ACCEL_SCALE_16;
             break;
     }
-    mpu6050RegisterWrite(MPU6050_ACCEL_CONFIG, accel_config_value);
+    mpu6050RegisterWrite(MPU6050_ACCEL_CONFIG, accelConfigValue);
 
-    // Enable Digital Lowpass Filter
-    mpu6050RegisterWrite(MPU6050_CONFIG, MPU6050_DLPF_CFG_6);
-
-    switch(sample_rate) {
+    // sample_rate = Gyro_Rate / divider.
+    // Where Gyro rate = 8kHz if DLPF is off and 1kHz if on.
+    
+    uint8_t dividerValue;
+    bool enableDLPF;
+    switch (sample_rate) {
         case MPU6050_5HZ_RATE:
-            divider_value = 200-1;
+            enableDLPF = true;
+            dividerValue = 200 - 1; // Implicit 1 attached.
             break;
         default:
         case MPU6050_1KHZ_RATE:
-            divider_value = 0; // no division as this is max speed
+            enableDLPF = true;
+            dividerValue = 0;
+            break;
+        case MPU6050_2KHZ_RATE:
+            enableDLPF = false;
+            dividerValue = 4 - 1;
+            break;
+        case MPU6050_4KHZ_RATE:
+            enableDLPF = false;
+            dividerValue = 2 - 1;
+            break;
+        case MPU6050_8KHZ_RATE:
+            enableDLPF = false;
+            dividerValue = 0;
             break;
     }
-    mpu6050RegisterWrite(MPU6050_SMPLRT_DIV, divider_value);
+
+    if (enableDLPF)
+        mpu6050RegisterWrite(MPU6050_CONFIG, MPU6050_DLPF_CFG_6);
+
+    mpu6050RegisterWrite(MPU6050_SMPLRT_DIV, dividerValue);
 
     // Enable Data Ready Interrupt
     mpu6050RegisterWrite(MPU6050_INT_ENABLE, MPU6050_DATA_RDY_INT_BIT);

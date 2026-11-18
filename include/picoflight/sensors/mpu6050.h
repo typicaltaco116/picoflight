@@ -8,9 +8,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+// Accelerometer has a max value of 
 typedef enum {
     MPU6050_5HZ_RATE,
     MPU6050_1KHZ_RATE,
+    MPU6050_2KHZ_RATE,
+    MPU6050_4KHZ_RATE,
+    MPU6050_8KHZ_RATE,
 } mpu6050SampleRate_e;
 
 typedef enum {
