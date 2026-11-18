@@ -158,7 +158,11 @@ int32_t shellExecuteCalibrate(char **argv, int32_t argc)
     }
     int32_t numCycles = atoi(argv[1]);
 
+    printf("Calibration Initiate\n");
+
     imuSaveCalibrationBlocking(numCycles);
+
+    printf("Calibration Complete\n");
 
     if (imuGetIsCalibrated())
         return EXIT_SUCCESS;
