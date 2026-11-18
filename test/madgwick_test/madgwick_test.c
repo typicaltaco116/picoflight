@@ -3,6 +3,8 @@
 #include <picoflight/sensors/imu.h>
 #include <picoflight/estimation/madgwick.h>
 #include <picoflight/orientation/types.h>
+#include <picoflight/core/cli.h>
+#include <picoflight/core/utilities.h>
 
 // PICO-sdk Headers
 #include <pico/stdlib.h>
@@ -11,26 +13,53 @@
 // Standard Headers
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+
+// IMU Parameters
+#define MPU6050_I2C_SCL_PIN (15)
+#define MPU6050_I2C_SDA_PIN (14)
+#define MPU6050_I2C_INST    I2C_INSTANCE(1)
+#define MPU6050_I2C_BAUD    200E3
+#define MPU6050_SAMPLE_RATE MPU6050_8KHZ_RATE
+#define MPU6050_G_SCALE     MPU6050_GYRO_SCALE_500
+#define MPU6050_A_SCALE     MPU6050_ACCEL_SCALE_2
+
+#define LOOP_RATE           (1E3)
+#define LOOP_RATE_INV       (1/LOOP_RATE)
+
+// Global Variables
+bool calibrationPrearm = false;
 
 int main() 
 {
     stdio_init_all();
 
-    mpu6050InitBus(i2c_default, PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN, 200*1000);
-    mpu6050InitDevice(MPU6050_5HZ_RATE, MPU6050_GYRO_SCALE_250, MPU6050_ACCEL_SCALE_2);
+    mpu6050InitBus(
+        MPU6050_I2C_INST,
+        MPU6050_I2C_SDA_PIN, MPU6050_I2C_SCL_PIN,
+        MPU6050_I2C_BAUD
+    );
+    mpu6050InitDevice(MPU6050_SAMPLE_RATE, MPU6050_G_SCALE, MPU6050_A_SCALE);
+    imuSetProcessingScale(MPU6050_G_SCALE, MPU6050_A_SCALE);
+    calibrationPrearm = imuGetIsCalibrated();
+    if (calibrationPrearm)
+        imuSaveCalibrationBlocking(10000);
+    else
+        imuLoadCalibration();
 
-    while (stdio_getchar_timeout_us(100) != (int)'\r');
+    while (!stdio_usb_connected());
+    cliProcessInput();
 
     while (1) {
-        while (mpu6050IsDataReady());
-
         imuVectors_t IMU_data = imuGetData();
 
-        platformState_t state = madgwickCompute(IMU_data, 5.0f);
+        platformState_t state = madgwickCompute(IMU_data, LOOP_RATE_INV);
 
         printf("State = {%03.03f %03.03f %03.03f %03.03f %03.03f %03.03f}\r\n",
                 state.theta.roll, state.theta.pitch, state.theta.yaw,
                 state.omega.roll, state.omega.pitch, state.omega.yaw
         );
+
+        smartDelay(LOOP_RATE_INV);
     }
 }
