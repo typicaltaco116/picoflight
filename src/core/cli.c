@@ -189,7 +189,7 @@ static void blockingReadlineStripped(char *buffer, uint32_t bufferSize)
     buffer[idx] = '\0'; // null terminate
 }
 
-void cliProcessInput(void)
+void cliProcessInputBlocking(void)
 {
     bool keepGoing = true;
 

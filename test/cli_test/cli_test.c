@@ -23,7 +23,7 @@ int main(void)
     };
     configGetIfPIDGains("TEST", defaultValue);
 
-    cliProcessInput();
+    cliProcessInputBlocking();
 
     printf("Done ...\n");
     while (1);

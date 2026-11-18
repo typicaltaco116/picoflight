@@ -48,7 +48,7 @@ int main()
         imuLoadCalibration();
 
     while (!stdio_usb_connected());
-    cliProcessInput();
+    cliProcessInputBlocking();
 
     while (1) {
         imuVectors_t IMU_data = imuGetData();

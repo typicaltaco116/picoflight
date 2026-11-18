@@ -141,7 +141,7 @@ void handleUSBCLI(void)
     if (!stdio_usb_connected())
         return;
 
-    cliProcessInput(); // Interactive and blocking function.
+    cliProcessInputBlocking(); // Interactive and blocking function.
     watchdog_enable(1 ,1);
     while (1); // Hold until hardware reset.
 }
