@@ -33,6 +33,7 @@ int main(void)
     rcMixerSetChannelParameters(6, mixParams);
 
     rcMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
+    rcMixerSetAxisMapping(ROLL_CHANNEL, PITCH_CHANNEL, YAW_CHANNEL);
     rcMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
     while (!stdio_usb_connected());
@@ -44,13 +45,13 @@ int main(void)
     bodyRates_t rateSetpoints;
 
     while (1) {
-        smartDelay((1/10.0f) * 1E6);
+        smartDelay((1/120.0f) * 1E6);
 
         rc_t radioChannels;
         if (sbusGetChannels(radioChannels)) {
             isFailsafe = sbusGetIsFailsafe();
-            isArmed = (radioChannels[ARM_CHANNEL] > 0.0f);
-            isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
+            isArmed = (radioChannels[ARM_CHANNEL] > (0.0f - 0.25f));
+            isAngle = (radioChannels[MODE_CHANNEL] < 0.0f - 0.25f);
             if (isAngle) {
                 angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
             }
@@ -70,11 +71,11 @@ int main(void)
         }
 
         if (isAngle) {
-            printf("Angle Mode: %0.2f %0.2f %0.2f\n",
+            printf("Angle Mode: %8.2f %8.2f %8.2f\n",
                     angleSetpoints.roll, angleSetpoints.pitch, angleSetpoints.yaw);
         }
         else {
-            printf("Acro Mode : %0.2f %0.2f %0.2f\n",
+            printf("Acro Mode : %8.2f %8.2f %8.2f\n",
                     rateSetpoints.roll, rateSetpoints.pitch, rateSetpoints.yaw);
         }
     }

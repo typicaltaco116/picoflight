@@ -27,8 +27,8 @@
 // SBUS Parameters
 #define SBUS_RX_PIN     9
 #define SBUS_UART_INST  uart1
-#define SBUS_MIN_VALUE  0.2
-#define SBUS_MAX_VALUE  0.7
+#define SBUS_MIN_VALUE  -0.75
+#define SBUS_MAX_VALUE  0.75
 
 // RC Mapping Parameters
 #define ARM_CHANNEL     (5)
@@ -39,8 +39,8 @@
 #define YAW_CHANNEL     (4)
 
 // Control Parameters
-#define RATES_ACRO_ROLL_DPS     (100.0f)
-#define RATES_ACRO_PITCH_DPS    (100.0f)
-#define RATES_ACRO_YAW_DPS      (100.0f)
+#define RATES_ACRO_ROLL_DPS     (300.0f)
+#define RATES_ACRO_PITCH_DPS    (300.0f)
+#define RATES_ACRO_YAW_DPS      (250.0f)
 #define RATES_ANGLE_ROLL_DEG    (90.0f)
 #define RATES_ANGLE_PITCH_DEG    (90.0f)
