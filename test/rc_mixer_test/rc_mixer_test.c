@@ -14,6 +14,8 @@ int main(void)
 {
     stdio_init_all();
 
+    sleep_ms(10);
+
     sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
     rcMixerInit();
@@ -35,24 +37,45 @@ int main(void)
 
     while (!stdio_usb_connected());
 
-    while (1) {
-        rc_t radioChannels;
-        sbusGetChannels(radioChannels);
+    bool isFailsafe = true;
+    bool isArmed = false;
+    bool isAngle;
+    bodyAngles_t angleSetpoints;
+    bodyRates_t rateSetpoints;
 
-        bool isFailsafe = sbusGetIsFailsafe();
-        bool isArmed = (radioChannels[ARM_CHANNEL] > 0.0f);
-        bool isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
-        float throttle = radioChannels[THROT_CHANNEL];
+    while (1) {
+        smartDelay((1/10.0f) * 1E6);
+
+        rc_t radioChannels;
+        if (sbusGetChannels(radioChannels)) {
+            isFailsafe = sbusGetIsFailsafe();
+            isArmed = (radioChannels[ARM_CHANNEL] > 0.0f);
+            isAngle = (radioChannels[MODE_CHANNEL] < 0.0f);
+            if (isAngle) {
+                angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
+            }
+            else {
+                rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
+            }
+        }
 
         if (isFailsafe) {
+            printf("Failsafe  :\n");
+            continue;
+        }
+
+        if (!isArmed) {
+            printf("Disarmed  :\n");
             continue;
         }
 
         if (isAngle) {
-            bodyAngles_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
+            printf("Angle Mode: %0.2f %0.2f %0.2f\n",
+                    angleSetpoints.roll, angleSetpoints.pitch, angleSetpoints.yaw);
         }
         else {
-            bodyRates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
+            printf("Acro Mode : %0.2f %0.2f %0.2f\n",
+                    rateSetpoints.roll, rateSetpoints.pitch, rateSetpoints.yaw);
         }
     }
 

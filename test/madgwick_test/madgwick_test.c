@@ -60,6 +60,6 @@ int main()
                 state.omega.roll, state.omega.pitch, state.omega.yaw
         );
 
-        smartDelay(LOOP_RATE_INV);
+        smartDelay(LOOP_RATE_INV * 1E6);
     }
 }
