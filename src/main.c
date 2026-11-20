@@ -70,6 +70,7 @@ void picoflightInit(void)
     rcMixerSetChannelParameters(6, mixParams);
 
     rcMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
+    rcMixerSetAxisMapping(ROLL_CHANNEL, PITCH_CHANNEL, YAW_CHANNEL);
     rcMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
     controller = pid3AxisConstructFromFlash(
