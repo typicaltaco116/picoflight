@@ -27,8 +27,7 @@ void madgwickSetStepSize(float B_val)
     _gradientDescentStepSize = B_val;
 }
 
-// CODE TAKEN FROM DREHMFLIGHT BY Nicholas Rehm
-platformState_t madgwickCompute(imuVectors_t imu, float sampleFreq)
+platformState_t madgwickCompute(imuVectors_t imu, float dt)
 {
     float recipNorm;
     float s0, s1, s2, s3;
@@ -41,7 +40,6 @@ platformState_t madgwickCompute(imuVectors_t imu, float sampleFreq)
     float ax = imu.accel.x;
     float ay = imu.accel.y;
     float az = imu.accel.z;
-    float invSampleFreq = 1.0f / sampleFreq;
 
     gx = DEG_TO_RAD(gx);
     gy = DEG_TO_RAD(gy);
@@ -97,10 +95,10 @@ platformState_t madgwickCompute(imuVectors_t imu, float sampleFreq)
     }
 
     //Integrate rate of change of quaternion to yield quaternion
-    _q0 += qDot1 * invSampleFreq;
-    _q1 += qDot2 * invSampleFreq;
-    _q2 += qDot3 * invSampleFreq;
-    _q3 += qDot4 * invSampleFreq;
+    _q0 += qDot1 * dt;
+    _q1 += qDot2 * dt;
+    _q2 += qDot3 * dt;
+    _q3 += qDot4 * dt;
 
     //Normalize quaternion
     recipNorm = invSqrt(_q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);

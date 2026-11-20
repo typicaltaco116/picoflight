@@ -109,11 +109,12 @@ int main(void)
     // Main loop.
     uint64_t deltaTime_us = LOOP_PERIOD_US;
     while (1) {
+        float dt = (float)deltaTime_us * 1E-6;
 
         handleUSBCLI();
 
         imuVectors_t IMU_data = imuGetData();
-        platformState_t state = madgwickCompute(IMU_data, LOOP_FREQ_HZ); 
+        platformState_t state = madgwickCompute(IMU_data, dt); 
 
         rc_t radioChannels;
         sbusGetChannels(radioChannels);
@@ -132,7 +133,7 @@ int main(void)
             pid3AxisGetAngleResponse(
                     controller,
                     state,
-                    (float)deltaTime_us * 1E-6,
+                    dt,
                     angleSetpoints,
                     isArmed,
                     &command.roll,
@@ -145,7 +146,7 @@ int main(void)
             pid3AxisGetRateResponse(
                     controller,
                     state,
-                    (float)deltaTime_us * 1E-6,
+                    dt,
                     rateSetpoints,
                     isArmed,
                     &command.roll,

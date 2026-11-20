@@ -55,9 +55,9 @@ int main()
 
         platformState_t state = madgwickCompute(IMU_data, LOOP_RATE_INV);
 
-        printf("State = {%03.03f %03.03f %03.03f %03.03f %03.03f %03.03f}\r\n",
-                state.theta.roll, state.theta.pitch, state.theta.yaw,
-                state.omega.roll, state.omega.pitch, state.omega.yaw
+        printf("State = {%7.02f %7.02f %7.02f %7.02f %7.02f %7.02f}\r\n",
+                RAD_TO_DEG(state.theta.roll), RAD_TO_DEG(state.theta.pitch), RAD_TO_DEG(state.theta.yaw),
+                RAD_TO_DEG(state.omega.roll), RAD_TO_DEG(state.omega.pitch), RAD_TO_DEG(state.omega.yaw)
         );
 
         smartDelay(LOOP_RATE_INV * 1E6);

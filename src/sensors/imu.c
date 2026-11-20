@@ -18,16 +18,16 @@ static float _gyroScale;
 static float _accelScale;
 
 
-static imuVectors_t vector_add(imuVectors_t A, imuVectors_t B)
+static imuVectors_t vector_sub(imuVectors_t A, imuVectors_t B)
 {
     imuVectors_t sum;
 
-    sum.gyro.x = A.gyro.x + B.gyro.x;
-    sum.gyro.y = A.gyro.y + B.gyro.y;
-    sum.gyro.z = A.gyro.z + B.gyro.z;
-    sum.accel.x = A.accel.x + B.accel.x;
-    sum.accel.y = A.accel.y + B.accel.y;
-    sum.accel.z = A.accel.z + B.accel.z;
+    sum.gyro.x = A.gyro.x - B.gyro.x;
+    sum.gyro.y = A.gyro.y - B.gyro.y;
+    sum.gyro.z = A.gyro.z - B.gyro.z;
+    sum.accel.x = A.accel.x - B.accel.x;
+    sum.accel.y = A.accel.y - B.accel.y;
+    sum.accel.z = A.accel.z - B.accel.z;
 
     return sum;
 }
@@ -48,7 +48,7 @@ imuVectors_t imuGetData(void)
     data.accel.y = (float)accel_y / _accelScale;
     data.accel.z = (float)accel_z / _accelScale;
 
-    data = vector_add(data, _errorVec);
+    data = vector_sub(data, _errorVec);
 
     return data;
 }
@@ -62,22 +62,23 @@ void imuSetErrorOffset(imuVectors_t error_offset)
 
 imuVectors_t imuGetCalibrationError(uint32_t cycle_count)
 {
-    double gyro_x_sum, gyro_y_sum, gyro_z_sum;
-    double accel_x_sum, accel_y_sum, accel_z_sum;
+    float gyro_x_sum, gyro_y_sum, gyro_z_sum;
+    float accel_x_sum, accel_y_sum, accel_z_sum;
     imuVectors_t read_data;
     imuVectors_t error_offset;
 
-    gyro_x_sum = gyro_y_sum = gyro_z_sum = 0.0;
-    accel_x_sum = accel_y_sum = accel_z_sum = 0.0;
+    gyro_x_sum = gyro_y_sum = gyro_z_sum = 0.0f;
+    accel_x_sum = accel_y_sum = accel_z_sum = 0.0f;
 
-    error_offset.gyro.x = 0.0;
-    error_offset.gyro.y = 0.0;
-    error_offset.gyro.z = 0.0;
-    error_offset.accel.x = 0.0;
-    error_offset.accel.y = 0.0;
-    error_offset.accel.z = 0.0;
+    error_offset.gyro.x = 0.0f;
+    error_offset.gyro.y = 0.0f;
+    error_offset.gyro.z = 0.0f;
+    error_offset.accel.x = 0.0f;
+    error_offset.accel.y = 0.0f;
+    error_offset.accel.z = 0.0f;
 
     for (uint32_t i = cycle_count; i != 0; --i) {
+        while (!mpu6050IsDataReady());
         read_data = imuGetData();
 
         gyro_x_sum += read_data.gyro.x;
@@ -93,7 +94,7 @@ imuVectors_t imuGetCalibrationError(uint32_t cycle_count)
     error_offset.gyro.z = gyro_z_sum / (float)cycle_count;
     error_offset.accel.x = accel_x_sum / (float)cycle_count;
     error_offset.accel.y = accel_y_sum / (float)cycle_count;
-    error_offset.accel.z = accel_z_sum / (float)cycle_count;
+    error_offset.accel.z = accel_z_sum / (float)cycle_count - 1.0f;
 
     return error_offset;
 }
@@ -145,6 +146,7 @@ void imuLoadCalibration(void)
     if (!imuGetIsCalibrated())
         while (1); // Cheap way to kill program.
 
+    configFetch();
     _errorVec.gyro.x = safeCastFloat(configGetEntry("GYRO_ERROR_X"));
     _errorVec.gyro.y = safeCastFloat(configGetEntry("GYRO_ERROR_Y"));
     _errorVec.gyro.z = safeCastFloat(configGetEntry("GYRO_ERROR_Z"));
@@ -153,18 +155,28 @@ void imuLoadCalibration(void)
     _errorVec.accel.z = safeCastFloat(configGetEntry("ACCEL_ERROR_Z"));
 }
 
+#include <stdio.h>
 void imuSaveCalibrationBlocking(uint32_t cycles)
 {
     configFetch();
-    configAddNewEntry("CALIBRATED", 1);
+    configSafeSetEntry("CALIBRATED", 1);
 
+    _errorVec = (imuVectors_t){{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
     _errorVec = imuGetCalibrationError(cycles);
-    configAddNewEntry("GYRO_ERROR_X", safeCastInt(_errorVec.gyro.x));
-    configAddNewEntry("GYRO_ERROR_Y", safeCastInt(_errorVec.gyro.y));
-    configAddNewEntry("GYRO_ERROR_Z", safeCastInt(_errorVec.gyro.z));
-    configAddNewEntry("ACCEL_ERROR_X", safeCastInt(_errorVec.accel.x));
-    configAddNewEntry("ACCEL_ERROR_Y", safeCastInt(_errorVec.accel.y));
-    configAddNewEntry("ACCEL_ERROR_Z", safeCastInt(_errorVec.accel.z));
+    printf("Saving values: %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n",
+            _errorVec.gyro.x,
+            _errorVec.gyro.y,
+            _errorVec.gyro.z,
+            _errorVec.accel.x,
+            _errorVec.accel.y,
+            _errorVec.accel.z
+    );
+    configSafeSetEntry("GYRO_ERROR_X", safeCastInt(_errorVec.gyro.x));
+    configSafeSetEntry("GYRO_ERROR_Y", safeCastInt(_errorVec.gyro.y));
+    configSafeSetEntry("GYRO_ERROR_Z", safeCastInt(_errorVec.gyro.z));
+    configSafeSetEntry("ACCEL_ERROR_X", safeCastInt(_errorVec.accel.x));
+    configSafeSetEntry("ACCEL_ERROR_Y", safeCastInt(_errorVec.accel.y));
+    configSafeSetEntry("ACCEL_ERROR_Z", safeCastInt(_errorVec.accel.z));
 
     configCommit();
 }
