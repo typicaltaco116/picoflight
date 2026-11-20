@@ -14,8 +14,20 @@
 
 static rcMixerChannelParameters_t _channel_params[RC_MAX_CH]; // Zero-indexed
 
-void rcMixerInit(void)
+void rcMixerInit(
+        float rollRate,
+        float pitchRate,
+        float yawRate,
+        float rollAngle,
+        float pitchAngle,
+        uint rollChan,
+        uint pitchChan,
+        uint yawChan)
 {
+    rcMixerSetRates(rollRate, pitchRate, yawRate);
+    rcMixerSetAngleLimits(rollAngle, pitchAngle);
+    rcMixerSetAxisMapping(rollChan, pitchChan, yawChan);
+
     for (uint i = 0; i < RC_MAX_CH; ++i) {
         _channel_params[i].enabled = false;
     }

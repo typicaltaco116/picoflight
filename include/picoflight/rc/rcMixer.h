@@ -17,7 +17,16 @@ typedef struct {
     float inMax;
 } rcMixerChannelParameters_t;
 
-void rcMixerInit(void);
+void rcMixerInit(
+    float rollRate,
+    float pitchRate,
+    float yawRate,
+    float rollAngle,
+    float pitchAngle,
+    uint rollChan,
+    uint pitchChan,
+    uint yawChan
+);
 
 void rcMixerSetChannelParameters(uint ch, rcMixerChannelParameters_t params);
 

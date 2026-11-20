@@ -55,7 +55,16 @@ void picoflightInit(void)
 
     sbusInitBus(SBUS_UART_INST, SBUS_RX_PIN);
 
-    rcMixerInit();
+    rcMixerInit(
+        RATES_ACRO_ROLL_DPS,
+        RATES_ACRO_PITCH_DPS,
+        RATES_ACRO_YAW_DPS,
+        RATES_ANGLE_ROLL_DEG,
+        RATES_ANGLE_PITCH_DEG,
+        ROLL_CHANNEL,
+        PITCH_CHANNEL,
+        YAW_CHANNEL
+    );
     rcMixerChannelParameters_t mixParams = (rcMixerChannelParameters_t){
         .enabled = true,
         .trimNorm = 0.0f,
@@ -64,14 +73,8 @@ void picoflightInit(void)
     };
     rcMixerSetChannelParameters(1, mixParams);
     rcMixerSetChannelParameters(2, mixParams);
-    rcMixerSetChannelParameters(3, mixParams);
     rcMixerSetChannelParameters(4, mixParams);
-    rcMixerSetChannelParameters(5, mixParams);
-    rcMixerSetChannelParameters(6, mixParams);
 
-    rcMixerSetRates(RATES_ACRO_ROLL_DPS, RATES_ACRO_PITCH_DPS, RATES_ACRO_YAW_DPS);
-    rcMixerSetAxisMapping(ROLL_CHANNEL, PITCH_CHANNEL, YAW_CHANNEL);
-    rcMixerSetAngleLimits(RATES_ANGLE_ROLL_DEG, RATES_ANGLE_PITCH_DEG);
 
     controller = pid3AxisConstructFromFlash(
             (pidGains_t){.p = 1.0f, .i = 0.0f, .d = 1.0f, .all = 1.0f}, // Roll Rate
