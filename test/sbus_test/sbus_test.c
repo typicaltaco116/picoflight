@@ -27,7 +27,7 @@ int main()
 
         rc_t ch;
         if (sbusGetChannels(ch)) {
-            memcpy(pCh, ch, 18 * sizeof(float));
+            memcpy(pCh, ch, 19 * sizeof(float));
         }
 
         if (sbusGetIsFailsafe()) {
@@ -35,7 +35,7 @@ int main()
             continue;
         }
 
-        printf("%0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f \n",
+        printf("%5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f \n",
                 pCh[1],
                 pCh[2],
                 pCh[3],
@@ -51,7 +51,9 @@ int main()
                 pCh[13],
                 pCh[14],
                 pCh[15],
-                pCh[16]
+                pCh[16],
+                pCh[17],
+                pCh[18]
         );
     }
 }

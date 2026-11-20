@@ -3,6 +3,7 @@
 
 // Local Headers
 #include <picoflight/rc/rc.h>
+#include <picoflight/core/utilities.h>
 
 // Pico-SDK Headers
 #include <hardware/uart.h>
@@ -11,6 +12,7 @@
 // Standard Headers
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define SBUS_BAUD       100000
 #define SBUS_DATA_BITS  8
@@ -21,6 +23,10 @@
 #define SBUS_FOOTER     0x00
 #define SBUS_PAYLOAD_SIZE 23
 
+#define SBUS_FRAME_CHAN17   0x1
+#define SBUS_FRAME_CHAN18   0x2
+#define SBUS_FRAME_LOST     0x4
+#define SBUS_FRAME_FAILSAFE 0x8
 
 // SBUS Protocol
 // 25 Byte frames
@@ -32,26 +38,45 @@
 // [23][4] failsafe active (0x10)
 // [23][3:0] unused
 // [24] SBUS end Byte
+typedef struct {
+    unsigned chan1  : 11;
+    unsigned chan2  : 11;
+    unsigned chan3  : 11;
+    unsigned chan4  : 11;
+    unsigned chan5  : 11;
+    unsigned chan6  : 11;
+    unsigned chan7  : 11;
+    unsigned chan8  : 11;
+    unsigned chan9  : 11;
+    unsigned chan10 : 11;
+    unsigned chan11 : 11;
+    unsigned chan12 : 11;
+    unsigned chan13 : 11;
+    unsigned chan14 : 11;
+    unsigned chan15 : 11;
+    unsigned chan16 : 11;
+    uint8_t flags;
+} __attribute__((__packed__)) sbusChannels_t;
 
-static uart_inst_t *_uart_instance;
+static uart_inst_t *_uartInst;
 static bool _failsafe = true;
+static uint8_t _buffer[64];
+static uint32_t _packetByteCount = 0;
 
 
 void sbusInitBus(uart_inst_t *uart, uint32_t rx)
 {
-    _uart_instance = uart;
+    _uartInst = uart;
 
     gpio_set_function(rx, UART_FUNCSEL_NUM(_uart_instance, rx));
     gpio_set_inover(rx, GPIO_OVERRIDE_INVERT);
 
-    uart_init(_uart_instance, SBUS_BAUD);
-    uart_set_format(_uart_instance, SBUS_DATA_BITS, SBUS_STOP_BITS, SBUS_PARITY);
+    uart_init(_uartInst, SBUS_BAUD);
+    uart_set_format(_uartInst, SBUS_DATA_BITS, SBUS_STOP_BITS, SBUS_PARITY);
 }
 
 
-// MIGHT BE USEFUL TO MOVE THE WHILE LOOP TO THE OUTSIDE OF THIS FUNCTION SO THE 
-// CALLER HAS CONTROL OVER THE PARSING TIMEFRAME.
-static bool parse(uint8_t **ret_ptr)
+static bool parse(void)
 {
     typedef enum {
         IDLE,
@@ -59,14 +84,10 @@ static bool parse(uint8_t **ret_ptr)
         READ_FOOTER,
     } parser_state_machine_e;
     static parser_state_machine_e state = IDLE;
-    static uint32_t packet_byte_count;
-    static uint8_t buffer[SBUS_PAYLOAD_SIZE] = {0};
     bool packet_complete = false;
 
-    *ret_ptr = buffer;
-
-    while (uart_is_readable(_uart_instance) && !packet_complete) {
-        uint8_t data = uart_getc(_uart_instance);
+    while (uart_is_readable(_uartInst) && !packet_complete) {
+        uint8_t data = uart_getc(_uartInst);
 
         switch (state) {
             default:
@@ -75,77 +96,54 @@ static bool parse(uint8_t **ret_ptr)
 
                 if (data == SBUS_HEADER) {
                     state = READ_CHANNEL_DATA;
-                    packet_byte_count = 0;
+                    _packetByteCount = 0;
                 }
                 break;
 
             case READ_CHANNEL_DATA:
-                buffer[packet_byte_count++] = data;
+                _buffer[_packetByteCount++] = data;
 
-                if (packet_byte_count >= SBUS_PAYLOAD_SIZE)
+                if (_packetByteCount >= SBUS_PAYLOAD_SIZE)
                     state = READ_FOOTER;
                 break;
 
             case READ_FOOTER:
-                if (data == SBUS_FOOTER) {
-                    state = IDLE;
+                state = IDLE;
+                if (data == SBUS_FOOTER)
                     packet_complete = true;
-                }
                 break;
         }
     }
-
     return packet_complete;
 }
 
 
-typedef uint16_t SBUS_raw_t[19];
-
-static bool GetRaw(SBUS_raw_t raw_ch)
-{
-    uint8_t *packet;
-
-    if (parse(&packet)) {
-        raw_ch[1] = (((uint16_t)packet[1] << 8) | ((uint16_t)packet[0])) & 0x07FF;
-        raw_ch[2] = (((uint16_t)packet[2] << 5) | ((uint16_t)packet[1] >> 3)) & 0x07FF;
-        raw_ch[3] = (((uint16_t)packet[4] << 10) | ((uint16_t)packet[3] << 2) | ((uint16_t)packet[2] >> 6)) & 0x07FF;
-        raw_ch[4] = (((uint16_t)packet[5] << 7) | ((uint16_t)packet[4] >> 1)) & 0x07FF;
-        raw_ch[5] = (((uint16_t)packet[6] << 4) | ((uint16_t)packet[5] >> 4)) & 0x07FF;
-        raw_ch[6] = (((uint16_t)packet[8] << 9) | ((uint16_t)packet[7] << 1) | ((uint16_t)packet[6] >> 7)) & 0x07FF;
-        raw_ch[7] = (((uint16_t)packet[9] << 6) | ((uint16_t)packet[8] >> 2)) & 0x07FF;
-        raw_ch[8] = (((uint16_t)packet[10] << 3) | ((uint16_t)packet[9] >> 5)) & 0x07FF;
-
-        raw_ch[9] = (((uint16_t)packet[12] << 8) | ((uint16_t)packet[11])) & 0x07FF;
-        raw_ch[10] = (((uint16_t)packet[13] << 5) | ((uint16_t)packet[12] >> 3)) & 0x07FF;
-        raw_ch[11] = (((uint16_t)packet[15] << 10) | ((uint16_t)packet[14] << 2) | ((uint16_t)packet[13] >> 6)) & 0x07FF;
-        raw_ch[12] = (((uint16_t)packet[16] << 7) | ((uint16_t)packet[15] >> 1)) & 0x07FF;
-        raw_ch[13] = (((uint16_t)packet[17] << 4) | ((uint16_t)packet[16] >> 4)) & 0x07FF;
-        raw_ch[14] = (((uint16_t)packet[19] << 9) | ((uint16_t)packet[18] << 1) | ((uint16_t)packet[17] >> 7)) & 0x07FF;
-        raw_ch[15] = (((uint16_t)packet[20] << 6) | ((uint16_t)packet[19] >> 2)) & 0x07FF;
-        raw_ch[16] = (((uint16_t)packet[21] << 3) | ((uint16_t)packet[20] >> 5)) & 0x07FF;
-
-        raw_ch[17] = (bool)(packet[22] & (0x1 << 7));
-        raw_ch[18] = (bool)(packet[22] & (0x1 << 6));
-
-        _failsafe = packet[22] & (0x1 << 4);
-
-        return true;
-    }
-
-    return false;
-}
-
 bool sbusGetChannels(rc_t rc)
 {
-    SBUS_raw_t raw_ch = {0};
+    if (parse()) {
+        sbusChannels_t data;
+        memcpy(&data, _buffer, 23);
 
-    if (GetRaw(raw_ch)) {
-        for (uint32_t i = 0; i <= 16; ++i) {
-            rc[i] = raw_ch[i] / 2048.0f; // normalize values to [0, 1]
-        }
+        rc[1]   = mapf((float)data.chan1, 0, 2048, -1, 1);
+        rc[2]   = mapf((float)data.chan2, 0, 2048, -1, 1);
+        rc[3]   = mapf((float)data.chan3, 0, 2048, -1, 1);
+        rc[4]   = mapf((float)data.chan4, 0, 2048, -1, 1);
+        rc[5]   = mapf((float)data.chan5, 0, 2048, -1, 1);
+        rc[6]   = mapf((float)data.chan6, 0, 2048, -1, 1);
+        rc[7]   = mapf((float)data.chan7, 0, 2048, -1, 1);
+        rc[8]   = mapf((float)data.chan8, 0, 2048, -1, 1);
+        rc[9]   = mapf((float)data.chan9, 0, 2048, -1, 1);
+        rc[10]  = mapf((float)data.chan10, 0, 2048, -1, 1);
+        rc[11]  = mapf((float)data.chan11, 0, 2048, -1, 1);
+        rc[12]  = mapf((float)data.chan12, 0, 2048, -1, 1);
+        rc[13]  = mapf((float)data.chan13, 0, 2048, -1, 1);
+        rc[14]  = mapf((float)data.chan14, 0, 2048, -1, 1);
+        rc[15]  = mapf((float)data.chan15, 0, 2048, -1, 1);
+        rc[16]  = mapf((float)data.chan16, 0, 2048, -1, 1);
+        rc[17]  = (data.flags & SBUS_FRAME_CHAN17) ? 1.0f : -1.0f;
+        rc[18]  = (data.flags & SBUS_FRAME_CHAN18) ? 1.0f : -1.0f;
 
-        rc[17] = (raw_ch[17]) ? 1.0f : 0.0f;
-        rc[18] = (raw_ch[18]) ? 1.0f : 0.0f;
+        _failsafe  = (bool)(data.flags & SBUS_FRAME_FAILSAFE);
 
         return true;
     }
