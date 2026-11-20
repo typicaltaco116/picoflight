@@ -143,3 +143,14 @@ uint32_t configGetEntry(const char *name)
 {
     return _memTableBase[configSeek(name)].data;
 }
+
+uint32_t configSafeSetEntry(const char *name, uint32_t data)
+{
+    if (configCheckExists(name)) {
+        configModifyEntry(name, data);
+        return 0;
+    }
+    else {
+        return configAddNewEntry(name, data);
+    }
+}
