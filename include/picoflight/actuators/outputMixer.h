@@ -37,12 +37,12 @@ void outputMixerFixedWingInit(outputMixerFixedWingPinout_t *pinout);
 void outputMixerInit(outputMixerType_e type, void *pinoutStruct);
 
 // expects commands from -1 to 1
-void outputMixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetQuadOutputs(bodyRates_t cmd, float throttle, float *outputs);
 
 // expects command to be -1 to 1
-void outputMixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetFixedWingOutputs(bodyRates_t cmd, float throttle, float *outputs);
 
 // expects commands to be -1 to 1
-void outputMixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs);
+void outputMixerGetOutputs(bodyRates_t cmd, float throttle, float *outputs);
 
 void outputMixerSetArm(bool armed);

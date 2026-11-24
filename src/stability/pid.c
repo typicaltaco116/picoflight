@@ -126,17 +126,15 @@ void pid3AxisFree(pid3Axis_t *obj)
     free(obj);
 }
 
-void pid3AxisGetAngleResponse(
+bodyRates_t pid3AxisGetAngleResponse(
         pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyAngles_t setpoints, // the yaw in this vector is a rate!!!!!!
-        bool isArmed,
-        float *rollCommandNorm,
-        float *pitchCommandNorm,
-        float *yawCommandNorm)
+        bool isArmed)
 {
-    *rollCommandNorm = pidGetResponse(
+    bodyRates_t cmd;
+    cmd.roll = pidGetResponse(
             obj->rollAngleController,
             setpoints.roll,
             isArmed,
@@ -145,7 +143,7 @@ void pid3AxisGetAngleResponse(
             deltaTime
     );
 
-    *pitchCommandNorm = pidGetResponse(
+    cmd.pitch = pidGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
             isArmed,
@@ -156,7 +154,7 @@ void pid3AxisGetAngleResponse(
 
     float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
-    *yawCommandNorm = pidGetResponse(
+    cmd.yaw = pidGetResponse(
             obj->yawRateController,
             setpoints.yaw,
             isArmed,
@@ -164,21 +162,22 @@ void pid3AxisGetAngleResponse(
             yawDotDot,
             deltaTime
     );
+
+    return cmd;
 }
 
-void pid3AxisGetRateResponse(
+bodyRates_t pid3AxisGetRateResponse(
         pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyRates_t setpoints,
-        bool isArmed,
-        float *rollCommandNorm,
-        float *pitchCommandNorm,
-        float *yawCommandNorm)
+        bool isArmed)
 {
+    bodyRates_t cmd;
+
     float rollDotDot = (state.omega.roll - obj->rollDifferentiatorState) / deltaTime;
     obj->rollDifferentiatorState = rollDotDot;
-    *rollCommandNorm = pidGetResponse(
+    cmd.roll = pidGetResponse(
             obj->rollAngleController,
             setpoints.roll,
             isArmed,
@@ -189,7 +188,7 @@ void pid3AxisGetRateResponse(
 
     float pitchDotDot = (state.omega.pitch - obj->pitchDifferentiatorState) / deltaTime;
     obj->pitchDifferentiatorState = pitchDotDot;
-    *pitchCommandNorm = pidGetResponse(
+    cmd.pitch = pidGetResponse(
             obj->pitchAngleController,
             setpoints.pitch,
             isArmed,
@@ -200,7 +199,7 @@ void pid3AxisGetRateResponse(
 
     float yawDotDot = (state.omega.yaw - obj->yawDifferentiatorState) / deltaTime;
     obj->yawDifferentiatorState = yawDotDot;
-    *yawCommandNorm = pidGetResponse(
+    cmd.yaw = pidGetResponse(
             obj->yawRateController,
             setpoints.yaw,
             isArmed,
@@ -208,4 +207,6 @@ void pid3AxisGetRateResponse(
             yawDotDot,
             deltaTime
     );
+
+    return cmd;
 }

@@ -82,24 +82,18 @@ pid3Axis_t* pid3AxisConstructFromFlash(
 
 void pid3AxisFree(pid3Axis_t *obj);
 
-void pid3AxisGetAngleResponse(
+bodyRates_t pid3AxisGetAngleResponse(
         pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyAngles_t setpoints, // the yaw in this vector is a rate!!!!!!
-        bool isArmed,
-        float *rollCommandNorm,
-        float *pitchCommandNorm,
-        float *yawCommandNorm
+        bool isArmed
 );
 
-void pid3AxisGetRateResponse(
+bodyRates_t pid3AxisGetRateResponse(
         pid3Axis_t *obj,
         platformState_t state,
         float deltaTime,
         bodyRates_t setpoints,
-        bool isArmed,
-        float *rollCommandNorm,
-        float *pitchCommandNorm,
-        float *yawCommandNorm
+        bool isArmed
 );

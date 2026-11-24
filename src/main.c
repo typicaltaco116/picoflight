@@ -131,37 +131,30 @@ int main(void)
 
         float throttle = radioChannels[THROT_CHANNEL];
 
-        bodyAngles_t command;
+        bodyRates_t command;
         if (isAngle) {
             bodyAngles_t angleSetpoints = rcMixerGetAngleSetpoints(radioChannels);
-            pid3AxisGetAngleResponse(
+            command = pid3AxisGetAngleResponse(
                     controller,
                     state,
                     dt,
                     angleSetpoints,
-                    isArmed,
-                    &command.roll,
-                    &command.pitch,
-                    &command.yaw
+                    isArmed
             );
         }
         else {
             bodyRates_t rateSetpoints = rcMixerGetRateSetpoints(radioChannels);
-            pid3AxisGetRateResponse(
+            command = pid3AxisGetRateResponse(
                     controller,
                     state,
                     dt,
                     rateSetpoints,
-                    isArmed,
-                    &command.roll,
-                    &command.pitch,
-                    &command.yaw
+                    isArmed
             );
         }
 
         float outputs[4];
         outputMixerGetOutputs(command, throttle, outputs);
-
         dshotx4SendNormThrottles(outputs);
 
         deltaTime_us = smartDelay(LOOP_PERIOD_US);

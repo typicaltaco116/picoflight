@@ -39,7 +39,7 @@ void outputMixerInit(outputMixerType_e type, void *pinout)
 }
 
 // expects commands from -1 to 1
-void outputMixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetQuadOutputs(bodyRates_t cmd, float throttle, float *outputs)
 {
     float motor1, motor2, motor3, motor4;
     outputMixerQuadPinout_t *pinout = (outputMixerQuadPinout_t*)_pinoutStruct;
@@ -65,7 +65,7 @@ void outputMixerGetQuadOutputs(bodyAngles_t cmd, float throttle, float *outputs)
 }
 
 // expects command to be -1 to 1
-void outputMixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetFixedWingOutputs(bodyRates_t cmd, float throttle, float *outputs)
 {
     outputMixerFixedWingPinout_t *pinout = (outputMixerFixedWingPinout_t*)_pinoutStruct;
 
@@ -79,7 +79,7 @@ void outputMixerGetFixedWingOutputs(bodyAngles_t cmd, float throttle, float *out
 }
 
 // expects commands to be -1 to 1
-void outputMixerGetOutputs(bodyAngles_t cmd, float throttle, float *outputs)
+void outputMixerGetOutputs(bodyRates_t cmd, float throttle, float *outputs)
 {
     switch (_type) {
         default:
